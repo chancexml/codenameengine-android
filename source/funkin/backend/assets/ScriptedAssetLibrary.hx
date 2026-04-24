@@ -7,6 +7,7 @@ import lime.text.Font;
 import lime.utils.AssetLibrary;
 import lime.utils.Assets as LimeAssets;
 import lime.utils.Bytes;
+import haxe.io.Path;
 
 #if MOD_SUPPORT
 import sys.FileStat;
@@ -22,6 +23,21 @@ class ScriptedAssetLibrary extends ModsFolderLibrary {
 
 	public function new(scriptName:String, args:Array<Dynamic> = null, basePath:String="./assets/", libName:String="assets", ?modName:String) {
 		if(modName == null) modName = scriptName;
+
+		// map relative paths to Android external storage directories
+		#if android
+		if (basePath != null) {
+			var p = Path.normalize(basePath);
+			if (p == "mods" || p.startsWith("mods/")) {
+				var remainder = p.length > 4 ? p.substr(5) : "";
+				basePath = Path.normalize(Path.join(["/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/", remainder]));
+			} else if (p == "assets" || p.startsWith("assets/")) {
+				var remainder = p.length > 6 ? p.substr(7) : "";
+				basePath = Path.normalize(Path.join(["/storage/emulated/0/Android/data/com.yoshman29.codenameengine/files/", remainder]));
+			}
+		}
+		#end
+
 		super(basePath, libName, modName);
 		this.scriptName = scriptName;
 		script = Script.create(Paths.script("data/library/" + scriptName));
