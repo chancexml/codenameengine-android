@@ -9,13 +9,13 @@ import funkin.backend.scripting.events.NameEvent;
 import funkin.menus.credits.CreditsMain;
 import funkin.options.OptionsMenu;
 import lime.app.Application;
-import mobile.controls.MobileControls;
-import mobile.controls.MobileControls.UP_DOWN;
-import mobile.controls.MobileControls.LEFT_RIGHT;
-import mobile.controls.MobileControls.FULL;
-import mobile.controls.MobileControls.NONE;
-import mobile.controls.MobileControls.A_B;
-import mobile.controls.MobileControls.A_B_X_Y;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 using StringTools;
 
@@ -35,13 +35,10 @@ class MainMenuState extends MusicBeatState
 	var devModeWarning:FunkinText;
 
 	public var canAccessDebugMenus:Bool = !Flags.DISABLE_EDITORS;
-	
-	function addMobile(dpad:Int, actions:Int)
-{
-    var buttonCam = new FlxCamera(0, 0, 1280, 720);
-    FlxG.cameras.add(buttonCam);
-    add(new MobileControls(dpad, actions, buttonCam));
-}
+
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 	
 	override function create()
 	{
@@ -63,7 +60,6 @@ class MainMenuState extends MusicBeatState
 		magenta.color = 0xFFfd719b;
 		add(magenta);
 
-        addMobile(UP_DOWN, A_B_X_Y);
 
 		for(bg in [bg, magenta]) {
 			bg.scrollFactor.set(0, 0.18);
@@ -109,6 +105,17 @@ class MainMenuState extends MusicBeatState
 		add(devModeWarning);
 		devModeWarning.scrollFactor.set();
 		devModeWarning.alpha = 0;
+
+		#if mobile
+        virtualPad = ButtonHelper.create(this, FULL, A_B_X_Y);
+
+        ButtonHelper.bind(virtualPad,
+        ['UP', 'DOWN', 'LEFT', 'RIGHT'],
+        ['ACCEPT', 'BACK', 'SWITCHMOD', 'DEV_ACCESS']
+        );
+
+        Controls.virtualPad = virtualPad;
+        #end
 	}
 
 	var selectedSomethin:Bool = false;
