@@ -78,6 +78,14 @@ class Main extends Sprite
 		addChild(framerateSprite = new Framerate());
 		SystemInfo.init();
 
+		var base = Context.getExternalFilesDir() + "/";
+        var firstRun = !sys.FileSystem.exists(base + "assets/");
+
+		if (firstRun)
+        {
+	        mobile.utils.Data.init();
+		}
+
 		if (!Permissions.hasManageAllFilesPermission()) 
 		{
 			trace("Requesting Manage All Files permission...");
@@ -106,11 +114,6 @@ class Main extends Sprite
 	}
 
 	public static function loadGameSettings() {
-
-		#if android
-        mobile.StorageUtil.requestPermissions();
-        #end
-	
 		WindowUtils.init();
 		SaveWarning.init();
 		MemoryUtil.init();
