@@ -25,11 +25,11 @@ class Paths
 	}
 
 	public static inline function getPath(file:String, ?library:String) {
-		var returnedPath:String = library != null ? '$library:assets/$file' : 'assets/$file';
+		var returnedPath:String = library != null ? '$library:Android/data/com.yoshman29.codenameengine/files/$file' : 'Android/data/com.yoshman29.codenameengine/files/$file';
 		#if (sys && !windows)
 		returnedPath = Path.normalize(returnedPath);
 		if (OpenFlAssets.exists(returnedPath)) return returnedPath;
-		var fixedPath:String = library != null ? '$library:assets/$library/' : 'assets/';
+		var fixedPath:String = library != null ? '$library:Android/data/com.yoshman29.codenameengine/files/$library/' : 'Android/data/com.yoshman29.codenameengine/files/';
 		var parts:Array<String> = returnedPath.split("/");
 		for (it=>part in parts) {
 			if (it == 0) continue;
@@ -140,10 +140,6 @@ class Paths
 		return getPath('data/characters/$character.xml', null);
 	}
 
-	/**
-	 * Gets the name of a registered font.
-	 * @param font The font's path (if it's already passed as a font name, the same name will be returned)
-	 */
 	inline static public function getFontName(font:String) {
 		return OpenFlAssets.exists(font, FONT) ? OpenFlAssets.getFont(font).fontName : font;
 	}
@@ -194,13 +190,8 @@ class Paths
 		return FlxAtlasFrames.fromAseprite('$key.${ext != null ? ext : Flags.IMAGE_EXT}', '$key.json');
 
 	inline static public function getAssetsRoot():String
-		return  ModsFolder.currentModFolder != null ? '${ModsFolder.modsPath}${ModsFolder.currentModFolder}' : #if (sys && TEST_BUILD) './${Main.pathBack}assets/' #else './assets' #end;
+		return  ModsFolder.currentModFolder != null ? 'Android/media/com.yoshman29.codenameengine/files/${ModsFolder.currentModFolder}' : #if (sys && TEST_BUILD) './${Main.pathBack}Android/data/com.yoshman29.codenameengine/files/' #else 'Android/data/com.yoshman29.codenameengine/files/' #end;
 
-	/**
-	 * Gets frames at specified path.
-	 * @param key Path to the frames
-	 * @param library (Additional) library to load the frames from.
-	 */
 	public static function getFrames(key:String, assetsPath:Bool = false, ?library:String, ?ext:String = null, ?animateSettings:FlxAnimateSettings) {
 		if (tempFramesCache.exists(key)) {
 			var frames = tempFramesCache[key];
@@ -212,14 +203,6 @@ class Paths
 		return tempFramesCache[key] = loadFrames(assetsPath ? key : Paths.image(key, library, true, ext), false, null, false, ext, animateSettings);
 	}
 
-	/**
-	 * Checks if the images needed for using getFrames() exist.
-	 * @param key Path to the image
-	 * @param checkAtlas Whenever to check for the Animation.json file (used in FlxAnimate)
-	 * @param assetsPath Whenever to use the raw path or to pass it through Paths.image()
-	 * @param library (Additional) library to load the frames from.
-	 * @return True if the images exist, false otherwise.
-	**/
 	public static function framesExists(key:String, checkAtlas:Bool = false, checkMulti:Bool = true, assetsPath:Bool = false, ?library:String) {
 		var path = assetsPath ? key : Paths.image(key, library, true);
 		var noExt = Path.withoutExtension(path);
@@ -236,16 +219,6 @@ class Paths
 		return false;
 	}
 
-	/**
-	 * Loads frames from a specific image path. Supports Sparrow Atlases, Packer Atlases, and multiple spritesheets.
-	 * @param path Path to the image
-	 * @param Unique Whenever the image should be unique in the cache
-	 * @param Key Key to the image in the cache
-	 * @param SkipAtlasCheck Whenever the atlas check should be skipped.
-	 * @param SkipMultiCheck Whenever the multi spritesheet check should be skipped.
-	 * @param Ext Extension of the image.
-	 * @return FlxFramesCollection Frames
-	 */
 	static function loadFrames(path:String, Unique:Bool = false, Key:String = null, SkipAtlasCheck:Bool = false, SkipMultiCheck:Bool = false, ?Ext:String = null, ?animateSettings:FlxAnimateSettings):FlxFramesCollection {
 		var noExt = Path.withoutExtension(path);
 		var ext = Ext != null ? Ext : Flags.IMAGE_EXT;
@@ -285,7 +258,7 @@ class Paths
 
 	public static function getFolderDirectories(key:String, addPath:Bool = false, source:AssetSource = BOTH):Array<String> {
 		if (!key.endsWith("/")) key += "/";
-		var content = assetsTree.getFolders('assets/$key', source);
+		var content = assetsTree.getFolders('Android/data/com.yoshman29.codenameengine/files/$key', source);
 		if (addPath) {
 			for(k=>e in content)
 				content[k] = '$key$e';
@@ -295,7 +268,7 @@ class Paths
 	static public function getFolderContent(key:String, addPath:Bool = false, source:AssetSource = BOTH, noExtension:Bool = false):Array<String> {
 		// designed to work both on windows and web
 		if (!key.endsWith("/")) key += "/";
-		var content = assetsTree.getFiles('assets/$key', source);
+		var content = assetsTree.getFiles('Android/data/com.yoshman29.codenameengine/files/$key', source);
 		for (k => e in content) {
 			if (noExtension) e = Path.withoutExtension(e);
 			content[k] = addPath ? '$key$e' : e;
@@ -303,7 +276,6 @@ class Paths
 		return content;
 	}
 
-	// Used in Script.hx
 	@:noCompletion public static function getFilenameFromLibFile(path:String) {
 		var file = new haxe.io.Path(path);
 		if(file.file.startsWith("LIB_")) {
