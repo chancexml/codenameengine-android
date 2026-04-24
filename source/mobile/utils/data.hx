@@ -1,72 +1,100 @@
+package mobile.utils;
+
+#if android
+import extension.androidtools.content.Context;
+#end
+
+import openfl.Assets;
+import haxe.io.Bytes;
+
+#if sys
 import sys.FileSystem;
 import sys.io.File;
-import sys.io.FileOutput;
+#end
 
-class CopyAssets
+import lime.system.System;
+import haxe.io.Path;
+
+using StringTools;
+
+class Files
 {
-    static var DEST = "/storage/emulated/0/Android/data/com.yoshman29.codenameengine/files/";
+	public static function getBase():String
+	{
+		#if android
+		return Context.getExternalFilesDir() + "/";
+		#elseif ios
+		return System.applicationStorageDirectory;
+		#else
+		return Sys.getCwd();
+		#end
+	}
 
-    static function main()
-    {
-        ensureDirectory(DEST);
+	public static function init():Void
+	{
+		var base = getBase();
+		base = Path.addTrailingSlash(base);
 
-        var folders = ["assets", "mods"];
+		trace("Base path: " + base);
 
-        for (folder in folders)
-        {
-            var srcPath = folder;
-            var destPath = DEST + folder;
-            copyFolder(srcPath, destPath);
-        }
+		copyFolderOnce("assets", base + "assets/");
+		copyFolderOnce("mods", base + "mods/");
+	}
 
-        trace("Folders copied successfully!");
-    }
+	static function copyFolderOnce(folder:String, target:String):Void
+	{
+		#if sys
+		if (FileSystem.exists(target))
+		{
+			trace(folder + " already exists, skipping.");
+			return;
+		}
+		#end
 
-    static function ensureDirectory(path:String)
-    {
-        var parts = path.split("/");
-        var current = "";
+		trace("Copying " + folder + "...");
+		copyAssets(folder, target);
+	}
 
-        for (part in parts)
-        {
-            if (part == "") continue;
+	static function copyAssets(source:String, target:String):Void
+	{
+		var list = Assets.list();
 
-            current += "/" + part;
+		for (asset in list)
+		{
+			if (!asset.startsWith(source)) continue;
 
-            if (!FileSystem.exists(current))
-                FileSystem.createDirectory(current);
-        }
-    }
+			var relative = asset.substr(source.length);
+			if (relative.startsWith("/")) relative = relative.substr(1);
 
-    static function copyFolder(src:String, dest:String)
-    {
-        if (!FileSystem.exists(src)) return;
+			var outPath = Path.addTrailingSlash(target) + relative;
 
-        ensureDirectory(dest);
+			createDirRecursive(Path.directory(outPath));
 
-        for (file in FileSystem.readDirectory(src))
-        {
-            var srcFile = src + "/" + file;
-            var destFile = dest + "/" + file;
+			try {
+				var bytes:Bytes = Assets.getBytes(asset);
 
-            if (FileSystem.isDirectory(srcFile))
-            {
-                copyFolder(srcFile, destFile);
-            }
-            else
-            {
-                copyFile(srcFile, destFile);
-            }
-        }
-    }
+				if (bytes != null)
+					File.saveBytes(outPath, bytes);
+				else
+					File.saveContent(outPath, Assets.getText(asset));
 
-    static function copyFile(src:String, dest:String)
-    {
-        ensureDirectory(dest.substr(0, dest.lastIndexOf("/")));
+			} catch (e:Dynamic) {
+				trace("Failed: " + asset + " -> " + e);
+			}
+		}
 
-        var content = File.getBytes(src);
-        var out = File.write(dest, true);
-        out.write(content);
-        out.close();
-    }
+		trace("Finished copying " + source);
+	}
+
+	static function createDirRecursive(path:String):Void
+	{
+		#if sys
+		if (path == null || path == "") return;
+
+		path = Path.normalize(path);
+
+		if (!FileSystem.exists(path))
+			FileSystem.createDirectory(path);
+		#end
+	}
 }
