@@ -4,9 +4,9 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxCamera;
 import flixel.group.FlxGroup;
-import states.PlayState;
-import backend.Paths;
-import backend.ClientPrefs;
+import funkin.game.PlayState;
+// import backend.Paths;
+import funkin.options.keybinds.KeybindsOptions;
 
 class Pause extends FlxGroup
 {
@@ -91,7 +91,7 @@ class Pause extends FlxGroup
         {
             pauseButton.animation.play('confirm');
             
-            game.openPauseMenu(); 
+            game.pauseGame();
         }
     }
 }
