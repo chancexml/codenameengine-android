@@ -121,12 +121,12 @@ class AssetsLibraryList extends AssetLibrary {
 
 				@:privateAccess
 				if (l.exists(id, type)) {
-             	var asset = l.getAsset(id, type);
-            	if (asset != null) {
-		        return asset;
-	            }
-			   }
-		      }
+					var asset = l.getAsset(id, type);
+					if (asset != null) {
+						return asset;
+					}
+				}
+			}
 			return null;
 		} catch(e) {
 			// TODO: trace the error
@@ -166,14 +166,31 @@ class AssetsLibraryList extends AssetLibrary {
 		Logs.infos("Used cne test / cne build. Switching into source assets.");
 
 		#if MOD_SUPPORT
+		#if android
+		ModsFolder.modsPath = '/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/';
+		ModsFolder.addonsPath = '/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/addons/';
+		#else
 		ModsFolder.modsPath = './${Main.pathBack}mods/';
 		ModsFolder.addonsPath = './${Main.pathBack}addons/';
 		#end
+		#end
 
+		#if android
+		__defaultLibraries.push(ModsFolder.loadLibraryFromFolder('assets', '/storage/emulated/0/Android/data/com.yoshman29.codenameengine/files/', true, SOURCE));
+		#else
 		__defaultLibraries.push(ModsFolder.loadLibraryFromFolder('assets', './${Main.pathBack}assets/', true, SOURCE));
+		#end
+		
 		#elseif USE_ADAPTED_ASSETS
+		
+		#if android
+		__defaultLibraries.push(ModsFolder.loadLibraryFromFolder('assets', '/storage/emulated/0/Android/data/com.yoshman29.codenameengine/files/', true, SOURCE));
+		#else
 		__defaultLibraries.push(ModsFolder.loadLibraryFromFolder('assets', './assets/', true, SOURCE));
 		#end
+		
+		#end
+		
 		for (d in __defaultLibraries) addLibrary(d);
 	}
 
