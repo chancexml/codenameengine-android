@@ -5,6 +5,7 @@ import hscript.Expr.Error;
 import hscript.Parser;
 import openfl.Assets;
 import funkin.backend.system.Controls;
+
 #if mobile
 import mobile.utils.ButtonHelper;
 import mobile.controls.VirtualPad;
@@ -42,16 +43,16 @@ class HScript extends Script {
 		interp.staticVariables = Script.staticVariables;
 		interp.allowStaticVariables = interp.allowPublicVariables = true;
 
-		// Default variables
 		interp.variables.set("trace", Reflect.makeVarArgs((args) -> {
 			var v:String = Std.string(args.shift());
 			for (a in args) v += ", " + Std.string(a);
 			this.trace(v);
 		}));
 		
-		interp.variables.set("ButtonHelper", ButtonHelper);
 		interp.variables.set("Controls", Controls);
+
 		#if mobile
+		interp.variables.set("ButtonHelper", ButtonHelper);
 		interp.variables.set("VirtualPad", VirtualPad);
 		#end
 
