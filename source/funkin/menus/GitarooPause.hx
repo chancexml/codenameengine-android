@@ -1,6 +1,13 @@
 package funkin.menus;
 
 import funkin.editors.charter.Charter;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 class GitarooPause extends MusicBeatState
 {
@@ -8,6 +15,10 @@ class GitarooPause extends MusicBeatState
 	var cancelButton:FlxSprite;
 
 	var replaySelect:Bool = false;
+
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 
 	public function new():Void
 	{
@@ -46,6 +57,17 @@ class GitarooPause extends MusicBeatState
 		changeThing();
 
 		super.create();
+
+		#if mobile
+        virtualPad = ButtonHelper.create(this, FULL, A_B);
+
+        ButtonHelper.bind(virtualPad,
+        [null, null, 'LEFT', 'RIGHT'],
+        ['ACCEPT', 'BACK']
+        );
+
+        Controls.virtualPad = virtualPad;
+        #end
 	}
 
 	override function update(elapsed:Float)
