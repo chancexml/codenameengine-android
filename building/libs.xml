@@ -9,7 +9,7 @@
 		<!-- <git name="lime" url="https://github.com/CodenameCrew/cne-lime" />  disabled for now until fixed -->
 
 		<!-- Flixel -->
-		<git name="flixel" url="https://github.com/ChanceXML/cne-flixel" />
+		<git name="flixel" url="https://github.com/ChanceXML/cne-flixel-old" />
 		<git name="flixel-addons" url="https://github.com/CodenameCrew/cne-flixel-addons" ref="old" />
 
 		<!-- Other Libraries -->
