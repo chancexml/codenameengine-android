@@ -21,11 +21,27 @@ class ModsFolderLibrary extends AssetLibrary implements IModsAssetLibrary {
 	public var prefix = 'assets/';
 
 	public function new(basePath:String, libName:String, ?modName:String) {
-		this.basePath = basePath;
+		this.basePath = resolveAndroidPath(basePath);
 		this.libName = libName;
 		this.prefix = 'assets/';
 		this.modName = modName == null ? libName : modName;
 		super();
+	}
+
+	private function resolveAndroidPath(path:String):String {
+		#if android
+		if (path == null) return null;
+		var p = Path.normalize(path);
+		
+		if (p == "mods" || p.startsWith("mods/")) {
+			var remainder = p.length > 4 ? p.substr(5) : "";
+			return Path.normalize(Path.join(["/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/", remainder]));
+		} else if (p == "assets" || p.startsWith("assets/")) {
+			var remainder = p.length > 6 ? p.substr(7) : "";
+			return Path.normalize(Path.join(["/storage/emulated/0/Android/data/com.yoshman29.codenameengine/files/", remainder]));
+		}
+		#end
+		return path;
 	}
 
 	function toString():String {
@@ -151,5 +167,5 @@ class ModsFolderLibrary extends AssetLibrary implements IModsAssetLibrary {
 
 	@:noCompletion public var folderPath(get, set):String;
 	@:noCompletion private inline function get_folderPath():String { return basePath; }
-	@:noCompletion private inline function set_folderPath(value:String):String { return basePath = value; }
+	@:noCompletion private inline function set_folderPath(value:String):String { return basePath = resolveAndroidPath(value); }
 }
