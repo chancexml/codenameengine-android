@@ -3,12 +3,22 @@ package funkin.menus;
 import flixel.util.FlxColor;
 import flixel.text.FlxText;
 import funkin.backend.FunkinText;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 class WarningState extends MusicBeatState {
 	var titleAlphabet:Alphabet;
 	var disclaimer:FunkinText;
 
 	var transitioning:Bool = false;
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 
 	public override function create() {
 
@@ -35,6 +45,17 @@ class WarningState extends MusicBeatState {
 		titleAlphabet.y += off;
 
 		DiscordUtil.call("onMenuLoaded", ["Beta Warning"]);
+
+		#if mobile
+        virtualPad = ButtonHelper.create(this, FULL, A_B);
+
+        ButtonHelper.bind(virtualPad,
+        ['UP', 'DOWN', 'LEFT', 'RIGHT'],
+        ['ACCEPT', 'BACK']
+        );
+
+        Controls.virtualPad = virtualPad;
+        #end
 	}
 
 	public override function update(elapsed:Float) {
