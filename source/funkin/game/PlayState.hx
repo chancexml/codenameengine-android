@@ -41,6 +41,7 @@ import haxe.io.Path;
 import mobile.controls.HitBox;
 import mobile.controls.Pause;
 import openfl.events.KeyboardEvent;
+#end
 
 using StringTools;
 
