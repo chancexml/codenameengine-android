@@ -15,13 +15,13 @@ import funkin.editors.charter.Charter;
 import funkin.menus.StoryMenuState;
 import funkin.options.OptionsMenu;
 import funkin.options.keybinds.KeybindsOptions;
-import mobile.controls.MobileControls;
-import mobile.controls.MobileControls.UP_DOWN;
-import mobile.controls.MobileControls.LEFT_RIGHT;
-import mobile.controls.MobileControls.FULL;
-import mobile.controls.MobileControls.NONE;
-import mobile.controls.MobileControls.A_B;
-import mobile.controls.MobileControls.A_B_X_Y;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 class PauseSubState extends MusicBeatSubstate
 {
@@ -47,12 +47,9 @@ class PauseSubState extends MusicBeatSubstate
 
 	private var __cancelDefault:Bool = false;
 
-	function addMobile(dpad:Int, actions:Int)
-{
-    var buttonCam = new FlxCamera(0, 0, 1280, 720);
-    FlxG.cameras.add(buttonCam);
-    add(new MobileControls(dpad, actions, buttonCam));
-}
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 	
 	public function new(?items:Array<String>, ?selectCall:NameEvent->Void) {
 		super();
@@ -95,8 +92,6 @@ class PauseSubState extends MusicBeatSubstate
 		bg.scrollFactor.set();
 		add(bg);
 
-        addMobile(UP_DOWN, A_B);
-
 		var multiplayerInfo:String = PlayState.opponentMode ? 'pause.opponentMode' :
 									 PlayState.coopMode ? 'pause.coopMode' :
 									 null;
@@ -137,6 +132,17 @@ class PauseSubState extends MusicBeatSubstate
 		camera = new FlxCamera();
 		camera.bgColor = 0;
 		FlxG.cameras.add(camera, false);
+
+		#if mobile
+        virtualPad = ButtonHelper.create(this, UP_DOWN, A_B);
+
+        ButtonHelper.bind(virtualPad,
+        ['UP', 'DOWN'],
+        ['ACCEPT', 'BACK']
+        );
+
+        Controls.virtualPad = virtualPad;
+        #end
 	}
 
 	override function createPost() {
