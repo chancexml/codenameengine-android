@@ -6,13 +6,13 @@ import flixel.util.FlxColor;
 import funkin.backend.assets.ModsFolder;
 import haxe.io.Path;
 import sys.FileSystem;
-import mobile.controls.MobileControls;
-import mobile.controls.MobileControls.UP_DOWN;
-import mobile.controls.MobileControls.LEFT_RIGHT;
-import mobile.controls.MobileControls.FULL;
-import mobile.controls.MobileControls.NONE;
-import mobile.controls.MobileControls.A_B;
-import mobile.controls.MobileControls.A_B_X_Y;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 class ModSwitchMenu extends MusicBeatSubstate {
 	var mods:Array<String> = [];
@@ -21,12 +21,9 @@ class ModSwitchMenu extends MusicBeatSubstate {
 
 	var subCam:FlxCamera;
 
-	function addMobile(dpad:Int, actions:Int)
-{
-    var buttonCam = new FlxCamera(0, 0, 1280, 720);
-    FlxG.cameras.add(buttonCam);
-    add(new MobileControls(dpad, actions, buttonCam));
-}
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 	
 	public override function create() {
 		super.create();
@@ -46,7 +43,6 @@ class ModSwitchMenu extends MusicBeatSubstate {
 		mods = ModsFolder.getModsList();
 		mods.push(null);
 
-        addMobile(UP_DOWN, A_B);
 
 		alphabets = new FlxTypedGroup<Alphabet>();
 		for(mod in mods) {
@@ -59,6 +55,17 @@ class ModSwitchMenu extends MusicBeatSubstate {
 		}
 		add(alphabets);
 		changeSelection(0, true);
+
+		#if mobile
+        virtualPad = ButtonHelper.create(this, FULL, A_B);
+
+        ButtonHelper.bind(virtualPad,
+        ['UP', 'DOWN', 'LEFT', 'RIGHT'],
+        ['ACCEPT', 'BACK']
+        );
+
+        Controls.virtualPad = virtualPad;
+        #end
 	}
 
 	public override function update(elapsed:Float) {
