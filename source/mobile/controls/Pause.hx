@@ -5,8 +5,9 @@ import flixel.FlxSprite;
 import flixel.FlxCamera;
 import flixel.group.FlxGroup;
 import funkin.game.PlayState;
-// import backend.Paths;
-import funkin.options.keybinds.KeybindsOptions;
+// import funkin.backend.aseets.Paths;
+import funkin.options.Options;
+import funkin.menus.PauseSubState;
 
 class Pause extends FlxGroup
 {
@@ -37,7 +38,7 @@ class Pause extends FlxGroup
         pauseButton.animation.play('idle');
         pauseButton.setPosition((FlxG.width - pauseButton.width) - 35, 35);
         
-        pauseButton.antialiasing = ClientPrefs.data.antialiasing; 
+        pauseButton.antialiasing = Options.antialiasing; 
         
         pauseButton.scrollFactor.set();
         pauseButton.cameras = [PauseCam];
@@ -87,11 +88,12 @@ class Pause extends FlxGroup
 
         var game = PlayState.instance;
 
-        if (touchedPause && !game.paused && game.canPause && !game.endingSong)
+        if (touchedPause && !game.paused && game.health > 0)
         {
             pauseButton.animation.play('confirm');
             
-            game.pauseGame();
+            game.paused = true;
+            game.openSubState(new PauseSubState());
         }
     }
 }
