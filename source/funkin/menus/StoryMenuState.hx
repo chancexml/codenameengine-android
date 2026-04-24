@@ -14,13 +14,13 @@ import funkin.backend.week.*;
 import funkin.savedata.FunkinSave;
 import haxe.io.Path;
 import haxe.xml.Access;
-import mobile.controls.MobileControls;
-import mobile.controls.MobileControls.UP_DOWN;
-import mobile.controls.MobileControls.LEFT_RIGHT;
-import mobile.controls.MobileControls.FULL;
-import mobile.controls.MobileControls.NONE;
-import mobile.controls.MobileControls.A_B;
-import mobile.controls.MobileControls.A_B_X_Y;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 class StoryMenuState extends MusicBeatState {
 	public var characters:Map<String, WeekData.WeekCharacter> = [];
@@ -56,12 +56,9 @@ class StoryMenuState extends MusicBeatState {
 
 	//public var charFrames:Map<String, FlxFramesCollection> = [];
 	
-	function addMobile(dpad:Int, actions:Int)
-{
-    var buttonCam = new FlxCamera(0, 0, 1280, 720);
-    FlxG.cameras.add(buttonCam);
-    add(new MobileControls(dpad, actions, buttonCam));
-}
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 
 	public override function create() {
 		super.create();
@@ -85,8 +82,6 @@ class StoryMenuState extends MusicBeatState {
 		weekBG.updateHitbox();
 
 		weekSprites = new FlxTypedGroup<MenuItem>();
-		
-        addMobile(FULL, A_B_X_Y);
 
 		// DUMBASS ARROWS
 		var assets = Paths.getFrames('menus/storymenu/assets');
@@ -149,6 +144,17 @@ class StoryMenuState extends MusicBeatState {
 
 		DiscordUtil.call("onMenuLoaded", ["Story Menu"]);
 		CoolUtil.playMenuSong();
+
+		#if mobile
+        virtualPad = ButtonHelper.create(this, FULL, A_B);
+
+        ButtonHelper.bind(virtualPad,
+        ['UP', 'DOWN', 'LEFT', 'RIGHT'],
+        ['ACCEPT', 'BACK']
+        );
+
+        Controls.virtualPad = virtualPad;
+        #end
 	}
 
 	var __lastDifficultyTween:FlxTween;
