@@ -37,7 +37,9 @@ import funkin.backend.week.WeekData;
 import funkin.savedata.FunkinSave;
 import funkin.options.Options;
 import haxe.io.Path;
+#if mobile
 import mobile.controls.HitBox;
+import mobile.controls.Pause;
 import openfl.events.KeyboardEvent;
 
 using StringTools;
@@ -676,6 +678,10 @@ class PlayState extends MusicBeatState
 	@:dox(hide) override public function create()
 	{
 		Note.__customNoteTypeExists = [];
+        #if mobile
+		var androidPause = new android.controls.Pause();
+        add(androidPause);
+        androidPause.setPauseButton('true');
 
 		hitbox = new HitBox();
         add(hitbox);
@@ -695,7 +701,7 @@ class PlayState extends MusicBeatState
         hitbox.buttonDown.onOut.callback = hitbox.buttonDown.onUp.callback;
         hitbox.buttonUp.onOut.callback = hitbox.buttonUp.onUp.callback;
         hitbox.buttonRight.onOut.callback = hitbox.buttonRight.onUp.callback;
-		
+		#end
 		// SCRIPTING & DATA INITIALIZATION
 		#if REGION
 		instance = this;
