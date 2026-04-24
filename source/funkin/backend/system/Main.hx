@@ -29,7 +29,7 @@ import extension.androidtools.os.Build;
 import extension.androidtools.Permissions;
 import extension.androidtools.os.Environment;
 import extension.androidtools.Settings;
-import mobile.utils.data;
+import mobile.utils.Data;
 #end
 
 class Main extends Sprite
