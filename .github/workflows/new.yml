@@ -1,0 +1,84 @@
+name: Mobile Build
+run-name: ${{ github.event.inputs.build_name }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_name:
+        description: Build Name
+        required: true
+        default: Mobile Build
+      clean:
+        description: Use Lime Clean?
+        type: boolean
+        required: true
+        default: true
+      android_flags:
+        description: Android Flags
+        required: true
+        default: -clean
+
+jobs:
+  buildAndroid:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.6
+
+      - name: Setup environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang openjdk-17-jdk wget unzip
+
+          haxelib setup ~/haxelib
+
+          haxe -cp commandline -D analyzer-optimize --run Main setup -s
+          
+          printf "%s\n%s\n%s\n" \
+            "$ANDROID_HOME" \
+            "$ANDROID_NDK_ROOT" \
+            "$JAVA_HOME" \
+            | haxelib run lime setup android  
+          
+          haxelib list
+
+      - name: Install Android SDK + NDK
+        run: |
+          mkdir -p ~/android-sdk
+          cd ~/android-sdk
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip commandlinetools-linux-*.zip
+
+          mkdir cmdline-tools/latest
+          mv cmdline-tools/* cmdline-tools/latest/ || true
+
+          yes | ~/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+          ~/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+            "platform-tools" \
+            "platforms;android-33" \
+            "build-tools;33.0.2" \
+            "ndk;25.2.9519653"
+
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$HOME/android-sdk/ndk/25.2.9519653" >> $GITHUB_ENV
+
+      - name: Clean Android
+        if: ${{ github.event.inputs.clean == 'true' }}
+        run: haxelib run lime clean android
+
+      - name: Build APK
+        run: |
+         haxelib run lime build android ${{ github.event.inputs.android_flags }}
+
+      - name: Find APK
+        run: find . -name "*.apk"
+        
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Android-Build
+          path: export/release/android/bin/app/build/outputs/apk/debug/*.apk
