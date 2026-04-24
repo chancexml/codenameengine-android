@@ -9,7 +9,7 @@ import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.input.keyboard.FlxKey;
 
 #if mobile
-import android.controls.VirtualPad;
+import mobile.controls.VirtualPad;
 import flixel.FlxG;
 #end
 
