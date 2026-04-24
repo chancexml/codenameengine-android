@@ -5,13 +5,13 @@ import flixel.util.typeLimit.OneOfThree;
 import funkin.editors.ui.UIState;
 import funkin.options.categories.*;
 import funkin.options.type.*;
-import mobile.controls.MobileControls;
-import mobile.controls.MobileControls.UP_DOWN;
-import mobile.controls.MobileControls.LEFT_RIGHT;
-import mobile.controls.MobileControls.FULL;
-import mobile.controls.MobileControls.NONE;
-import mobile.controls.MobileControls.A_B;
-import mobile.controls.MobileControls.A_B_X_Y;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 typedef OptionCategory = {
 	var name:String;
@@ -61,12 +61,9 @@ class OptionsMenu extends TreeMenu {
 	var bg:FlxSprite;
 	var debugOption:TextOption;
 
-	function addMobile(dpad:Int, actions:Int)
-{
-    var buttonCam = new FlxCamera(0, 0, 1280, 720);
-    FlxG.cameras.add(buttonCam);
-    add(new MobileControls(dpad, actions, buttonCam));
-}
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 
 	override function create() {
 		super.create();
@@ -80,7 +77,16 @@ class OptionsMenu extends TreeMenu {
 		bg.scrollFactor.set();
 		updateBG();
 
-        addMobile(FULL, A_B);
+		#if mobile
+        virtualPad = ButtonHelper.create(this, FULL, A_B);
+
+        ButtonHelper.bind(virtualPad,
+        ['UP', 'DOWN', 'LEFT', 'RIGHT'],
+        ['ACCEPT', 'BACK']
+        );
+
+        Controls.virtualPad = virtualPad;
+        #end
 
 		for (i in mainOptions) if (i.name == "optionsTree.language-name" && Flags.DISABLE_LANGUAGES) mainOptions.remove(i);
 
