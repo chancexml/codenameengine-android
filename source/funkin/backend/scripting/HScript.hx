@@ -4,13 +4,17 @@ import hscript.*;
 import hscript.Expr.Error;
 import hscript.Parser;
 import openfl.Assets;
+import funkin.backend.system.Controls;
+#if mobile
+import mobile.utils.ButtonHelper;
+import mobile.controls.VirtualPad;
+#end
 
 class HScript extends Script {
 	public var interp:Interp;
 	public var parser:Parser;
 	public var expr:Expr;
 	public var code:String = null;
-	//public var folderlessPath:String;
 	var __importedPaths:Array<String>;
 
 	public static function initParser() {
@@ -30,7 +34,6 @@ class HScript extends Script {
 		} catch(e) Logs.error('Error while reading $path: ${Std.string(e)}');
 
 		parser = initParser();
-		//folderlessPath = Path.directory(path);
 		__importedPaths = [path];
 
 		interp.errorHandler = _errorHandler;
@@ -39,11 +42,18 @@ class HScript extends Script {
 		interp.staticVariables = Script.staticVariables;
 		interp.allowStaticVariables = interp.allowPublicVariables = true;
 
+		// Default variables
 		interp.variables.set("trace", Reflect.makeVarArgs((args) -> {
 			var v:String = Std.string(args.shift());
 			for (a in args) v += ", " + Std.string(a);
 			this.trace(v);
 		}));
+		
+		interp.variables.set("ButtonHelper", ButtonHelper);
+		interp.variables.set("Controls", Controls);
+		#if mobile
+		interp.variables.set("VirtualPad", VirtualPad);
+		#end
 
 		#if GLOBAL_SCRIPT
 		funkin.backend.scripting.GlobalScript.call("onScriptCreated", [this, "hscript"]);
@@ -70,18 +80,19 @@ class HScript extends Script {
 		}
 		return false;
 	}
+
 	private function _importFailedCallback(cl:Array<String>, prefix:String):Bool {
 		var assetsPath = 'assets/$prefix${cl.join("/")}';
 		for(hxExt in ["hx", "hscript", "hsc", "hxs"]) {
 			var p = '$assetsPath.$hxExt';
 			if (__importedPaths.contains(p))
-				return true; // no need to reimport again
+				return true; 
 			if (Assets.exists(p)) {
 				var code = Assets.getText(p);
 				var expr:Expr = null;
 				try {
 					if (code != null && code.trim() != "") {
-						parser.line = 1; // fun fact: this is all you need to reuse a parser without issues. all the other vars get reset on parse.
+						parser.line = 1; 
 						expr = parser.parseString(code, cl.join("/") + "." + hxExt);
 					}
 				} catch(e:Error) {
@@ -113,8 +124,8 @@ class HScript extends Script {
 		}
 
 		Logs.traceColored([
-			Logs.logText(fn, GREEN),
-			Logs.logText(err, RED)
+			Logs.logText(fn, 0xFF00FF00), // GREEN
+			Logs.logText(err, 0xFFFF0000) // RED
 		], ERROR);
 	}
 
@@ -131,8 +142,8 @@ class HScript extends Script {
 		}
 
 		Logs.traceColored([
-			Logs.logText(fn, GREEN),
-			Logs.logText(err, YELLOW)
+			Logs.logText(fn, 0xFF00FF00), // GREEN
+			Logs.logText(err, 0xFFFFFF00) // YELLOW
 		], WARNING);
 	}
 
@@ -154,8 +165,6 @@ class HScript extends Script {
 	}
 
 	public override function reload() {
-		// save variables
-
 		interp.allowStaticVariables = interp.allowPublicVariables = false;
 		var savedVariables:Map<String, Dynamic> = [];
 		for(k=>e in interp.variables) {
@@ -200,7 +209,7 @@ class HScript extends Script {
 	public override function trace(v:Dynamic) {
 		var posInfo = interp.posInfos();
 		Logs.traceColored([
-			Logs.logText('${fileName}:${posInfo.lineNumber}: ', GREEN),
+			Logs.logText('${fileName}:${posInfo.lineNumber}: ', 0xFF00FF00), // GREEN
 			Logs.logText(Std.isOfType(v, String) ? v : Std.string(v))
 		], TRACE);
 	}
