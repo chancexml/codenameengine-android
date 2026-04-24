@@ -29,7 +29,7 @@ import extension.androidtools.os.Build;
 import extension.androidtools.Permissions;
 import extension.androidtools.os.Environment;
 import extension.androidtools.Settings;
-import mobile.MobilePermissions;
+import mobile.utils.data;
 #end
 
 class Main extends Sprite
@@ -77,6 +77,12 @@ class Main extends Sprite
 
 		addChild(framerateSprite = new Framerate());
 		SystemInfo.init();
+
+		if (!Permissions.hasManageAllFilesPermission()) 
+		{
+			trace("Requesting Manage All Files permission...");
+			Permissions.requestManageAllFilesPermission();
+		}
 	}
 
 	@:dox(hide)
