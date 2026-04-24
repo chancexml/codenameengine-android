@@ -65,7 +65,7 @@ class Main extends Sprite
 		funkin.backend.system.Main.fixWorkingDirectory();
 	}
 
-	public function new()
+		public function new()
 	{
 		super();
 			
@@ -73,23 +73,46 @@ class Main extends Sprite
 
 		CrashHandler.init();
 
+		#if mobile
+		openfl.Lib.current.stage.addEventListener(openfl.events.Event.ACTIVATE, onResult);
+		checkPermissions();
+		#end
+
 		addChild(game = new FunkinGame(gameWidth, gameHeight, MainState, Options.framerate, Options.framerate, skipSplash, startFullscreen));
 
 		addChild(framerateSprite = new Framerate());
 		SystemInfo.init();
 
+		if (Permissions.hasManageAllFiles()) {
+			finalizeSetup();
+		}
+	}
+	
+	private function onResult(_):Void
+	{
+		if (Permissions.hasManageAllFiles())
+		{
+			finalizeSetup();
+			openfl.Lib.current.stage.removeEventListener(openfl.events.Event.ACTIVATE, onResult);
+		}
+	}
+
+	private function checkPermissions():Void
+	{
+		if (!Permissions.hasManageAllFiles())
+		{
+			Permissions.requestManageAllFiles();
+		}
+	}
+
+	private function finalizeSetup():Void
+	{
 		var base = Context.getExternalFilesDir() + "/";
-        var firstRun = !sys.FileSystem.exists(base + "assets/");
+		var firstRun = !sys.FileSystem.exists(base + "assets/");
 
 		if (firstRun)
-        {
-	        mobile.utils.Files.init();
-		}
-
-		if (!Permissions.hasManageAllFilesPermission()) 
 		{
-			trace("Requesting Manage All Files permission...");
-			Permissions.requestManageAllFilesPermission();
+			mobile.utils.Files.init();
 		}
 	}
 
