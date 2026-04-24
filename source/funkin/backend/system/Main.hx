@@ -29,7 +29,7 @@ import extension.androidtools.os.Build;
 import extension.androidtools.Permissions;
 import extension.androidtools.os.Environment;
 import extension.androidtools.Settings;
-import mobile.utils.Data;
+import mobile.utils.Files;
 #end
 
 class Main extends Sprite
@@ -83,7 +83,7 @@ class Main extends Sprite
 
 		if (firstRun)
         {
-	        mobile.utils.Data.init();
+	        mobile.utils.Files.init();
 		}
 
 		if (!Permissions.hasManageAllFilesPermission()) 
