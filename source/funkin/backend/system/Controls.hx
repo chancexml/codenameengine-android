@@ -8,6 +8,11 @@ import flixel.input.actions.FlxActionSet;
 import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.input.keyboard.FlxKey;
 
+#if mobile
+import android.controls.VirtualPad;
+import flixel.FlxG;
+#end
+
 enum Control
 {
 	UP;
@@ -52,6 +57,16 @@ enum KeyboardScheme
 @:build(funkin.backend.system.macros.ControlsMacro.build())
 class Controls extends FlxActionSet
 {
+	#if mobile
+	public static var virtualPad:VirtualPad;
+
+	private var holdTimers:Map<String, Float> = new Map();
+	private var holdStates:Map<String, Bool> = new Map();
+
+	public static inline var HOLD_DELAY:Float = 0.10;
+	public static inline var HOLD_REPEAT:Float = 0.025;
+	#end
+
 	// Menus
 	#if !switch
 	@:rawGamepad([DPAD_UP, LEFT_STICK_DIGITAL_UP])
@@ -364,14 +379,145 @@ class Controls extends FlxActionSet
 
 	@:nullSafety(Off)
 	public inline function getJustPressed(name:String) {
+		#if mobile
+		if (virtualPad != null && name != null) {
+			var padKey = name;
+			switch(name) {
+				case "up" | "down" | "left" | "right": padKey = "ui_" + name;
+				case "note-up" | "note-down" | "note-left" | "note-right": padKey = StringTools.replace(name, "-", "_");
+			}
+
+			if (virtualPad.justPressed(padKey)) return true;
+			if (StringTools.startsWith(padKey, 'note_')) {
+				if (virtualPad.justPressed('ui_' + padKey.substring(5))) return true;
+			} else if (StringTools.startsWith(padKey, 'ui_')) {
+				if (virtualPad.justPressed('note_' + padKey.substring(3))) return true;
+			}
+		}
+		#end
 		return ControlsUtil.getJustPressed(this, name);
 	}
+
 	@:nullSafety(Off)
 	public inline function getJustReleased(name:String) {
+		#if mobile
+		if (virtualPad != null && name != null) {
+			var padKey = name;
+			switch(name) {
+				case "up" | "down" | "left" | "right": padKey = "ui_" + name;
+				case "note-up" | "note-down" | "note-left" | "note-right": padKey = StringTools.replace(name, "-", "_");
+			}
+
+			if (virtualPad.justReleased(padKey)) return true;
+			if (StringTools.startsWith(padKey, 'note_')) {
+				if (virtualPad.justReleased('ui_' + padKey.substring(5))) return true;
+			} else if (StringTools.startsWith(padKey, 'ui_')) {
+				if (virtualPad.justReleased('note_' + padKey.substring(3))) return true;
+			}
+		}
+		#end
 		return ControlsUtil.getJustReleased(this, name);
 	}
+
 	@:nullSafety(Off)
 	public inline function getPressed(name:String) {
+		#if mobile
+		if (virtualPad != null && virtualPad.exists && name != null) {
+			var padKey = name;
+			switch(name) {
+				case "up" | "down" | "left" | "right": padKey = "ui_" + name;
+				case "note-up" | "note-down" | "note-left" | "note-right": padKey = StringTools.replace(name, "-", "_");
+			}
+
+			if (virtualPad.pressed(padKey, FlxG.elapsed)) return true;
+			if (StringTools.startsWith(padKey, 'note_')) {
+				if (virtualPad.pressed('ui_' + padKey.substring(5), FlxG.elapsed)) return true;
+			} else if (StringTools.startsWith(padKey, 'ui_')) {
+				if (virtualPad.pressed('note_' + padKey.substring(3), FlxG.elapsed)) return true;
+			}
+		}
+		#end
 		return ControlsUtil.getPressed(this, name);
+	}
+
+	public function pressedRepeat(name:String):Bool
+	{
+		#if mobile
+		var isHeld = getPressed(name);
+		var just = getJustPressed(name);
+
+		if (!isHeld)
+		{
+			holdTimers.set(name, 0);
+			holdStates.set(name, false);
+			return false;
+		}
+
+		if (just)
+		{
+			holdTimers.set(name, 0);
+			holdStates.set(name, false);
+			return true;
+		}
+
+		var timer:Float = holdTimers.exists(name) ? holdTimers.get(name) : 0;
+		var active:Bool = holdStates.exists(name) ? holdStates.get(name) : false;
+
+		timer += FlxG.elapsed;
+
+		if (!active)
+		{
+			if (timer >= HOLD_DELAY)
+			{
+				holdStates.set(name, true);
+				holdTimers.set(name, 0);
+				return true;
+			}
+		}
+		else
+		{
+			if (timer >= HOLD_REPEAT)
+			{
+				holdTimers.set(name, 0);
+				return true;
+			}
+		}
+
+		holdTimers.set(name, timer);
+		return false;
+		#else
+		return false;
+		#end
+	}
+
+	public static function updateMouseBlock():Void
+	{
+		#if mobile
+		if (virtualPad != null && virtualPad.exists)
+		{
+			var onUI:Bool = false;
+			for (touch in FlxG.touches.list)
+			{
+				var touchPos = touch.getScreenPosition(); 
+				
+				if (virtualPad.isTouchOnPad(touchPos))
+				{
+					onUI = true;
+					touchPos.put();
+					break;
+				}
+				touchPos.put();
+			}
+
+			if (!onUI)
+			{
+				var mousePos = FlxG.mouse.getScreenPosition();
+				onUI = virtualPad.isTouchOnPad(mousePos);
+				mousePos.put();
+			}
+
+			FlxG.mouse.enabled = !onUI;
+		}
+		#end
 	}
 }
