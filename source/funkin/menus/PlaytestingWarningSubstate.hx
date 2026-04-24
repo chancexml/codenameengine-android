@@ -6,6 +6,13 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import funkin.backend.FunkinText;
 import funkin.editors.ui.UIWarningSubstate.WarningButton;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 class PlaytestingWarningSubstate extends MusicBeatSubstate
 {
@@ -19,6 +26,10 @@ class PlaytestingWarningSubstate extends MusicBeatSubstate
 	var buttonsData:Array<WarningButton> = [];
 
 	var indicator:FunkinText;
+
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 
 	public function new(closingWindow:Bool, buttons:Array<WarningButton>) {
 		super();
@@ -68,6 +79,17 @@ class PlaytestingWarningSubstate extends MusicBeatSubstate
 
 		curSelected = options.length-1;
 		changeSelection(0);
+
+		#if mobile
+        virtualPad = ButtonHelper.create(this, FULL, A_B);
+
+        ButtonHelper.bind(virtualPad,
+        ['UP', 'DOWN', 'LEFT', 'RIGHT'], // i dont even know what Playtesting warning is
+        ['ACCEPT', 'BACK']
+        );
+
+        Controls.virtualPad = virtualPad;
+        #end
 	}
 
 	var sinner:Float = 0;
