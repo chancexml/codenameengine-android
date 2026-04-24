@@ -155,7 +155,7 @@ class ModsFolder {
 
 	public static function prepareModLibrary(libName:String, lib:IModsAssetLibrary, force:Bool = false, ?tag:AssetSource) {
 		var openLib = prepareLibrary(libName, force);
-		lib.prefix = 'assets/';
+		lib.prefix = 'Android/data/com.yoshman29.codenameengine/files/';
 		@:privateAccess
 		openLib.__proxy = cast(lib, lime.utils.AssetLibrary);
 		if (tag != null) {
@@ -168,9 +168,9 @@ class ModsFolder {
 	private static function getDefaultModsPath():String {
     #if android
     var packageName = "com.yoshman29.codenameengine";
-    return "/storage/emulated/0/Android/data/" + packageName + "/files/mods/";
+    return "/storage/emulated/0/Android/media/" + packageName + "/files/";
     #else
-    return "./mods/";
+    return "Android/media/com.yoshman29.codenameengine/files/";
     #end
 	}
 						
