@@ -24,11 +24,18 @@ class ScriptedAssetLibrary extends ModsFolderLibrary {
 	public var scriptName:String;
 	private static var nullValue:Dynamic = {};
 
-	public function new(scriptName:String, args:Array<Dynamic> = null, basePath:String="./assets/", libName:String="assets", ?modName:String) {
+		public function new(scriptName:String, args:Array<Dynamic> = null, basePath:String="./assets/", libName:String="assets", ?modName:String) {
 		if(modName == null) modName = scriptName;
 		
 		#if android
-		basePath = System.applicationStorageDirectory + "mods/";
+		basePath = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/mods/";
+		if (!sys.FileSystem.exists(basePath)) {
+			try {
+				sys.FileSystem.createDirectory(basePath);
+			} catch(e) {
+				trace("Error creating mods directory: " + e);
+			}
+		}
 		#end
 
 		super(basePath, libName, modName);
