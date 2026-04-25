@@ -124,8 +124,8 @@ class HScript extends Script {
 			if (err.startsWith(fn)) err = err.substr(fn.length);
 		}
 
-		Logs.traceColored([
-			Logs.logText(fn, 0xFF00FF00), // GREEN
+		Logs.traceColored([		    
+            Logs.logText(fn, funkin.backend.utils.ConsoleColor.GREEN),
 			Logs.logText(err, 0xFFFF0000) // RED
 		], ERROR);
 	}
@@ -143,7 +143,7 @@ class HScript extends Script {
 		}
 
 		Logs.traceColored([
-			Logs.logText(fn, 0xFF00FF00), // GREEN
+		    Logs.logText(fn, funkin.backend.utils.ConsoleColor.GREEN), // GREEN
 			Logs.logText(err, 0xFFFFFF00) // YELLOW
 		], WARNING);
 	}
@@ -210,7 +210,7 @@ class HScript extends Script {
 	public override function trace(v:Dynamic) {
 		var posInfo = interp.posInfos();
 		Logs.traceColored([
-			Logs.logText('${fileName}:${posInfo.lineNumber}: ', 0xFF00FF00), // GREEN
+			Logs.logText('${fileName}:${posInfo.lineNumber}: ', funkin.backend.utils.ConsoleColor.GREEN),
 			Logs.logText(Std.isOfType(v, String) ? v : Std.string(v))
 		], TRACE);
 	}
