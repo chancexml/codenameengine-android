@@ -246,12 +246,7 @@
 
     <!-- Mobile Stuff !-->
 	<config:android minimum-sdk-version="21" />
-    <config:android target-sdk-version="35" />
-
-	<config:android build-tools-version="35.0.0" />
-
-    <config:android gradle-version="8.7" />
-    <config:android gradle-plugin="8.6.0" />
+    <config:android target-sdk-version="30" />
 		
     <android-permission name="android.permission.READ_EXTERNAL_STORAGE" />
     <android-permission name="android.permission.WRITE_EXTERNAL_STORAGE" />
