@@ -5,7 +5,6 @@ import lime.media.AudioBuffer;
 import lime.graphics.Image;
 import lime.text.Font;
 import lime.utils.Bytes;
-import haxe.io.Path;
 
 #if MOD_SUPPORT
 import sys.FileStat;
@@ -18,30 +17,22 @@ class ModsFolderLibrary extends AssetLibrary implements IModsAssetLibrary {
 	public var basePath:String;
 	public var modName:String;
 	public var libName:String;
+	//public var useImageCache:Bool = true;
 	public var prefix = 'assets/';
 
 	public function new(basePath:String, libName:String, ?modName:String) {
-		this.basePath = resolveAndroidPath(basePath);
-		this.libName = libName;
-		this.prefix = 'assets/';
-		this.modName = modName == null ? libName : modName;
-		super();
-	}
-
-	private function resolveAndroidPath(path:String):String {
 		#if android
-		if (path == null) return null;
-		var p = Path.normalize(path);
-		
-		if (p == "mods" || p.startsWith("mods/")) {
-			var remainder = p.length > 4 ? p.substr(5) : "";
-			return Path.normalize(Path.join(["/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/", remainder]));
-		} else if (p == "assets" || p.startsWith("assets/")) {
-			var remainder = p.length > 6 ? p.substr(7) : "";
-			return Path.normalize(Path.join(["/storage/emulated/0/Android/data/com.yoshman29.codenameengine/files/", remainder]));
+		if (basePath.startsWith("mods/") || basePath == "mods") {
+			var androidMediaDir = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/";
+			basePath = androidMediaDir + basePath;
 		}
 		#end
-		return path;
+
+		this.basePath = basePath;
+		this.libName = libName;
+		this.prefix = 'assets/$libName/';
+		this.modName = modName == null ? libName : modName;
+		super();
 	}
 
 	function toString():String {
@@ -57,31 +48,40 @@ class ModsFolderLibrary extends AssetLibrary implements IModsAssetLibrary {
 	}
 
 	public override function getAudioBuffer(id:String):AudioBuffer {
-		if (!exists(id, "SOUND")) return null;
+		if (!exists(id, "SOUND"))
+			return null;
 		var path = getAssetPath();
 		editedTimes[id] = FileSystem.stat(path).mtime.getTime();
-		return AudioBuffer.fromFile(path);
+		var e = AudioBuffer.fromFile(path);
+		// LimeAssets.cache.audio.set('$libName:$id', e);
+		return e;
 	}
 
 	public override function getBytes(id:String):Bytes {
-		if (!exists(id, "BINARY")) return null;
+		if (!exists(id, "BINARY"))
+			return null;
 		var path = getAssetPath();
 		editedTimes[id] = FileSystem.stat(path).mtime.getTime();
-		return Bytes.fromFile(path);
+		var e = Bytes.fromFile(path);
+		return e;
 	}
 
 	public override function getFont(id:String):Font {
-		if (!exists(id, "FONT")) return null;
+		if (!exists(id, "FONT"))
+			return null;
 		var path = getAssetPath();
 		editedTimes[id] = FileSystem.stat(path).mtime.getTime();
 		return ModsFolder.registerFont(Font.fromFile(path));
 	}
 
 	public override function getImage(id:String):Image {
-		if (!exists(id, "IMAGE")) return null;
+		if (!exists(id, "IMAGE"))
+			return null;
 		var path = getAssetPath();
 		editedTimes[id] = FileSystem.stat(path).mtime.getTime();
-		return Image.fromFile(path);
+
+		var e = Image.fromFile(path);
+		return e;
 	}
 
 	public override function getPath(id:String):String {
@@ -102,10 +102,12 @@ class ModsFolderLibrary extends AssetLibrary implements IModsAssetLibrary {
 		try {
 			var result:Array<String> = [];
 			for(e in FileSystem.readDirectory(path))
-				if (FileSystem.isDirectory(Path.join([path, e])) == folders)
+				if (FileSystem.isDirectory('$path$e') == folders)
 					result.push(e);
 			return result;
-		} catch(e) {}
+		} catch(e) {
+			// woops!!
+		}
 		return [];
 	}
 
@@ -114,27 +116,42 @@ class ModsFolderLibrary extends AssetLibrary implements IModsAssetLibrary {
 		return FileSystem.exists(getAssetPath());
 	}
 
+	private function getAssetPath() {
+		return '$basePath/$_parsedAsset';
+	}
+
 	private function __isCacheValid(cache:Map<String, Dynamic>, asset:String, isLocalCache:Bool = false) {
-		if (!editedTimes.exists(asset)) return false;
+		if (!editedTimes.exists(asset))
+			return false;
 		var editedTime = editedTimes[asset];
-		if (editedTime == null || editedTime < FileSystem.stat(getPath(asset)).mtime.getTime()) return false;
+		if (editedTime == null || editedTime < FileSystem.stat(getPath(asset)).mtime.getTime()) {
+			// destroy already existing to prevent memory leak!!!
+			/*var asset = cache[asset];
+			if (asset != null) {
+				switch(Type.getClass(asset)) {
+					case lime.graphics.Image:
+						trace("getting rid of image cause replaced");
+						cast(asset, lime.graphics.Image);
+				}
+			}*/
+			return false;
+		}
+
 		if (!isLocalCache) asset = '$libName:$asset';
+
 		return cache.exists(asset) && cache[asset] != null;
 	}
 
 	private function __parseAsset(asset:String):Bool {
-		if (asset == null || !asset.startsWith(prefix)) return false;
-		
+		if (!asset.startsWith(prefix)) return false;
 		_parsedAsset = asset.substr(prefix.length);
-		
 		if(ModsFolder.useLibFile) {
-			var file = new Path(_parsedAsset);
+			var file = new haxe.io.Path(_parsedAsset);
 			if(file.file.startsWith("LIB_")) {
 				var library = file.file.substr(4);
 				if(library != modName) return false;
-				
-				var dir = (file.dir != null && file.dir != "") ? file.dir + "/" : "";
-				_parsedAsset = dir + file.file + (file.ext != null ? "." + file.ext : "");
+
+				_parsedAsset = file.dir + "." + file.ext;
 			}
 		}
 		return true;
@@ -147,25 +164,29 @@ class ModsFolderLibrary extends AssetLibrary implements IModsAssetLibrary {
 	}
 
 	function __listAppend(arr:Array<String>, folder:String) {
-		var fullFolderPath = Path.join([basePath, folder]);
-		if (!FileSystem.exists(fullFolderPath)) return;
-		
-		for(file in FileSystem.readDirectory(fullFolderPath)) {
-			var fullPath = Path.join([fullFolderPath, file]);
+		for(file in FileSystem.readDirectory('$basePath/$folder')) {
+			var fullPath = '$basePath/$folder/$file';
 			if (FileSystem.isDirectory(fullPath))
-				__listAppend(arr, folder + file + '/');
+				__listAppend(arr, '$folder$file/');
 			else
-				arr.push(prefix + folder + file);
+				arr.push('$prefix$folder$file');
 		}
 	}
 	#end
 
-	public function getAssetPath():String {
-		var p = Path.normalize(Path.join([basePath, _parsedAsset]));
-		return p;
-	}
+	// Backwards compat
 
 	@:noCompletion public var folderPath(get, set):String;
-	@:noCompletion private inline function get_folderPath():String { return basePath; }
-	@:noCompletion private inline function set_folderPath(value:String):String { return basePath = resolveAndroidPath(value); }
+	@:noCompletion private inline function get_folderPath():String {
+		return basePath;
+	}
+	@:noCompletion private inline function set_folderPath(value:String):String {
+		#if android
+		if (value.startsWith("mods/") || value == "mods") {
+			var androidMediaDir = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/";
+			value = androidMediaDir + value;
+		}
+		#end
+		return basePath = value;
+	}
 }
