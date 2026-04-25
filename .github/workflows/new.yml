@@ -2,6 +2,8 @@ name: Mobile Build
 run-name: ${{ github.event.inputs.build_name }}
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       build_name:
@@ -16,7 +18,7 @@ on:
       android_flags:
         description: Android Flags
         required: true
-        default: -clean
+        default:
 
 jobs:
   buildAndroid:
@@ -68,17 +70,17 @@ jobs:
           echo "ANDROID_NDK_ROOT=$HOME/android-sdk/ndk/25.2.9519653" >> $GITHUB_ENV
 
       - name: Clean Android
-        if: ${{ github.event.inputs.clean == 'true' }}
+        if: ${{ github.event_name == 'push' || github.event.inputs.clean == 'true' }}
         run: haxelib run lime clean android
 
-      - name:
+      - name: Install Android-Tools
         run: |
          haxelib remove extension-androidtools
          haxelib git extension-androidtools https://github.com/ChanceXML/androidTools.git
 
       - name: Build APK
         run: |
-         haxelib run lime build android ${{ github.event.inputs.android_flags }}
+         haxelib run lime build android -clean ${{ github.event.inputs.android_flags }}
 
       - name: Find APK
         run: find . -name "*.apk"
