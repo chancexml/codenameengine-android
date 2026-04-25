@@ -245,7 +245,8 @@
 	<haxedef name="EXPERIMENTAL_FLXGRAPHIC_DESTROY_FIX" />
 
     <!-- Mobile Stuff !-->
-	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33"/>
+	<config:android minimum-sdk-version="21" />
+    <config:android target-sdk-version="35" />
 		
     <android-permission name="android.permission.READ_EXTERNAL_STORAGE" />
     <android-permission name="android.permission.WRITE_EXTERNAL_STORAGE" />
