@@ -78,6 +78,10 @@ jobs:
          haxelib remove extension-androidtools
          haxelib git extension-androidtools https://github.com/ChanceXML/androidTools.git
 
+      - name: Increase Gradle Memory
+        run: |
+         echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=512m" >> gradle.properties
+  
       - name: Build APK
         run: |
          haxelib run lime build android -clean ${{ github.event.inputs.android_flags }}
