@@ -4,7 +4,10 @@ import hscript.*;
 import hscript.Expr.Error;
 import hscript.Parser;
 import openfl.Assets;
+
 import funkin.backend.system.Controls;
+
+import funkin.backend.utils.NativeAPI;
 
 #if mobile
 import mobile.utils.ButtonHelper;
@@ -125,7 +128,7 @@ class HScript extends Script {
 		}
 
 		Logs.traceColored([		    
-            Logs.logText(fn, funkin.backend.utils.ConsoleColor.GREEN),
+            Logs.logText(fn, funkin.backend.utils.NativeAPI.GREEN),
 			Logs.logText(err, 0xFFFF0000) // RED
 		], ERROR);
 	}
@@ -143,7 +146,7 @@ class HScript extends Script {
 		}
 
 		Logs.traceColored([
-		    Logs.logText(fn, funkin.backend.utils.ConsoleColor.GREEN), // GREEN
+		    Logs.logText(fn, funkin.backend.utils.NativeAPI.GREEN), // GREEN
 			Logs.logText(err, 0xFFFFFF00) // YELLOW
 		], WARNING);
 	}
@@ -210,7 +213,7 @@ class HScript extends Script {
 	public override function trace(v:Dynamic) {
 		var posInfo = interp.posInfos();
 		Logs.traceColored([
-			Logs.logText('${fileName}:${posInfo.lineNumber}: ', funkin.backend.utils.ConsoleColor.GREEN),
+			Logs.logText('${fileName}:${posInfo.lineNumber}: ', funkin.backend.utils.NativeAPI.GREEN),
 			Logs.logText(Std.isOfType(v, String) ? v : Std.string(v))
 		], TRACE);
 	}
