@@ -88,16 +88,17 @@ class Main extends Sprite
        #if android
        if (Permissions.hasManageAllFiles()) {
          finalizeSetup();
+		#end
        }
-       #end
-
+	}
+       
 	#if android
     private function onResult(_):Void {
         if (Permissions.hasManageAllFiles()) {
             finalizeSetup();
             openfl.Lib.current.stage.removeEventListener(openfl.events.Event.ACTIVATE, onResult);
         }
-    } 
+    }
  
     private function checkPermissions():Void {
         if (!Permissions.hasManageAllFiles()) {
@@ -117,8 +118,6 @@ class Main extends Sprite
 			mobile.utils.Files.init();
 		}
 	}
-}
-
 	@:dox(hide)
 	public static var audioDisconnected:Bool = false;
 
