@@ -24,14 +24,24 @@ class ModsFolder {
 	 * Current mod folder. Will affect `Paths`.
 	 */
 	public static var currentModFolder:String = null;
+	
 	/**
 	 * Path to the `mods` folder.
 	 */
-	public static var modsPath:String = getDefaultModsPath();
+	#if android
+	public static var modsPath:String = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/mods/";
+	#else
+	public static var modsPath:String = "./mods/";
+	#end
+
 	/**
 	 * Path to the `addons` folder.
 	 */
+	#if android
+	public static var addonsPath:String = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/addons/";
+	#else
 	public static var addonsPath:String = "./addons/";
+	#end
 
 	/**
 	 * If accessing a file as assets/data/global/LIB_mymod.hx should redirect to mymod:assets/data/global.hx
@@ -83,10 +93,11 @@ class ModsFolder {
 	 */
 	public static function loadModLib(path:String, force:Bool = false, ?modName:String) {
 		#if MOD_SUPPORT
-		if (FileSystem.exists('$path.zip'))
-			return loadLibraryFromZip('$path'.toLowerCase(), '$path.zip', force, modName);
-		else
-			return loadLibraryFromFolder('$path'.toLowerCase(), '$path', force, modName);
+		for (ext in Flags.ALLOWED_ZIP_EXTENSIONS) {
+			if (!FileSystem.exists('$path.$ext')) continue;
+			return loadLibraryFromZip('$path'.toLowerCase(), '$path.$ext', force, modName);
+		}
+		return loadLibraryFromFolder('$path'.toLowerCase(), '$path', force, modName);
 
 		#else
 		return null;
@@ -96,27 +107,16 @@ class ModsFolder {
 	public static function getModsList():Array<String> {
 		var mods:Array<String> = [];
 		#if MOD_SUPPORT
-		if (!FileSystem.exists(modsPath)) {
-			// Mods directory does not exist yet, create it
-			FileSystem.createDirectory(modsPath);
-		}
+		// Mods directory does not exist yet, create it
+		if (!FileSystem.exists(modsPath)) FileSystem.createDirectory(modsPath);
 		
 		final modsList:Array<String> = FileSystem.readDirectory(modsPath);
 
-		if (modsList == null || modsList.length <= 0)
-			return mods;
+		if (modsList == null || modsList.length <= 0) return mods;
 
 		for (modFolder in modsList) {
-			if (FileSystem.isDirectory(modsPath + modFolder)) {
-				mods.push(modFolder);
-			} else {
-				var ext = Path.extension(modFolder).toLowerCase();
-				switch(ext) {
-					case 'zip':
-						// is a zip mod!!
-						mods.push(Path.withoutExtension(modFolder));
-				}
-			}
+			if (FileSystem.isDirectory(modsPath + modFolder)) mods.push(modFolder);
+			else if (Flags.ALLOWED_ZIP_EXTENSIONS.contains(Path.extension(modFolder))) mods.push(Path.withoutExtension(modFolder));
 		}
 		#end
 		return mods;
@@ -128,7 +128,9 @@ class ModsFolder {
 			#if TRANSLATIONS_SUPPORT
 			if(skipTranslated && (l is TranslatedAssetLibrary)) continue;
 			#end
-			if (l is ScriptedAssetLibrary || l is IModsAssetLibrary) libs.push(cast(l, IModsAssetLibrary));
+			// No need to check for it being a `ScriptedAssetLibrary`, if `ScriptedAssetLibrary` extends ModsFolderLibrary, which implements `IModsAssetLibrary`
+			// If you have to revert this change then uhhhhh wasn't me, trust 🙏
+			if (/*l is ScriptedAssetLibrary ||*/ l is IModsAssetLibrary) libs.push(cast(l, IModsAssetLibrary));
 		}
 		return libs;
 	}
@@ -155,7 +157,7 @@ class ModsFolder {
 
 	public static function prepareModLibrary(libName:String, lib:IModsAssetLibrary, force:Bool = false, ?tag:AssetSource) {
 		var openLib = prepareLibrary(libName, force);
-		lib.prefix = 'Android/data/com.yoshman29.codenameengine/files/';
+		lib.prefix = 'assets/';
 		@:privateAccess
 		openLib.__proxy = cast(lib, lime.utils.AssetLibrary);
 		if (tag != null) {
@@ -165,15 +167,6 @@ class ModsFolder {
 		return openLib;
 	}
 
-	private static function getDefaultModsPath():String {
-    #if android
-    var packageName = "com.yoshman29.codenameengine";
-    return "/storage/emulated/0/Android/media/" + packageName + "/files/";
-    #else
-    return "Android/media/com.yoshman29.codenameengine/files/";
-    #end
-	}
-						
 	#if MOD_SUPPORT
 	public static function loadLibraryFromFolder(libName:String, folder:String, force:Bool = false, ?modName:String, ?tag:AssetSource = MODS) {
 		return prepareModLibrary(libName, new ModsFolderLibrary(folder, libName, modName), force, tag);
