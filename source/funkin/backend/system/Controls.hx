@@ -378,7 +378,7 @@ class Controls extends FlxActionSet
 	}
 
 	@:nullSafety(Off)
-	public inline function getJustPressed(name:String) {
+	public function getJustPressed(name:String) {
 		#if mobile
 		if (virtualPad != null && name != null) {
 			var padKey = name;
@@ -420,7 +420,7 @@ class Controls extends FlxActionSet
 	}
 
 	@:nullSafety(Off)
-	public inline function getPressed(name:String) {
+	public function getPressed(name:String) {
 		#if mobile
 		if (virtualPad != null && virtualPad.exists && name != null) {
 			var padKey = name;
