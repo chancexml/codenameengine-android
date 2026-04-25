@@ -25,7 +25,7 @@ class Pause extends FlxGroup
         FlxG.cameras.add(PauseCam, false);
 
         pauseButton = new FlxSprite(0, 0);
-        pauseButton.frames = Paths.getSparrowAtlas('pauseButton');
+        pauseButton.frames = Paths.getSparrowAtlas('game/pauseButton');
         pauseButton.animation.addByIndices('idle', 'pause', [0], "", 24, false);
         pauseButton.animation.addByIndices('hold', 'pause', [5], "", 24, false);
         
@@ -43,7 +43,7 @@ class Pause extends FlxGroup
         pauseButton.scrollFactor.set();
         pauseButton.cameras = [PauseCam];
 
-        pauseCircle = new FlxSprite(0, 0).loadGraphic(Paths.image('pauseCircle'));
+        pauseCircle = new FlxSprite(0, 0).loadGraphic(Paths.image('game/pauseCircle'));
         pauseCircle.scale.set(0.84, 0.8);
         pauseCircle.updateHitbox();
         pauseCircle.x = ((pauseButton.x + (pauseButton.width / 2)) - (pauseCircle.width / 2));
