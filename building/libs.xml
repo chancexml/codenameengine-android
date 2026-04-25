@@ -25,7 +25,7 @@
 		<lib name="hxcpp-debug-server" />
 
 		<lib name="nape-haxe4" />
-		<lib name="extension-androidtools" url="https://github.com/ChanceXML/androidTools" />
+		<lib name="extension-androidtools" url="https://github.com/ChanceXML/androidTools" ref="91ee9ec998db2754e11481c182ae6b3ff12075e3"/>
 
 		<!-- For building lime -->
 		<lib global="true" name="hxp" /> <lib name="hxp" />
