@@ -24,22 +24,36 @@ class Paths
 		});
 	}
 
+	inline static public function getAssetsRoot():String {
+		var base = "Android/data/com.yoshman29.codenameengine/files/";
+		if (ModsFolder.currentModFolder != null) {
+			base = 'Android/media/com.yoshman29.codenameengine/files/${ModsFolder.currentModFolder}/';
+		}
+		return base;
+	}
+
 	public static inline function getPath(file:String, ?library:String) {
-		var returnedPath:String = library != null ? '$library:Android/data/com.yoshman29.codenameengine/files/$file' : 'Android/data/com.yoshman29.codenameengine/files/$file';
+		var root = getAssetsRoot();
+		var returnedPath:String = library != null ? '$library:$root$file' : '$root$file';
+
 		#if (sys && !windows)
 		returnedPath = Path.normalize(returnedPath);
 		if (OpenFlAssets.exists(returnedPath)) return returnedPath;
-		var fixedPath:String = library != null ? '$library:Android/data/com.yoshman29.codenameengine/files/$library/' : 'Android/data/com.yoshman29.codenameengine/files/';
+
+		var fixedPath:String = library != null ? '$library:$root$library/' : root;
 		var parts:Array<String> = returnedPath.split("/");
 		for (it=>part in parts) {
 			if (it == 0) continue;
 			var entries:Array<String> = null;
 			if (Path.extension(part) == "") entries = assetsTree.getFolders(fixedPath);
 			else entries = assetsTree.getFiles(fixedPath);
-			for (entry in entries) {
-				if (entry.toLowerCase() == part.toLowerCase()) {
-					fixedPath += entry + (it != parts.length - 1 ? "/" : "");
-					break;
+			
+			if (entries != null) {
+				for (entry in entries) {
+					if (entry.toLowerCase() == part.toLowerCase()) {
+						fixedPath += entry + (it != parts.length - 1 ? "/" : "");
+						break;
+					}
 				}
 			}
 		}
@@ -132,7 +146,6 @@ class Paths
 	static public function chart(song:String, ?difficulty:String, ?variant:String):String
 	{
 		difficulty = (difficulty != null ? difficulty : Flags.DEFAULT_DIFFICULTY);
-
 		return getPath('songs/$song/charts/${variant != null ? variant + "/" : ""}$difficulty.json', null);
 	}
 
@@ -148,26 +161,6 @@ class Paths
 		return getPath('fonts/$key');
 	}
 
-	public static inline function obj(key:String) {
-		return getPath('models/$key.obj');
-	}
-
-	public static inline function dae(key:String) {
-		return getPath('models/$key.dae');
-	}
-
-	public static inline function md2(key:String) {
-		return getPath('models/$key.md2');
-	}
-
-	public static inline function md5(key:String) {
-		return getPath('models/$key.md5');
-	}
-
-	public static inline function awd(key:String) {
-		return getPath('models/$key.awd');
-	}
-
 	inline static public function getSparrowAtlas(key:String, ?library:String, ?ext:String)
 		return FlxAtlasFrames.fromSparrow(image(key, library, ext), file('images/$key.xml', library));
 
@@ -180,17 +173,8 @@ class Paths
 	inline static public function getPackerAtlas(key:String, ?library:String, ?ext:String)
 		return FlxAtlasFrames.fromSpriteSheetPacker(image(key, library, ext), file('images/$key.txt', library));
 
-	inline static public function getPackerAtlasAlt(key:String, ?ext:String)
-		return FlxAtlasFrames.fromSpriteSheetPacker('$key.${ext != null ? ext : Flags.IMAGE_EXT}', '$key.txt');
-
 	inline static public function getAsepriteAtlas(key:String, ?library:String, ?ext:String)
 		return FlxAtlasFrames.fromAseprite(image(key, library, ext), file('images/$key.json', library));
-
-	inline static public function getAsepriteAtlasAlt(key:String, ?ext:String)
-		return FlxAtlasFrames.fromAseprite('$key.${ext != null ? ext : Flags.IMAGE_EXT}', '$key.json');
-
-	inline static public function getAssetsRoot():String
-		return  ModsFolder.currentModFolder != null ? 'Android/media/com.yoshman29.codenameengine/files/${ModsFolder.currentModFolder}' : #if (sys && TEST_BUILD) './${Main.pathBack}Android/data/com.yoshman29.codenameengine/files/' #else 'Android/data/com.yoshman29.codenameengine/files/' #end;
 
 	public static function getFrames(key:String, assetsPath:Bool = false, ?library:String, ?ext:String = null, ?animateSettings:FlxAnimateSettings) {
 		if (tempFramesCache.exists(key)) {
@@ -203,72 +187,52 @@ class Paths
 		return tempFramesCache[key] = loadFrames(assetsPath ? key : Paths.image(key, library, true, ext), false, null, false, ext, animateSettings);
 	}
 
-	public static function framesExists(key:String, checkAtlas:Bool = false, checkMulti:Bool = true, assetsPath:Bool = false, ?library:String) {
-		var path = assetsPath ? key : Paths.image(key, library, true);
-		var noExt = Path.withoutExtension(path);
-		if(checkAtlas && Assets.exists('$noExt/Animation.json'))
-			return true;
-		if(checkMulti && Assets.exists('$noExt/1.png'))
-			return true;
-		if(Assets.exists('$noExt.xml'))
-			return true;
-		if(Assets.exists('$noExt.txt'))
-			return true;
-		if(Assets.exists('$noExt.json'))
-			return true;
-		return false;
-	}
-
 	static function loadFrames(path:String, Unique:Bool = false, Key:String = null, SkipAtlasCheck:Bool = false, SkipMultiCheck:Bool = false, ?Ext:String = null, ?animateSettings:FlxAnimateSettings):FlxFramesCollection {
 		var noExt = Path.withoutExtension(path);
 		var ext = Ext != null ? Ext : Flags.IMAGE_EXT;
 
-		if (!SkipMultiCheck && Assets.exists('$noExt/1.${ext}')) {
-			// MULTIPLE SPRITESHEETS!!
-
+		if (!SkipMultiCheck && OpenFlAssets.exists('$noExt/1.${ext}')) {
 			var graphic = FlxG.bitmap.add("flixel/images/logo/default.png", false, '$noExt/mult');
 			var frames = MultiFramesCollection.findFrame(graphic);
-			if (frames != null)
-				return frames;
+			if (frames != null) return frames;
 
-			trace("no frames yet for multiple atlases!!");
 			var cur = 1;
 			var finalFrames = new MultiFramesCollection(graphic);
-			while(Assets.exists('$noExt/$cur.${ext}')) {
+			while(OpenFlAssets.exists('$noExt/$cur.${ext}')) {
 				var spr = loadFrames('$noExt/$cur.${ext}', false, null, false, true);
 				finalFrames.addFrames(spr);
 				cur++;
 			}
 			return finalFrames;
-		} else if (Assets.exists('$noExt/Animation.json')) {
+		} else if (OpenFlAssets.exists('$noExt/Animation.json')) {
 			return Paths.getAnimateAtlasAlt(noExt, animateSettings);
-		} else if (Assets.exists('$noExt.xml')) {
+		} else if (OpenFlAssets.exists('$noExt.xml')) {
 			return Paths.getSparrowAtlasAlt(noExt, ext);
-		} else if (Assets.exists('$noExt.txt')) {
+		} else if (OpenFlAssets.exists('$noExt.txt')) {
 			return Paths.getPackerAtlasAlt(noExt, ext);
-		} else if (Assets.exists('$noExt.json')) {
+		} else if (OpenFlAssets.exists('$noExt.json')) {
 			return Paths.getAsepriteAtlasAlt(noExt, ext);
 		}
 
 		var graph:FlxGraphic = FlxG.bitmap.add(path, Unique, Key);
-		if (graph == null)
-			return null;
+		if (graph == null) return null;
 		return graph.imageFrame;
 	}
 
 	public static function getFolderDirectories(key:String, addPath:Bool = false, source:AssetSource = BOTH):Array<String> {
 		if (!key.endsWith("/")) key += "/";
-		var content = assetsTree.getFolders('Android/data/com.yoshman29.codenameengine/files/$key', source);
+		var root = getAssetsRoot();
+		var content = assetsTree.getFolders('$root$key', source);
 		if (addPath) {
-			for(k=>e in content)
-				content[k] = '$key$e';
+			for(k=>e in content) content[k] = '$key$e';
 		}
 		return content;
 	}
+
 	static public function getFolderContent(key:String, addPath:Bool = false, source:AssetSource = BOTH, noExtension:Bool = false):Array<String> {
-		// designed to work both on windows and web
 		if (!key.endsWith("/")) key += "/";
-		var content = assetsTree.getFiles('Android/data/com.yoshman29.codenameengine/files/$key', source);
+		var root = getAssetsRoot();
+		var content = assetsTree.getFiles('$root$key', source);
 		for (k => e in content) {
 			if (noExtension) e = Path.withoutExtension(e);
 			content[k] = addPath ? '$key$e' : e;
@@ -278,18 +242,12 @@ class Paths
 
 	@:noCompletion public static function getFilenameFromLibFile(path:String) {
 		var file = new haxe.io.Path(path);
-		if(file.file.startsWith("LIB_")) {
-			return file.dir + "." + file.ext;
-		}
-		return path;
+		return file.file.startsWith("LIB_") ? file.dir + "." + file.ext : path;
 	}
 
 	@:noCompletion public static function getLibFromLibFile(path:String) {
 		var file = new haxe.io.Path(path);
-		if(file.file.startsWith("LIB_")) {
-			return file.file.substr(4);
-		}
-		return "";
+		return file.file.startsWith("LIB_") ? file.file.substr(4) : "";
 	}
 }
 
