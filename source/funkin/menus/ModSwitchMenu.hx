@@ -57,10 +57,10 @@ class ModSwitchMenu extends MusicBeatSubstate {
 		changeSelection(0, true);
 
 		#if mobile
-        virtualPad = ButtonHelper.create(this, LEFT_RIGHT, A_B);
+        virtualPad = ButtonHelper.create(this, UP_DOWN, A_B);
 
         ButtonHelper.bind(virtualPad,
-        [null, null, 'LEFT', 'RIGHT'],
+        ['UP', 'DOWN'],
         ['ACCEPT', 'BACK']
         );
 
