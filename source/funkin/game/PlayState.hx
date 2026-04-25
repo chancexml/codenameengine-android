@@ -680,7 +680,7 @@ class PlayState extends MusicBeatState
 	{
 		Note.__customNoteTypeExists = [];
         #if mobile
-		var androidPause = new mobile.utils.Pause();
+		var androidPause = new mobile.controls.Pause();
         add(androidPause);
         androidPause.setPauseButton('true');
 
