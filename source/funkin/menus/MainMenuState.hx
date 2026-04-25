@@ -247,5 +247,6 @@ class MainMenuState extends MusicBeatState
         spr.updateHitbox();
         spr.centerOffsets();
     });
+    }
 }
-					
+	
