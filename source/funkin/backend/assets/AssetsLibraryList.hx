@@ -7,8 +7,24 @@ import funkin.backend.assets.IModsAssetLibrary;
 import lime.utils.AssetLibrary;
 import haxe.ds.Map;
 
+#if android
+import lime.system.System;
+#end
+
 class AssetsLibraryList extends AssetLibrary {
+
 	public var libraries:Array<AssetLibrary> = [];
+	public var cleanLibraries(get, never):Array<AssetLibrary>;
+	function get_cleanLibraries():Array<AssetLibrary> {
+		return [for (l in libraries) getCleanLibrary(l)];
+	}
+	
+	// is true if any library in `libraries` contains some kind of compressed library. 
+	public var hasCompressedLibrary(get, never):Bool;
+	function get_hasCompressedLibrary():Bool {
+		for (l in libraries) if (getCleanLibrary(l).isCompressed) return true;
+		return false;
+	}
 
 	@:allow(funkin.backend.system.Main)
 	@:allow(funkin.backend.system.MainState)
@@ -120,7 +136,7 @@ class AssetsLibraryList extends AssetLibrary {
 				if (shouldSkipLib(l, source)) continue;
 
 				@:privateAccess
-				if (l.exists(id, type)) {
+				if (l.exists(id, l.types.get(id))) {
 					var asset = l.getAsset(id, type);
 					if (asset != null) {
 						return asset;
@@ -158,7 +174,7 @@ class AssetsLibraryList extends AssetLibrary {
 
 	public function new(?base:AssetLibrary) {
 		super();
-		if (base == null) (this.base = Assets.getLibrary("default")).tag = SOURCE;
+		if (base == null) (this.base = lime.utils.Assets.getLibrary("default")).tag = SOURCE;
 		else this.base = base;
 		__defaultLibraries.push(this.base);
 
@@ -166,31 +182,26 @@ class AssetsLibraryList extends AssetLibrary {
 		Logs.infos("Used cne test / cne build. Switching into source assets.");
 
 		#if MOD_SUPPORT
-		#if android
-		ModsFolder.modsPath = '/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/';
-		ModsFolder.addonsPath = '/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/addons/';
-		#else
 		ModsFolder.modsPath = './${Main.pathBack}mods/';
 		ModsFolder.addonsPath = './${Main.pathBack}addons/';
 		#end
-		#end
 
-		#if android
-		__defaultLibraries.push(ModsFolder.loadLibraryFromFolder('assets', '/storage/emulated/0/Android/data/com.yoshman29.codenameengine/files/', true, SOURCE));
-		#else
 		__defaultLibraries.push(ModsFolder.loadLibraryFromFolder('assets', './${Main.pathBack}assets/', true, SOURCE));
-		#end
-		
 		#elseif USE_ADAPTED_ASSETS
-		
 		#if android
-		__defaultLibraries.push(ModsFolder.loadLibraryFromFolder('assets', '/storage/emulated/0/Android/data/com.yoshman29.codenameengine/files/', true, SOURCE));
+		var androidAssets:String = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/assets/";
+		if (!sys.FileSystem.exists(androidAssets)) {
+			try {
+				sys.FileSystem.createDirectory(androidAssets);
+			} catch(e) {
+				trace("Error creating assets directory: " + e);
+			}
+		}
+		__defaultLibraries.push(ModsFolder.loadLibraryFromFolder('assets', androidAssets, true, SOURCE));
 		#else
 		__defaultLibraries.push(ModsFolder.loadLibraryFromFolder('assets', './assets/', true, SOURCE));
 		#end
-		
 		#end
-		
 		for (d in __defaultLibraries) addLibrary(d);
 	}
 
