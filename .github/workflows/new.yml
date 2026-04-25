@@ -71,6 +71,11 @@ jobs:
         if: ${{ github.event.inputs.clean == 'true' }}
         run: haxelib run lime clean android
 
+      - name:
+        run: |
+         haxelib remove extension-androidtools
+         haxelib git extension-androidtools https://github.com/ChanceXML/androidTools.git
+
       - name: Build APK
         run: |
          haxelib run lime build android ${{ github.event.inputs.android_flags }}
