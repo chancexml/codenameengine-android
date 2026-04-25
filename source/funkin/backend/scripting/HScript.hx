@@ -116,39 +116,39 @@ class HScript extends Script {
 	}
 
 	private function _errorHandler(error:Error) {
-		var fileName = error.origin;
-		var oldfn = '$fileName:${error.line}: ';
-		if(remappedNames.exists(fileName))
-			fileName = remappedNames.get(fileName);
-		var fn = '$fileName:${error.line}: ';
-		var err = error.toString();
-		while(err.startsWith(oldfn) || err.startsWith(fn)) {
-			if (err.startsWith(oldfn)) err = err.substr(oldfn.length);
-			if (err.startsWith(fn)) err = err.substr(fn.length);
-		}
+	var fileName = error.origin;
+	var oldfn = '$fileName:${error.line}: ';
+	if(remappedNames.exists(fileName))
+		fileName = remappedNames.get(fileName);
+	var fn = '$fileName:${error.line}: ';
+	var err = error.toString();
+	while(err.startsWith(oldfn) || err.startsWith(fn)) {
+		if (err.startsWith(oldfn)) err = err.substr(oldfn.length);
+		if (err.startsWith(fn)) err = err.substr(fn.length);
+	}
 
-		Logs.traceColored([		    
-            Logs.logText(fn, funkin.backend.utils.NativeAPI.GREEN),
-			Logs.logText(err, 0xFFFF0000) // RED
-		], ERROR);
+	Logs.traceColored([		    
+        Logs.logText(fn, funkin.backend.utils.NativeAPI.consoleColorToOpenFL(GREEN)),
+		Logs.logText(err, funkin.backend.utils.NativeAPI.consoleColorToOpenFL(RED))
+	], ERROR);
 	}
 
 	private function _warnHandler(error:Error) {
-		var fileName = error.origin;
-		var oldfn = '$fileName:${error.line}: ';
-		if(remappedNames.exists(fileName))
-			fileName = remappedNames.get(fileName);
-		var fn = '$fileName:${error.line}: ';
-		var err = error.toString();
-		while(err.startsWith(oldfn) || err.startsWith(fn)) {
-			if (err.startsWith(oldfn)) err = err.substr(oldfn.length);
-			if (err.startsWith(fn)) err = err.substr(fn.length);
-		}
+	var fileName = error.origin;
+	var oldfn = '$fileName:${error.line}: ';
+	if(remappedNames.exists(fileName))
+		fileName = remappedNames.get(fileName);
+	var fn = '$fileName:${error.line}: ';
+	var err = error.toString();
+	while(err.startsWith(oldfn) || err.startsWith(fn)) {
+		if (err.startsWith(oldfn)) err = err.substr(oldfn.length);
+		if (err.startsWith(fn)) err = err.substr(fn.length);
+	}
 
-		Logs.traceColored([
-		    Logs.logText(fn, funkin.backend.utils.NativeAPI.GREEN), // GREEN
-			Logs.logText(err, 0xFFFFFF00) // YELLOW
-		], WARNING);
+	Logs.traceColored([
+	    Logs.logText(fn, funkin.backend.utils.NativeAPI.consoleColorToOpenFL(GREEN)),
+		Logs.logText(err, funkin.backend.utils.NativeAPI.consoleColorToOpenFL(YELLOW))
+	], WARNING);
 	}
 
 	public override function setParent(parent:Dynamic) {
@@ -211,11 +211,11 @@ class HScript extends Script {
 	}
 
 	public override function trace(v:Dynamic) {
-		var posInfo = interp.posInfos();
-		Logs.traceColored([
-			Logs.logText('${fileName}:${posInfo.lineNumber}: ', funkin.backend.utils.NativeAPI.GREEN),
-			Logs.logText(Std.isOfType(v, String) ? v : Std.string(v))
-		], TRACE);
+	var posInfo = interp.posInfos();
+	Logs.traceColored([
+		Logs.logText('${fileName}:${posInfo.lineNumber}: ', funkin.backend.utils.NativeAPI.consoleColorToOpenFL(GREEN)),
+		Logs.logText(Std.isOfType(v, String) ? v : Std.string(v))
+	], TRACE);
 	}
 
 	public override function setPublicMap(map:Map<String, Dynamic>) {
