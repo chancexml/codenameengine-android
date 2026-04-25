@@ -217,29 +217,35 @@ class MainMenuState extends MusicBeatState
 		});
 	}
 	function changeItem(huh:Int = 0)
-	{
-		var event = event("onChangeItem", EventManager.get(MenuChangeEvent).recycle(curSelected, FlxMath.wrap(curSelected + huh, 0, menuItems.length-1), huh, huh != 0));
-		if (event.cancelled) return;
+{
+    if (menuItems == null || menuItems.length == 0) {
+        trace("WARNING: No menu items found! Skipping changeItem to prevent crash.");
+        return;
+    }
 
-		curSelected = event.value;
+    var event = event("onChangeItem", EventManager.get(MenuChangeEvent).recycle(curSelected, FlxMath.wrap(curSelected + huh, 0, menuItems.length - 1), huh, huh != 0));
+    
+    if (event.cancelled) return;
 
-		if (event.playMenuSFX)
-			CoolUtil.playMenuSFX(SCROLL, 0.7);
+    curSelected = event.value;
 
-		menuItems.forEach(function(spr:FlxSprite)
-		{
-			spr.animation.play('idle');
+    if (event.playMenuSFX)
+        CoolUtil.playMenuSFX(SCROLL, 0.7);
 
-			if (spr.ID == curSelected)
-			{
-				spr.animation.play('selected');
-				var mid = spr.getGraphicMidpoint();
-				camFollow.setPosition(mid.x, mid.y);
-				mid.put();
-			}
+    menuItems.forEach(function(spr:FlxSprite)
+    {
+        spr.animation.play('idle');
 
-			spr.updateHitbox();
-			spr.centerOffsets();
-		});
-	}
+        if (spr.ID == curSelected)
+        {
+            spr.animation.play('selected');
+            var mid = spr.getGraphicMidpoint();
+            camFollow.setPosition(mid.x, mid.y);
+            mid.put();
+        }
+
+        spr.updateHitbox();
+        spr.centerOffsets();
+    });
 }
+					
