@@ -78,13 +78,21 @@ jobs:
          haxelib remove extension-androidtools
          haxelib git extension-androidtools https://github.com/ChanceXML/androidTools.git
 
-      - name: Increase Gradle Memory
+      - name: Configure Gradle (5GB Safe Mode)
         run: |
-         echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=512m" >> gradle.properties
-  
+          mkdir -p ~/.gradle
+          echo "org.gradle.jvmargs=-Xmx5g -XX:MaxMetaspaceSize=1536m -Dfile.encoding=UTF-8" > ~/.gradle/gradle.properties
+          echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
+          echo "org.gradle.parallel=false" >> ~/.gradle/gradle.properties
+          echo "org.gradle.configureondemand=false" >> ~/.gradle/gradle.properties
+          echo "android.splits.abi.enable=false" >> ~/.gradle/gradle.properties
+          
+      - name: Limit Java heap globally
+        run: echo "JAVA_TOOL_OPTIONS=-Xmx5g" >> $GITHUB_ENV
+        
       - name: Build APK
         run: |
-         haxelib run lime build android -clean ${{ github.event.inputs.android_flags }}
+         haxelib run lime build android -clean -DONLY_ARM64 ${{ github.event.inputs.android_flags }}
 
       - name: Find APK
         run: find . -name "*.apk"
