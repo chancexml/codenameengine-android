@@ -174,9 +174,9 @@ class Strum extends FlxSprite {
 				if (daNote.isSustainNote) offset.y -= height * 0.5;
 
 				if (Std.int(daNote.__noteAngle % 360) != 0) {
-					var noteAngle = FlxMath.fastSinCos(daNote.__noteAngle / PIX180);
-					var noteAngleCos = noteAngle.cos;
-					var noteAngleSin = noteAngle.sin;
+					var angleRad = daNote.__noteAngle / PIX180;
+                    var noteAngleCos = Math.cos(angleRad);
+                    var noteAngleSin = Math.sin(angleRad);
 
 					var aOffset:FlxPoint = FlxPoint.get(
 						(daNote.origin.x / daNote.scale.x) - daNote.offset.x,
