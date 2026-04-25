@@ -26,6 +26,7 @@ class Paths
 
 	inline static public function getAssetsRoot():String {
 		var base = "Android/data/com.yoshman29.codenameengine/files/";
+		
 		if (ModsFolder.currentModFolder != null) {
 			base = 'Android/media/com.yoshman29.codenameengine/files/${ModsFolder.currentModFolder}/';
 		}
@@ -173,8 +174,23 @@ class Paths
 	inline static public function getPackerAtlas(key:String, ?library:String, ?ext:String)
 		return FlxAtlasFrames.fromSpriteSheetPacker(image(key, library, ext), file('images/$key.txt', library));
 
+	inline static public function getPackerAtlasAlt(key:String, ?ext:String)
+		return FlxAtlasFrames.fromSpriteSheetPacker('$key.${ext != null ? ext : Flags.IMAGE_EXT}', '$key.txt');
+
 	inline static public function getAsepriteAtlas(key:String, ?library:String, ?ext:String)
 		return FlxAtlasFrames.fromAseprite(image(key, library, ext), file('images/$key.json', library));
+
+	inline static public function getAsepriteAtlasAlt(key:String, ?ext:String)
+		return FlxAtlasFrames.fromAseprite('$key.${ext != null ? ext : Flags.IMAGE_EXT}', '$key.json');
+
+	public static function framesExists(path:String, checkXml:Bool = true, checkTxt:Bool = true, checkJson:Bool = true):Bool {
+		var noExt = Path.withoutExtension(path);
+		if (checkXml && OpenFlAssets.exists('$noExt.xml')) return true;
+		if (checkTxt && OpenFlAssets.exists('$noExt.txt')) return true;
+		if (checkJson && OpenFlAssets.exists('$noExt.json')) return true;
+		if (OpenFlAssets.exists('$noExt/Animation.json')) return true;
+		return false;
+	}
 
 	public static function getFrames(key:String, assetsPath:Bool = false, ?library:String, ?ext:String = null, ?animateSettings:FlxAnimateSettings) {
 		if (tempFramesCache.exists(key)) {
