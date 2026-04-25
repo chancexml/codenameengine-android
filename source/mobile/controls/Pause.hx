@@ -5,7 +5,7 @@ import flixel.FlxSprite;
 import flixel.FlxCamera;
 import flixel.group.FlxGroup;
 import funkin.game.PlayState;
-import funkin.backend.aseets.Paths;
+import funkin.backend.assets.Paths;
 import funkin.options.Options;
 import funkin.menus.PauseSubState;
 
