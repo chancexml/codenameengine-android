@@ -85,11 +85,13 @@ class Main extends Sprite
         addChild(framerateSprite = new Framerate());
         SystemInfo.init();
   
-       #if android
-       if (Permissions.hasManageAllFiles()) {
-         finalizeSetup();
-		#end
-       }
+        #if android
+        if (Permissions.hasManageAllFiles()) {
+           finalizeSetup();
+        }
+        #else
+           finalizeSetup();
+        #end
 	}
        
 	#if android
@@ -105,8 +107,7 @@ class Main extends Sprite
             Permissions.requestManageAllFiles();
         }
     }
-    #end
-	
+    #end	
 
 	private function finalizeSetup():Void
 	{
@@ -118,6 +119,7 @@ class Main extends Sprite
 			mobile.utils.Files.init();
 		}
 	}
+	
 	@:dox(hide)
 	public static var audioDisconnected:Bool = false;
 
