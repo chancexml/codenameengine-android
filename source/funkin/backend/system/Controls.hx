@@ -58,7 +58,7 @@ enum KeyboardScheme
 class Controls extends FlxActionSet
 {
 	#if mobile
-	public static var virtualPad:VirtualPad;
+	public static var virtualPad:Null<VirtualPad>;
 
 	private var holdTimers:Map<String, Float> = new Map();
 	private var holdStates:Map<String, Bool> = new Map();
@@ -460,8 +460,8 @@ class Controls extends FlxActionSet
 			return true;
 		}
 
-		var timer:Float = holdTimers.exists(name) ? holdTimers.get(name) : 0;
-		var active:Bool = holdStates.exists(name) ? holdStates.get(name) : false;
+		var timer:Float = holdTimers.get(name) ?? 0;
+        var active:Bool = holdStates.get(name) ?? false;
 
 		timer += FlxG.elapsed;
 
