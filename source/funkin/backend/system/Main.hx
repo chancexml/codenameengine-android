@@ -74,29 +74,23 @@ class Main extends Sprite
 		CrashHandler.init();
 
 		#if mobile
-		openfl.Lib.current.stage.addEventListener(openfl.events.Event.ACTIVATE, onResult);
-		checkPermissions();
-		#end
+        openfl.Lib.current.stage.addEventListener(openfl.events.Event.ACTIVATE, onResult);
+        #if android
+        checkPermissions();
+        #end
+        #end
 
-		addChild(game = new FunkinGame(gameWidth, gameHeight, MainState, Options.framerate, Options.framerate, skipSplash, startFullscreen));
+        addChild(game = new FunkinGame(gameWidth, gameHeight, MainState, Options.framerate, Options.framerate, skipSplash, startFullscreen));
 
-		addChild(framerateSprite = new Framerate());
-		SystemInfo.init();
-
-		if (Permissions.hasManageAllFiles()) {
-			finalizeSetup();
-		}
-	}
+        addChild(framerateSprite = new Framerate());
+        SystemInfo.init();
+  
+       #if android
+       if (Permissions.hasManageAllFiles()) {
+         finalizeSetup();
+       }
+       #end
 	
-	private function onResult(_):Void
-	{
-		if (Permissions.hasManageAllFiles())
-		{
-			finalizeSetup();
-			openfl.Lib.current.stage.removeEventListener(openfl.events.Event.ACTIVATE, onResult);
-		}
-	}
-
 	private function checkPermissions():Void
 	{
 		if (!Permissions.hasManageAllFiles())
