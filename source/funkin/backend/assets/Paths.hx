@@ -19,8 +19,16 @@ class Paths
 {
 	public static function init() {
 		#if android
-		var packageName:String = "com.yoshman29.codenameengine"; 
-		ModsFolder.modsPath = "/storage/emulated/0/Android/media/" + packageName + "/files/mods/";
+		var extDir:String = Context.getExternalFilesDir(null);
+		
+		if (extDir != null) {
+			extDir = extDir.replace("Android/data/", "Android/media/");
+			if (!extDir.endsWith("/")) extDir += "/";
+			ModsFolder.modsPath = extDir + "mods/";
+		} else {
+			var packageName:String = "com.yoshman29.codenameengine"; 
+			ModsFolder.modsPath = "/storage/emulated/0/Android/media/" + packageName + "/files/mods/";
+		}
 
 		try {
 			if (!sys.FileSystem.exists(ModsFolder.modsPath))
@@ -34,60 +42,58 @@ class Paths
 			tempFramesCache.clear();
 		});
 	}
-	
 
 	public static var assetsTree:AssetsLibraryList;
 
 	public static var tempFramesCache:Map<String, FlxFramesCollection> = [];
 
-
 	public static inline function getPath(file:String, ?library:String) {
-    var returnedPath:String = library != null ? '$library:$file' : file;
-    
-    #if (sys && !windows)
-    returnedPath = Path.normalize(returnedPath);
-    if (OpenFlAssets.exists(returnedPath)) return returnedPath;
+		var returnedPath:String = library != null ? '$library:$file' : file;
+		
+		#if (sys && !windows)
+		returnedPath = Path.normalize(returnedPath);
+		if (OpenFlAssets.exists(returnedPath)) return returnedPath;
 
-    var prefix:String = "";
-    if (returnedPath.contains(":")) {
-        var split = returnedPath.split(":");
-        prefix = split[0] + ":";
-        returnedPath = split[1];
-    }
+		var prefix:String = "";
+		if (returnedPath.contains(":")) {
+			var split = returnedPath.split(":");
+			prefix = split[0] + ":";
+			returnedPath = split[1];
+		}
 
-    var fixedPath:String = prefix;
-    var parts:Array<String> = returnedPath.split("/");
-    
-    for (it in 0...parts.length) {
-        var part = parts[it];
-        if (part == "") continue;
+		var fixedPath:String = prefix;
+		var parts:Array<String> = returnedPath.split("/");
+		
+		for (it in 0...parts.length) {
+			var part = parts[it];
+			if (part == "") continue;
 
-        var entries:Array<String> = [];
-        
-        if (it < parts.length - 1) 
-            entries = assetsTree.getFolders(fixedPath == "" ? "." : fixedPath);
-        else 
-            entries = assetsTree.getFiles(fixedPath == "" ? "." : fixedPath);
+			var entries:Array<String> = [];
+			
+			if (it < parts.length - 1) 
+				entries = assetsTree.getFolders(fixedPath == "" ? "." : fixedPath);
+			else 
+				entries = assetsTree.getFiles(fixedPath == "" ? "." : fixedPath);
 
-        var found:Bool = false;
-        for (entry in entries) {
-            if (entry.toLowerCase() == part.toLowerCase()) {
-                fixedPath += entry + (it != parts.length - 1 ? "/" : "");
-                found = true;
-                break;
-            }
-        }
+			var found:Bool = false;
+			for (entry in entries) {
+				if (entry.toLowerCase() == part.toLowerCase()) {
+					fixedPath += entry + (it != parts.length - 1 ? "/" : "");
+					found = true;
+					break;
+				}
+			}
 
-        if (!found) {
-            fixedPath += part + (it != parts.length - 1 ? "/" : "");
-        }
-    }
+			if (!found) {
+				fixedPath += part + (it != parts.length - 1 ? "/" : "");
+			}
+		}
 
-    if (returnedPath.toLowerCase() == fixedPath.toLowerCase() || (prefix + returnedPath).toLowerCase() == fixedPath.toLowerCase()) 
-        returnedPath = fixedPath;
-    #end
-    
-    return returnedPath;
+		if (returnedPath.toLowerCase() == fixedPath.toLowerCase() || (prefix + returnedPath).toLowerCase() == fixedPath.toLowerCase()) 
+			returnedPath = fixedPath;
+		#end
+		
+		return returnedPath;
 	}
 	
 	public static inline function video(key:String, ?ext:String)
