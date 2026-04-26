@@ -115,7 +115,7 @@ class MainMenuState extends MusicBeatState
         ['ACCEPT', 'BACK', 'SWITCHMOD', 'DEV_ACCESS']
         );
 
-        Options.virtualPad = virtualPad;
+        Controls.virtualPad = virtualPad;
         #end
 	}
 
