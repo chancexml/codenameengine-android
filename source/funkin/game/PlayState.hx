@@ -679,7 +679,22 @@ class PlayState extends MusicBeatState
 	@:dox(hide) override public function create()
 	{
 		Note.__customNoteTypeExists = [];
-        #if mobile
+		// SCRIPTING & DATA INITIALIZATION
+		#if REGION
+		instance = this;
+		if (FlxG.sound.music != null) FlxG.sound.music.stop();
+
+		PauseSubState.script = Flags.DEFAULT_PAUSE_SCRIPT;
+		GameOverSubstate.script = Flags.DEFAULT_GAMEOVER_SCRIPT;
+		(scripts = new ScriptPack("PlayState")).setParent(this);
+
+		camGame = camera;
+		FlxG.cameras.add(camHUD = new HudCamera(), false);
+		camHUD.bgColor.alpha = 0;
+
+		downscroll = Options.downscroll;
+
+		#if mobile
 		var androidPause = new mobile.controls.Pause();
         add(androidPause);
         androidPause.setPauseButton('true');
@@ -703,20 +718,6 @@ class PlayState extends MusicBeatState
         hitbox.buttonUp.onOut.callback = hitbox.buttonUp.onUp.callback;
         hitbox.buttonRight.onOut.callback = hitbox.buttonRight.onUp.callback;
 		#end
-		// SCRIPTING & DATA INITIALIZATION
-		#if REGION
-		instance = this;
-		if (FlxG.sound.music != null) FlxG.sound.music.stop();
-
-		PauseSubState.script = Flags.DEFAULT_PAUSE_SCRIPT;
-		GameOverSubstate.script = Flags.DEFAULT_GAMEOVER_SCRIPT;
-		(scripts = new ScriptPack("PlayState")).setParent(this);
-
-		camGame = camera;
-		FlxG.cameras.add(camHUD = new HudCamera(), false);
-		camHUD.bgColor.alpha = 0;
-
-		downscroll = Options.downscroll;
 
 		persistentUpdate = true;
 		persistentDraw = true;
