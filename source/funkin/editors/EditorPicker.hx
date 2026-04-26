@@ -2,9 +2,21 @@ package funkin.editors;
 
 import flixel.effects.FlxFlicker;
 import flixel.math.FlxPoint;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.Options;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 class EditorPicker extends MusicBeatSubstate {
 	public var bg:FlxSprite;
+
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 
 	// Name is for backwards compatibility, don't use it, use id instead
 	public var options:Array<Editor> = [
@@ -84,6 +96,17 @@ class EditorPicker extends MusicBeatSubstate {
 		sprites[0].selected = true;
 
 		FlxG.mouse.getScreenPosition(subCam, oldMousePos);
+
+		#if mobile
+        virtualPad = ButtonHelper.create(this, UP_DOWN, A_B);
+
+        ButtonHelper.bind(virtualPad,
+        ['UP', 'DOWN'],
+        ['ACCEPT', 'BACK']
+        );
+
+        Options.virtualPad = virtualPad;
+        #end
 	}
 
 	public override function update(elapsed:Float) {
