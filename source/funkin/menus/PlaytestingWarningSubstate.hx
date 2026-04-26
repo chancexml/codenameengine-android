@@ -7,6 +7,7 @@ import flixel.util.FlxColor;
 import funkin.backend.FunkinText;
 import funkin.editors.ui.UIWarningSubstate.WarningButton;
 #if mobile
+import funkin.options.Options;
 import funkin.backend.system.Controls;
 import funkin.options.keybinds.KeybindsOptions;
 import mobile.controls.VirtualPad;
@@ -88,7 +89,7 @@ class PlaytestingWarningSubstate extends MusicBeatSubstate
         ['ACCEPT', 'BACK']
         );
 
-        Controls.virtualPad = virtualPad;
+        Options.virtualPad = virtualPad;
         #end
 	}
 
