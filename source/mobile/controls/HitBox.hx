@@ -97,8 +97,11 @@ class HitboxButton extends FlxSprite {
             if (onDown.callback != null) onDown.callback();
         } 
         else if (!isPressed && _wasPressed) {
-            if (onUp.callback != null) onUp.callback();
-            if (onOut.callback != null) onOut.callback();
+            if (overlapPointCheck(_touchPoint)) {
+                if (onUp.callback != null) onUp.callback();
+            } else {
+                if (onOut.callback != null) onOut.callback();
+            }
         }
 
         if (Options.hitboxHints) {
@@ -113,10 +116,12 @@ class HitboxButton extends FlxSprite {
     private function checkInputs():Void {
         #if FLX_TOUCH
         for (touch in FlxG.touches.list) {
-            touch.getWorldPosition(_assignedCamera, _touchPoint);
-            if (overlapPointCheck(_touchPoint)) {
-                isPressed = true;
-                return;
+            if (touch.pressed || touch.justPressed) {
+                touch.getWorldPosition(_assignedCamera, _touchPoint);
+                if (overlapPointCheck(_touchPoint)) {
+                    isPressed = true;
+                    return;
+                }
             }
         }
         #end
@@ -137,7 +142,7 @@ class HitboxButton extends FlxSprite {
         var top:Float = y;
         var bottom:Float = y + height;
 
-        if (point.x >= left && point.x <= right && point.y >= top && point.y <= bottom) {
+        if (point.x >= left && point.x < right && point.y >= top && point.y < bottom) {
             return true;
         }
         return false;
