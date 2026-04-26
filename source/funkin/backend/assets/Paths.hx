@@ -9,16 +9,31 @@ import haxe.io.Path;
 import lime.utils.AssetLibrary;
 import openfl.utils.Assets as OpenFlAssets;
 import animate.FlxAnimateFrames;
+#if android
+import extension.androidtools.content.Context;
+#end
 
 using StringTools;
 
 class Paths
 {
-	static function __init__() {
-		#if android
-		ModsFolder.modsPath = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/mods/";
-		#end
-	}
+    public static function init() {
+    #if android
+    /
+    var packageName:String = "com.yoshman29.codenameengine"; 
+    ModsFolder.modsPath = "/storage/emulated/0/Android/media/" + packageName + "/files/mods/";
+    
+    try {
+        if (!sys.FileSystem.exists("/storage/emulated/0/Android/media/" + packageName + "/"))
+             sys.FileSystem.createDirectory("/storage/emulated/0/Android/media/" + packageName + "/");
+             
+        if (!sys.FileSystem.exists(ModsFolder.modsPath))
+             sys.FileSystem.createDirectory(ModsFolder.modsPath);
+    } catch(e:Dynamic) {
+        trace("Error initializing storage: " + e);
+    }
+    #end
+}
 
 	public static var assetsTree:AssetsLibraryList;
 
