@@ -17,33 +17,29 @@ using StringTools;
 
 class Paths
 {
-    public static function init() {
-    #if android
+	public static function init() {
+		#if android
+		var packageName:String = "com.yoshman29.codenameengine"; 
+		ModsFolder.modsPath = "/storage/emulated/0/Android/media/" + packageName + "/files/mods/";
 
-    var packageName:String = "com.yoshman29.codenameengine"; 
-    ModsFolder.modsPath = "/storage/emulated/0/Android/media/" + packageName + "/files/mods/";
-    
-    try {
-        if (!sys.FileSystem.exists("/storage/emulated/0/Android/media/" + packageName + "/"))
-             sys.FileSystem.createDirectory("/storage/emulated/0/Android/media/" + packageName + "/");
-             
-        if (!sys.FileSystem.exists(ModsFolder.modsPath))
-             sys.FileSystem.createDirectory(ModsFolder.modsPath);
-    } catch(e:Dynamic) {
-        trace("Error initializing storage: " + e);
-    }
-    #end
-}
+		try {
+			if (!sys.FileSystem.exists(ModsFolder.modsPath))
+				sys.FileSystem.createDirectory(ModsFolder.modsPath);
+		} catch(e:Dynamic) {
+			trace("Error initializing storage: " + e);
+		}
+		#end
+
+		FlxG.signals.preStateSwitch.add(function() {
+			tempFramesCache.clear();
+		});
+	}
+	
 
 	public static var assetsTree:AssetsLibraryList;
 
 	public static var tempFramesCache:Map<String, FlxFramesCollection> = [];
 
-	public static function init() {
-		FlxG.signals.preStateSwitch.add(function() {
-			tempFramesCache.clear();
-		});
-	}
 
 	public static inline function getPath(file:String, ?library:String) {
     var returnedPath:String = library != null ? '$library:$file' : file;
