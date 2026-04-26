@@ -74,7 +74,6 @@ class ControlsUtil {
 		}
 	}
 
-
 	private static inline function checkControl(controls:Controls, name:String) {
 		var control = getControl(controls, name);
 		if (control != null) return control.check();
@@ -85,37 +84,40 @@ class ControlsUtil {
 		return controls.byName.get(name);
 	}
 
-	public static inline function getJustPressed(controls:Controls, name:String) {
+	public static inline function getJustPressed(controls:Controls, name:String):Bool {
+		var active:Bool = false;
 		#if mobile
 		var upperName = name.toUpperCase();
 		if (funkin.options.Options.controlButtons.exists(upperName)) {
 			var btn = funkin.options.Options.controlButtons.get(upperName);
-			if (btn != null && btn.justPressed) return true;
+			if (btn != null && btn.justPressed) active = true;
 		}
 		#end
-		return checkControl(controls, name + "_P");
+		return active || checkControl(controls, name + "_P");
 	}
 
-	public static inline function getJustReleased(controls:Controls, name:String) {
+	public static inline function getJustReleased(controls:Controls, name:String):Bool {
+		var active:Bool = false;
 		#if mobile
 		var upperName = name.toUpperCase();
 		if (funkin.options.Options.controlButtons.exists(upperName)) {
 			var btn = funkin.options.Options.controlButtons.get(upperName);
-			if (btn != null && btn.justReleased) return true;
+			if (btn != null && btn.justReleased) active = true;
 		}
 		#end
-		return checkControl(controls, name + "_R");
+		return active || checkControl(controls, name + "_R");
 	}
 
-	public static inline function getPressed(controls:Controls, name:String) {
+	public static inline function getPressed(controls:Controls, name:String):Bool {
+		var active:Bool = false;
 		#if mobile
 		var upperName = name.toUpperCase();
 		if (funkin.options.Options.controlButtons.exists(upperName)) {
 			var btn = funkin.options.Options.controlButtons.get(upperName);
-			if (btn != null && btn.pressed) return true;
+			if (btn != null && btn.pressed) active = true;
 		}
 		#end
-		return checkControl(controls, name);
+		return active || checkControl(controls, name);
 	}
 
 	public static function loadCustomControls() {
