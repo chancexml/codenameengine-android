@@ -63,11 +63,11 @@ jobs:
             "platform-tools" \
             "platforms;android-33" \
             "build-tools;33.0.2" \
-            "ndk;25.2.9519653"
+            "ndk;29.0.14206865"
 
           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_NDK_ROOT=$HOME/android-sdk/ndk/25.2.9519653" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$HOME/android-sdk/ndk/29.0.14206865" >> $GITHUB_ENV
 
       - name: Clean Android
         if: ${{ github.event_name == 'push' || github.event.inputs.clean == 'true' }}
