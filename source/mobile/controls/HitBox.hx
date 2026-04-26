@@ -49,11 +49,14 @@ class HitBox extends FlxSpriteGroup {
     }
 
     public function setupCamera():Void {
-        if (!FlxG.cameras.list.contains(hitboxCamera)) {
-            FlxG.cameras.add(hitboxCamera, false);
-        }
+    if (!FlxG.cameras.list.contains(hitboxCamera)) {
+        FlxG.cameras.add(hitboxCamera, false);
+    } else {
+        FlxG.cameras.remove(hitboxCamera, false);
+        FlxG.cameras.add(hitboxCamera, false);
     }
-
+}
+    
     override public function destroy():Void {
         super.destroy();
         if (FlxG.cameras.list.contains(hitboxCamera)) {
