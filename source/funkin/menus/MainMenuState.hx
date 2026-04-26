@@ -11,6 +11,7 @@ import funkin.options.OptionsMenu;
 import lime.app.Application;
 #if mobile
 import funkin.backend.system.Controls;
+import funkin.options.Options;
 import funkin.options.keybinds.KeybindsOptions;
 import mobile.controls.VirtualPad;
 import mobile.controls.FlxButton;
@@ -114,7 +115,7 @@ class MainMenuState extends MusicBeatState
         ['ACCEPT', 'BACK', 'SWITCHMOD', 'DEV_ACCESS']
         );
 
-        Controls.virtualPad = virtualPad;
+        Options.virtualPad = virtualPad;
         #end
 	}
 
