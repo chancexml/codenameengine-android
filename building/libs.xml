@@ -3,11 +3,9 @@
 	<if cond="update || all">
 		<print pretty="true">Preparing installation...</print>
 
-		<!-- OpenFL & Lime (Required for Flixel) 
-		<git name="openfl" url="https://github.com/CodenameCrew/cne-openfl"/> -->
-		<lib name="openfl" version="9.3.3" />
+		<!-- OpenFL & Lime (Required for Flixel) -->
+		<git name="openfl" url="https://github.com/CodenameCrew/cne-openfl" ref="old" />
 		<lib name="lime" version="8.1.2" />
-		<!-- <git name="lime" url="https://github.com/CodenameCrew/cne-lime" />  disabled for now until fixed -->
 
 		<!-- Flixel -->
 		<git name="flixel" url="https://github.com/ChanceXML/cne-flixel-old" />
@@ -15,24 +13,24 @@
 
 		<!-- Other Libraries -->
 		<git name="hscript-improved" url="https://github.com/CodenameCrew/hscript-improved" ref="codename-dev" />
-		<git name="hxdiscord_rpc" url="https://github.com/CodenameCrew/cne-hxdiscord_rpc" skipDeps="true" />
+		<git name="hxdiscord_rpc" url="https://github.com/CodenameCrew/cne-hxdiscord_rpc" ref="old" skipDeps="true" />
 		<lib name="funkin-modchart" skipDeps="true" />
 		<lib name="hxvlc" version="1.9.3" skipDeps="true" />
 
 		<!-- Documentation and other features -->
+		<git name="extension-androidtools" url="https://github.com/ChanceXML/androidTools"/>
 		<git name="away3d" url="https://github.com/CodenameCrew/away3d" />
 		<!-- <lib name="dox" /> -->
 		<lib name="markdown" />
 		<lib name="hxcpp-debug-server" />
 
 		<lib name="nape-haxe4" />
-		<lib name="extension-androidtools" url="https://github.com/ChanceXML/androidTools" ref="91ee9ec998db2754e11481c182ae6b3ff12075e3"/>
 
 		<!-- For building lime -->
 		<lib global="true" name="hxp" /> <lib name="hxp" />
 		<lib global="true" name="format" /> <lib name="format" />
 
-		<git name="hxcpp" url="https://github.com/CodenameCrew/cne-hxcpp"/>
+		<git name="hxcpp" url="https://github.com/CodenameCrew/cne-hxcpp" ref="old" />
 
 		<git name="flixel-animate" url="https://github.com/CodenameCrew/cne-flixel-animate/" ref="old" skipDeps="true"/>
 	</if>
