@@ -9,93 +9,45 @@ import haxe.io.Path;
 import lime.utils.AssetLibrary;
 import openfl.utils.Assets as OpenFlAssets;
 import animate.FlxAnimateFrames;
-#if android
-import extension.androidtools.content.Context;
-#end
 
 using StringTools;
 
 class Paths
 {
+	public static var assetsTree:AssetsLibraryList;
+
+	public static var tempFramesCache:Map<String, FlxFramesCollection> = [];
+
 	public static function init() {
-		#if android
-		var extDir:String = Context.getExternalFilesDir(null);
-		
-		if (extDir != null) {
-			extDir = extDir.replace("Android/data/", "Android/media/");
-			if (!extDir.endsWith("/")) extDir += "/";
-			ModsFolder.modsPath = extDir + "mods/";
-		} else {
-			var packageName:String = "com.yoshman29.codenameengine"; 
-			ModsFolder.modsPath = "/storage/emulated/0/Android/media/" + packageName + "/files/mods/";
-		}
-
-		try {
-			if (!sys.FileSystem.exists(ModsFolder.modsPath))
-				sys.FileSystem.createDirectory(ModsFolder.modsPath);
-		} catch(e:Dynamic) {
-			trace("Error initializing storage: " + e);
-		}
-		#end
-
 		FlxG.signals.preStateSwitch.add(function() {
 			tempFramesCache.clear();
 		});
 	}
 
-	public static var assetsTree:AssetsLibraryList;
-
-	public static var tempFramesCache:Map<String, FlxFramesCollection> = [];
-
 	public static inline function getPath(file:String, ?library:String) {
-		var returnedPath:String = library != null ? '$library:$file' : file;
-		
+		var returnedPath:String = library != null ? '$library:assets/$library/$file' : 'assets/$file';
 		#if (sys && !windows)
 		returnedPath = Path.normalize(returnedPath);
 		if (OpenFlAssets.exists(returnedPath)) return returnedPath;
-
-		var prefix:String = "";
-		if (returnedPath.contains(":")) {
-			var split = returnedPath.split(":");
-			prefix = split[0] + ":";
-			returnedPath = split[1];
-		}
-
-		var fixedPath:String = prefix;
+		var fixedPath:String = library != null ? '$library:assets/$library/' : 'assets/';
 		var parts:Array<String> = returnedPath.split("/");
-		
-		for (it in 0...parts.length) {
-			var part = parts[it];
-			if (part == "") continue;
-
-			var entries:Array<String> = [];
-			
-			if (it < parts.length - 1) 
-				entries = assetsTree.getFolders(fixedPath == "" ? "." : fixedPath);
-			else 
-				entries = assetsTree.getFiles(fixedPath == "" ? "." : fixedPath);
-
-			var found:Bool = false;
+		for (it=>part in parts) {
+			if (it == 0) continue;
+			var entries:Array<String> = null;
+			if (Path.extension(part) == "") entries = assetsTree.getFolders(fixedPath);
+			else entries = assetsTree.getFiles(fixedPath);
 			for (entry in entries) {
 				if (entry.toLowerCase() == part.toLowerCase()) {
 					fixedPath += entry + (it != parts.length - 1 ? "/" : "");
-					found = true;
 					break;
 				}
 			}
-
-			if (!found) {
-				fixedPath += part + (it != parts.length - 1 ? "/" : "");
-			}
 		}
-
-		if (returnedPath.toLowerCase() == fixedPath.toLowerCase() || (prefix + returnedPath).toLowerCase() == fixedPath.toLowerCase()) 
-			returnedPath = fixedPath;
+		if (returnedPath.toLowerCase() == fixedPath.toLowerCase()) returnedPath = fixedPath;
 		#end
-		
 		return returnedPath;
 	}
-	
+
 	public static inline function video(key:String, ?ext:String)
 		return getPath('videos/$key.${ext != null ? ext : Flags.VIDEO_EXT}');
 
@@ -242,9 +194,9 @@ class Paths
 		return FlxAtlasFrames.fromAseprite('$key.${ext != null ? ext : Flags.IMAGE_EXT}', '$key.json');
 
 	inline static public function getAssetsRoot():String
-		return  ModsFolder.currentModFolder != null ? '${ModsFolder.modsPath}${ModsFolder.currentModFolder}' : #if (sys && TEST_BUILD) './${Main.pathBack}assets/' #else './assets' #end;
+		return  ModsFolder.currentModFolder != null ? '/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/mods/${ModsFolder.currentModFolder}' : #if (sys && TEST_BUILD) './${Main.pathBack}assets/' #else './assets' #end;
 
-	 /**
+	/**
 	 * Gets frames at specified path.
 	 * @param key Path to the frames
 	 * @param library (Additional) library to load the frames from.
@@ -257,37 +209,48 @@ class Paths
 			else
 				tempFramesCache.remove(key);
 		}
-		return tempFramesCache[key] = loadFrames(assetsPath ? key : Paths.image(key, library, true, ext), false, null, false, false, ext, animateSettings);
+		return tempFramesCache[key] = loadFrames(assetsPath ? key : Paths.image(key, library, true, ext), false, null, false, ext, animateSettings);
 	}
 
 	/**
 	 * Checks if the images needed for using getFrames() exist.
-	 */
+	 * @param key Path to the image
+	 * @param checkAtlas Whenever to check for the Animation.json file (used in FlxAnimate)
+	 * @param assetsPath Whenever to use the raw path or to pass it through Paths.image()
+	 * @param library (Additional) library to load the frames from.
+	 * @return True if the images exist, false otherwise.
+	**/
 	public static function framesExists(key:String, checkAtlas:Bool = false, checkMulti:Bool = true, assetsPath:Bool = false, ?library:String) {
 		var path = assetsPath ? key : Paths.image(key, library, true);
 		var noExt = Path.withoutExtension(path);
-		
-		if(checkAtlas && OpenFlAssets.exists('$noExt/Animation.json'))
+		if(checkAtlas && Assets.exists('$noExt/Animation.json'))
 			return true;
-		if(checkMulti && OpenFlAssets.exists('$noExt/1.png'))
+		if(checkMulti && Assets.exists('$noExt/1.png'))
 			return true;
-		if(OpenFlAssets.exists('$noExt.xml'))
+		if(Assets.exists('$noExt.xml'))
 			return true;
-		if(OpenFlAssets.exists('$noExt.txt'))
+		if(Assets.exists('$noExt.txt'))
 			return true;
-		if(OpenFlAssets.exists('$noExt.json'))
+		if(Assets.exists('$noExt.json'))
 			return true;
 		return false;
 	}
 
 	/**
 	 * Loads frames from a specific image path. Supports Sparrow Atlases, Packer Atlases, and multiple spritesheets.
+	 * @param path Path to the image
+	 * @param Unique Whenever the image should be unique in the cache
+	 * @param Key Key to the image in the cache
+	 * @param SkipAtlasCheck Whenever the atlas check should be skipped.
+	 * @param SkipMultiCheck Whenever the multi spritesheet check should be skipped.
+	 * @param Ext Extension of the image.
+	 * @return FlxFramesCollection Frames
 	 */
 	static function loadFrames(path:String, Unique:Bool = false, Key:String = null, SkipAtlasCheck:Bool = false, SkipMultiCheck:Bool = false, ?Ext:String = null, ?animateSettings:FlxAnimateSettings):FlxFramesCollection {
 		var noExt = Path.withoutExtension(path);
 		var ext = Ext != null ? Ext : Flags.IMAGE_EXT;
 
-		if (!SkipMultiCheck && OpenFlAssets.exists('$noExt/1.${ext}')) {
+		if (!SkipMultiCheck && Assets.exists('$noExt/1.${ext}')) {
 			// MULTIPLE SPRITESHEETS!!
 
 			var graphic = FlxG.bitmap.add("flixel/images/logo/default.png", false, '$noExt/mult');
@@ -298,19 +261,19 @@ class Paths
 			trace("no frames yet for multiple atlases!!");
 			var cur = 1;
 			var finalFrames = new MultiFramesCollection(graphic);
-			while(OpenFlAssets.exists('$noExt/$cur.${ext}')) {
+			while(Assets.exists('$noExt/$cur.${ext}')) {
 				var spr = loadFrames('$noExt/$cur.${ext}', false, null, false, true);
 				finalFrames.addFrames(spr);
 				cur++;
 			}
 			return finalFrames;
-		} else if (OpenFlAssets.exists('$noExt/Animation.json')) {
+		} else if (Assets.exists('$noExt/Animation.json')) {
 			return Paths.getAnimateAtlasAlt(noExt, animateSettings);
-		} else if (OpenFlAssets.exists('$noExt.xml')) {
+		} else if (Assets.exists('$noExt.xml')) {
 			return Paths.getSparrowAtlasAlt(noExt, ext);
-		} else if (OpenFlAssets.exists('$noExt.txt')) {
+		} else if (Assets.exists('$noExt.txt')) {
 			return Paths.getPackerAtlasAlt(noExt, ext);
-		} else if (OpenFlAssets.exists('$noExt.json')) {
+		} else if (Assets.exists('$noExt.json')) {
 			return Paths.getAsepriteAtlasAlt(noExt, ext);
 		}
 
