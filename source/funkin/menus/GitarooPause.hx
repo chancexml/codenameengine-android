@@ -67,7 +67,7 @@ class GitarooPause extends MusicBeatState
         ['ACCEPT', 'BACK']
         );
 
-        Options.virtualPad = virtualPad;
+        Controls.virtualPad = virtualPad;
         #end
 	}
 
