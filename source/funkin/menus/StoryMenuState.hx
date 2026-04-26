@@ -15,6 +15,7 @@ import funkin.savedata.FunkinSave;
 import haxe.io.Path;
 import haxe.xml.Access;
 #if mobile
+import funkin.options.Options;
 import funkin.backend.system.Controls;
 import funkin.options.keybinds.KeybindsOptions;
 import mobile.controls.VirtualPad;
@@ -153,7 +154,7 @@ class StoryMenuState extends MusicBeatState {
         ['ACCEPT', 'BACK']
         );
 
-        Controls.virtualPad = virtualPad;
+        Options.virtualPad = virtualPad;
         #end
 	}
 
