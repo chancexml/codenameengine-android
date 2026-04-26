@@ -1,8 +1,14 @@
 package funkin.options;
 
+import flixel.FlxG;
 import flixel.input.keyboard.FlxKey;
 import flixel.util.FlxSave;
 import openfl.Lib;
+
+#if mobile
+import mobile.controls.FlxButton;
+import mobile.controls.VirtualPad;
+#end
 
 /**
  * The save data of the engine.
@@ -106,6 +112,15 @@ class Options
 	public static var playAnimOnOffset:Bool = false;
 
 	/**
+	 * MOBILE CONTROLS / VIRTUAL PAD
+	 */
+	#if mobile
+	// This stores the dynamic mapping: e.g., "ACCEPT" -> virtualPad.buttonC
+	@:doNotSave public static var controlButtons:Map<String, FlxButton> = new Map();
+	@:doNotSave public static var virtualPad:VirtualPad = null;
+	#end
+
+	/**
 	 * PLAYER 1 CONTROLS
 	 */
 	public static var P1_NOTE_LEFT:Array<FlxKey> = [A];
@@ -201,6 +216,44 @@ class Options
 	public static var SOLO_DEV_ACCESS(get, null):Array<FlxKey>;
 	public static var SOLO_DEV_CONSOLE(get, null):Array<FlxKey>;
 	public static var SOLO_DEV_RELOAD(get, null):Array<FlxKey>;
+
+	/**
+	 * INPUT HELPER (Checks Keyboard AND VirtualPad)
+	 */
+	public static function isPressed(control:String):Bool
+	{
+		// Check Keyboard (Dynamic based on your P1 arrays)
+		var keys:Array<FlxKey> = getKeysForControl(control);
+		if (FlxG.keys.anyPressed(keys)) return true;
+
+		// Check Virtual Pad (Dynamic Mapping)
+		#if mobile
+		var ctrl = control.toUpperCase();
+		if (controlButtons.exists(ctrl)) {
+			var btn = controlButtons.get(ctrl);
+			if (btn != null && btn.pressed) return true;
+		}
+		#end
+
+		return false;
+	}
+
+	/**
+	 * Maps a string name to the actual public key arrays
+	 */
+	private static function getKeysForControl(control:String):Array<FlxKey>
+	{
+		return switch(control.toUpperCase()) {
+			case "UP": P1_UP;
+			case "DOWN": P1_DOWN;
+			case "LEFT": P1_LEFT;
+			case "RIGHT": P1_RIGHT;
+			case "ACCEPT": P1_ACCEPT;
+			case "BACK": P1_BACK;
+			case "PAUSE": P1_PAUSE;
+			default: [];
+		}
+	}
 
 	public static function load() {
 		var path = haxe.macro.Compiler.getDefine("SAVE_OPTIONS_PATH"), name = haxe.macro.Compiler.getDefine("SAVE_OPTIONS_NAME");
