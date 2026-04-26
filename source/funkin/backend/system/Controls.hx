@@ -381,17 +381,25 @@ class Controls extends FlxActionSet
 	public function getJustPressed(name:String) {
 		#if mobile
 		if (virtualPad != null && name != null) {
-			var padKey = name;
 			switch(name) {
-				case "up" | "down" | "left" | "right": padKey = "ui_" + name;
-				case "note-up" | "note-down" | "note-left" | "note-right": padKey = StringTools.replace(name, "-", "_");
-			}
-
-			if (virtualPad.justPressed(padKey)) return true;
-			if (StringTools.startsWith(padKey, 'note_')) {
-				if (virtualPad.justPressed('ui_' + padKey.substring(5))) return true;
-			} else if (StringTools.startsWith(padKey, 'ui_')) {
-				if (virtualPad.justPressed('note_' + padKey.substring(3))) return true;
+				case "up" | "note-up" | "ui_up" | "UP":
+					if (virtualPad.buttonUp != null && virtualPad.buttonUp.justPressed) return true;
+				case "down" | "note-down" | "ui_down" | "DOWN":
+					if (virtualPad.buttonDown != null && virtualPad.buttonDown.justPressed) return true;
+				case "left" | "note-left" | "ui_left" | "LEFT":
+					if (virtualPad.buttonLeft != null && virtualPad.buttonLeft.justPressed) return true;
+				case "right" | "note-right" | "ui_right" | "RIGHT":
+					if (virtualPad.buttonRight != null && virtualPad.buttonRight.justPressed) return true;
+				case "accept" | "ACCEPT":
+					if (virtualPad.buttonA != null && virtualPad.buttonA.justPressed) return true;
+				case "back" | "BACK":
+					if (virtualPad.buttonB != null && virtualPad.buttonB.justPressed) return true;
+				case "pause" | "change-mode" | "switchmod" | "PAUSE":
+					if (virtualPad.buttonC != null && virtualPad.buttonC.justPressed) return true;
+				case "reset" | "RESET":
+					if (virtualPad.buttonY != null && virtualPad.buttonY.justPressed) return true;
+				case "fps-counter" | "cheat":
+					if (virtualPad.buttonX != null && virtualPad.buttonX.justPressed) return true;
 			}
 		}
 		#end
@@ -402,17 +410,25 @@ class Controls extends FlxActionSet
 	public inline function getJustReleased(name:String) {
 		#if mobile
 		if (virtualPad != null && name != null) {
-			var padKey = name;
 			switch(name) {
-				case "up" | "down" | "left" | "right": padKey = "ui_" + name;
-				case "note-up" | "note-down" | "note-left" | "note-right": padKey = StringTools.replace(name, "-", "_");
-			}
-
-			if (virtualPad.justReleased(padKey)) return true;
-			if (StringTools.startsWith(padKey, 'note_')) {
-				if (virtualPad.justReleased('ui_' + padKey.substring(5))) return true;
-			} else if (StringTools.startsWith(padKey, 'ui_')) {
-				if (virtualPad.justReleased('note_' + padKey.substring(3))) return true;
+				case "up" | "note-up" | "ui_up" | "UP":
+					if (virtualPad.buttonUp != null && virtualPad.buttonUp.justReleased) return true;
+				case "down" | "note-down" | "ui_down" | "DOWN":
+					if (virtualPad.buttonDown != null && virtualPad.buttonDown.justReleased) return true;
+				case "left" | "note-left" | "ui_left" | "LEFT":
+					if (virtualPad.buttonLeft != null && virtualPad.buttonLeft.justReleased) return true;
+				case "right" | "note-right" | "ui_right" | "RIGHT":
+					if (virtualPad.buttonRight != null && virtualPad.buttonRight.justReleased) return true;
+				case "accept" | "ACCEPT":
+					if (virtualPad.buttonA != null && virtualPad.buttonA.justReleased) return true;
+				case "back" | "BACK":
+					if (virtualPad.buttonB != null && virtualPad.buttonB.justReleased) return true;
+				case "pause" | "change-mode" | "switchmod" | "PAUSE":
+					if (virtualPad.buttonC != null && virtualPad.buttonC.justReleased) return true;
+				case "reset" | "RESET":
+					if (virtualPad.buttonY != null && virtualPad.buttonY.justReleased) return true;
+				case "fps-counter" | "cheat":
+					if (virtualPad.buttonX != null && virtualPad.buttonX.justReleased) return true;
 			}
 		}
 		#end
@@ -423,17 +439,25 @@ class Controls extends FlxActionSet
 	public function getPressed(name:String) {
 		#if mobile
 		if (virtualPad != null && virtualPad.exists && name != null) {
-			var padKey = name;
 			switch(name) {
-				case "up" | "down" | "left" | "right": padKey = "ui_" + name;
-				case "note-up" | "note-down" | "note-left" | "note-right": padKey = StringTools.replace(name, "-", "_");
-			}
-
-			if (virtualPad.pressed(padKey, FlxG.elapsed)) return true;
-			if (StringTools.startsWith(padKey, 'note_')) {
-				if (virtualPad.pressed('ui_' + padKey.substring(5), FlxG.elapsed)) return true;
-			} else if (StringTools.startsWith(padKey, 'ui_')) {
-				if (virtualPad.pressed('note_' + padKey.substring(3), FlxG.elapsed)) return true;
+				case "up" | "note-up" | "ui_up" | "UP":
+					if (virtualPad.buttonUp != null && virtualPad.buttonUp.pressed) return true;
+				case "down" | "note-down" | "ui_down" | "DOWN":
+					if (virtualPad.buttonDown != null && virtualPad.buttonDown.pressed) return true;
+				case "left" | "note-left" | "ui_left" | "LEFT":
+					if (virtualPad.buttonLeft != null && virtualPad.buttonLeft.pressed) return true;
+				case "right" | "note-right" | "ui_right" | "RIGHT":
+					if (virtualPad.buttonRight != null && virtualPad.buttonRight.pressed) return true;
+				case "accept" | "ACCEPT":
+					if (virtualPad.buttonA != null && virtualPad.buttonA.pressed) return true;
+				case "back" | "BACK":
+					if (virtualPad.buttonB != null && virtualPad.buttonB.pressed) return true;
+				case "pause" | "change-mode" | "switchmod" | "PAUSE":
+					if (virtualPad.buttonC != null && virtualPad.buttonC.pressed) return true;
+				case "reset" | "RESET":
+					if (virtualPad.buttonY != null && virtualPad.buttonY.pressed) return true;
+				case "fps-counter" | "cheat":
+					if (virtualPad.buttonX != null && virtualPad.buttonX.pressed) return true;
 			}
 		}
 		#end
