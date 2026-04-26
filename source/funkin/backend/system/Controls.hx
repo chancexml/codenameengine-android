@@ -188,83 +188,6 @@ class Controls extends FlxActionSet
 	@:pressed("dev-reload") public var DEV_RELOAD_HOLD(get, set): Bool;
 	@:justReleased("dev-reload") public var DEV_RELOAD_R(get, set): Bool;
 
-	// --- MANUAL GETTER OVERRIDES FOR MOBILE ---
-	// Ensures the game properly queries our overrides instead of bypassing them via the macro.
-	#if mobile
-	private function get_UP():Bool return getPressed("up");
-	private function get_UP_P():Bool return getJustPressed("up");
-	private function get_UP_R():Bool return getJustReleased("up");
-
-	private function get_DOWN():Bool return getPressed("down");
-	private function get_DOWN_P():Bool return getJustPressed("down");
-	private function get_DOWN_R():Bool return getJustReleased("down");
-
-	private function get_LEFT():Bool return getPressed("left");
-	private function get_LEFT_P():Bool return getJustPressed("left");
-	private function get_LEFT_R():Bool return getJustReleased("left");
-
-	private function get_RIGHT():Bool return getPressed("right");
-	private function get_RIGHT_P():Bool return getJustPressed("right");
-	private function get_RIGHT_R():Bool return getJustReleased("right");
-
-	private function get_NOTE_UP():Bool return getPressed("note-up");
-	private function get_NOTE_UP_P():Bool return getJustPressed("note-up");
-	private function get_NOTE_UP_R():Bool return getJustReleased("note-up");
-
-	private function get_NOTE_DOWN():Bool return getPressed("note-down");
-	private function get_NOTE_DOWN_P():Bool return getJustPressed("note-down");
-	private function get_NOTE_DOWN_R():Bool return getJustReleased("note-down");
-
-	private function get_NOTE_LEFT():Bool return getPressed("note-left");
-	private function get_NOTE_LEFT_P():Bool return getJustPressed("note-left");
-	private function get_NOTE_LEFT_R():Bool return getJustReleased("note-left");
-
-	private function get_NOTE_RIGHT():Bool return getPressed("note-right");
-	private function get_NOTE_RIGHT_P():Bool return getJustPressed("note-right");
-	private function get_NOTE_RIGHT_R():Bool return getJustReleased("note-right");
-
-	private function get_ACCEPT():Bool return getJustPressed("accept");
-	private function get_ACCEPT_HOLD():Bool return getPressed("accept");
-	private function get_ACCEPT_R():Bool return getJustReleased("accept");
-
-	private function get_BACK():Bool return getJustPressed("back");
-	private function get_BACK_HOLD():Bool return getPressed("back");
-	private function get_BACK_R():Bool return getJustReleased("back");
-
-	private function get_PAUSE():Bool return getJustPressed("pause");
-	private function get_PAUSE_HOLD():Bool return getPressed("pause");
-	private function get_PAUSE_R():Bool return getJustReleased("pause");
-
-	private function get_RESET():Bool return getJustPressed("reset");
-	private function get_RESET_HOLD():Bool return getPressed("reset");
-	private function get_RESET_R():Bool return getJustReleased("reset");
-
-	private function get_CHANGE_MODE():Bool return getJustPressed("change-mode");
-	private function get_CHANGE_MODE_HOLD():Bool return getPressed("change-mode");
-	private function get_CHANGE_MODE_R():Bool return getJustReleased("change-mode");
-
-	private function get_SWITCHMOD():Bool return getJustPressed("switchmod");
-	private function get_SWITCHMOD_HOLD():Bool return getPressed("switchmod");
-	private function get_SWITCHMOD_R():Bool return getJustReleased("switchmod");
-
-	private function get_FPS_COUNTER():Bool return getJustPressed("fps-counter");
-	private function get_FPS_COUNTER_HOLD():Bool return getPressed("fps-counter");
-	private function get_FPS_COUNTER_R():Bool return getJustReleased("fps-counter");
-
-	private function get_DEV_ACCESS():Bool return getJustPressed("dev-access");
-	private function get_DEV_ACCESS_HOLD():Bool return getPressed("dev-access");
-	private function get_DEV_ACCESS_R():Bool return getJustReleased("dev-access");
-
-	private function get_DEV_CONSOLE():Bool return getJustPressed("dev-console");
-	private function get_DEV_CONSOLE_HOLD():Bool return getPressed("dev-console");
-	private function get_DEV_CONSOLE_R():Bool return getJustReleased("dev-console");
-
-	private function get_DEV_RELOAD():Bool return getJustPressed("dev-reload");
-	private function get_DEV_RELOAD_HOLD():Bool return getPressed("dev-reload");
-	private function get_DEV_RELOAD_R():Bool return getJustReleased("dev-reload");
-	#end
-	// --- END OF OVERRIDES ---
-
 	@:allow(funkin.backend.utils.ControlsUtil)
 	var byName:Map<String, FlxActionDigital> = [];
 
@@ -458,7 +381,7 @@ class Controls extends FlxActionSet
 	}
 
 	@:nullSafety(Off)
-	public inline function getJustReleased(name:String):Bool {
+	public function getJustReleased(name:String):Bool {
 		#if mobile
 		if (virtualPad != null && virtualPad.exists && name != null) {
 			var pad = virtualPad;
