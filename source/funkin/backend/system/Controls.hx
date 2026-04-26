@@ -46,12 +46,6 @@ enum KeyboardScheme
 	Custom;
 }
 
-/**
- * A list of actions that a player would invoke via some input device.
- * Uses FlxActions to funnel various inputs to a single action.
- */
-// Macro generated
-// A and B are swapped for switch
 @:noCustomClass
 @:nullSafety
 @:build(funkin.backend.system.macros.ControlsMacro.build())
@@ -167,11 +161,6 @@ class Controls extends FlxActionSet
 	@:pressed("change-mode") public var CHANGE_MODE_HOLD(get, set): Bool;
 	@:justReleased("change-mode") public var CHANGE_MODE_R(get, set): Bool;
 
-	//@:gamepad([])
-	//@:justPressed("cheat") public var CHEAT(get, set): Bool;
-	//@:pressed("cheat") public var CHEAT_HOLD(get, set): Bool;
-	//@:justReleased("cheat") public var CHEAT_R(get, set): Bool;
-
 	@:gamepad([FlxGamepadInputID.BACK]) // select button
 	@:justPressed("switchmod") public var SWITCHMOD(get, set): Bool;
 	@:pressed("switchmod") public var SWITCHMOD_HOLD(get, set): Bool;
@@ -254,19 +243,11 @@ class Controls extends FlxActionSet
 			bindButtons(control, deviceID, [toAdd]);
 	}
 
-	/**
-	 * Sets all actions that pertain to the binder to trigger when the supplied keys are used.
-	 * If binder is a literal you can inline this
-	 */
 	public inline function bindKeys(control:Control, keys:Array<FlxKey>)
 	{
 		macro_forEachBound(control, (action, state) -> addKeys(action, keys, state));
 	}
 
-	/**
-	 * Sets all actions that pertain to the binder to trigger when the supplied keys are used.
-	 * If binder is a literal you can inline this
-	 */
 	public inline function unbindKeys(control:Control, keys:Array<FlxKey>)
 	{
 		macro_forEachBound(control, (action, _) -> removeKeys(action, keys));
@@ -337,19 +318,11 @@ class Controls extends FlxActionSet
 		gamepadsAdded.remove(deviceID);
 	}
 
-	/**
-	 * Sets all actions that pertain to the binder to trigger when the supplied keys are used.
-	 * If binder is a literal you can inline this
-	 */
 	public inline function bindButtons(control:Control, id, buttons)
 	{
 		macro_forEachBound(control, (action, state) -> addButtons(action, buttons, state, id));
 	}
 
-	/**
-	 * Sets all actions that pertain to the binder to trigger when the supplied keys are used.
-	 * If binder is a literal you can inline this
-	 */
 	public inline function unbindButtons(control:Control, gamepadID:Int, buttons)
 	{
 		macro_forEachBound(control, (action, _) -> removeButtons(action, gamepadID, buttons));
@@ -394,16 +367,18 @@ class Controls extends FlxActionSet
 					if (virtualPad.buttonA != null && virtualPad.buttonA.justPressed) return true;
 				case "back" | "BACK":
 					if (virtualPad.buttonB != null && virtualPad.buttonB.justPressed) return true;
-				case "pause" | "change-mode" | "switchmod" | "PAUSE":
-					if (virtualPad.buttonC != null && virtualPad.buttonC.justPressed) return true;
-				case "reset" | "RESET":
-					if (virtualPad.buttonY != null && virtualPad.buttonY.justPressed) return true;
-				case "fps-counter" | "cheat":
+				case "switchmod" | "SWITCHMOD":
 					if (virtualPad.buttonX != null && virtualPad.buttonX.justPressed) return true;
+				case "dev-access" | "DEV_ACCESS":
+					if (virtualPad.buttonY != null && virtualPad.buttonY.justPressed) return true;
+				case "pause" | "change-mode" | "PAUSE":
+					if (virtualPad.buttonC != null && virtualPad.buttonC.justPressed) return true;
+				case "fps-counter" | "cheat" | "reset" | "RESET":
+					// Add custom mapping for these if you expand your virtual pad in ButtonHelper!
 			}
 		}
 		#end
-		return ControlsUtil.getJustPressed(this, name);
+		return funkin.backend.utils.ControlsUtil.getJustPressed(this, name);
 	}
 
 	@:nullSafety(Off)
@@ -423,16 +398,16 @@ class Controls extends FlxActionSet
 					if (virtualPad.buttonA != null && virtualPad.buttonA.justReleased) return true;
 				case "back" | "BACK":
 					if (virtualPad.buttonB != null && virtualPad.buttonB.justReleased) return true;
-				case "pause" | "change-mode" | "switchmod" | "PAUSE":
-					if (virtualPad.buttonC != null && virtualPad.buttonC.justReleased) return true;
-				case "reset" | "RESET":
-					if (virtualPad.buttonY != null && virtualPad.buttonY.justReleased) return true;
-				case "fps-counter" | "cheat":
+				case "switchmod" | "SWITCHMOD":
 					if (virtualPad.buttonX != null && virtualPad.buttonX.justReleased) return true;
+				case "dev-access" | "DEV_ACCESS":
+					if (virtualPad.buttonY != null && virtualPad.buttonY.justReleased) return true;
+				case "pause" | "change-mode" | "PAUSE":
+					if (virtualPad.buttonC != null && virtualPad.buttonC.justReleased) return true;
 			}
 		}
 		#end
-		return ControlsUtil.getJustReleased(this, name);
+		return funkin.backend.utils.ControlsUtil.getJustReleased(this, name);
 	}
 
 	@:nullSafety(Off)
@@ -452,16 +427,16 @@ class Controls extends FlxActionSet
 					if (virtualPad.buttonA != null && virtualPad.buttonA.pressed) return true;
 				case "back" | "BACK":
 					if (virtualPad.buttonB != null && virtualPad.buttonB.pressed) return true;
-				case "pause" | "change-mode" | "switchmod" | "PAUSE":
-					if (virtualPad.buttonC != null && virtualPad.buttonC.pressed) return true;
-				case "reset" | "RESET":
-					if (virtualPad.buttonY != null && virtualPad.buttonY.pressed) return true;
-				case "fps-counter" | "cheat":
+				case "switchmod" | "SWITCHMOD":
 					if (virtualPad.buttonX != null && virtualPad.buttonX.pressed) return true;
+				case "dev-access" | "DEV_ACCESS":
+					if (virtualPad.buttonY != null && virtualPad.buttonY.pressed) return true;
+				case "pause" | "change-mode" | "PAUSE":
+					if (virtualPad.buttonC != null && virtualPad.buttonC.pressed) return true;
 			}
 		}
 		#end
-		return ControlsUtil.getPressed(this, name);
+		return funkin.backend.utils.ControlsUtil.getPressed(this, name);
 	}
 
 	public function pressedRepeat(name:String):Bool
@@ -540,7 +515,7 @@ class Controls extends FlxActionSet
 				mousePos.put();
 			}
 
-			FlxG.mouse.enabled = !onUI;
+			// FlxG.mouse.enabled = !onUI;
 		}
 		#end
 	}
