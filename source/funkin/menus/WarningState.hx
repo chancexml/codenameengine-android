@@ -4,6 +4,7 @@ import flixel.util.FlxColor;
 import flixel.text.FlxText;
 import funkin.backend.FunkinText;
 #if mobile
+import funkin.options.Options;
 import funkin.backend.system.Controls;
 import funkin.options.keybinds.KeybindsOptions;
 import mobile.controls.VirtualPad;
@@ -54,7 +55,7 @@ class WarningState extends MusicBeatState {
         ['ACCEPT', 'BACK']
         );
 
-        Controls.virtualPad = virtualPad;
+        Options.virtualPad = virtualPad;
         #end
 	}
 
