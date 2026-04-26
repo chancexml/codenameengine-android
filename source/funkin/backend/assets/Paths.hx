@@ -19,7 +19,7 @@ class Paths
 {
     public static function init() {
     #if android
-    /
+
     var packageName:String = "com.yoshman29.codenameengine"; 
     ModsFolder.modsPath = "/storage/emulated/0/Android/media/" + packageName + "/files/mods/";
     
