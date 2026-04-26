@@ -142,7 +142,7 @@ class PauseSubState extends MusicBeatSubstate
         ['ACCEPT', 'BACK']
         );
 
-        Options.virtualPad = virtualPad;
+        Controls.virtualPad = virtualPad;
         #end
 	}
 
