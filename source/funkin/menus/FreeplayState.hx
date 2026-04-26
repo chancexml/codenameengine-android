@@ -11,6 +11,7 @@ import funkin.game.HealthIcon;
 import funkin.savedata.FunkinSave;
 #if mobile
 import funkin.backend.system.Controls;
+import funkin.options.Options;
 import funkin.options.keybinds.KeybindsOptions;
 import mobile.controls.VirtualPad;
 import mobile.controls.FlxButton;
@@ -206,7 +207,7 @@ class FreeplayState extends MusicBeatState
         ['ACCEPT', 'BACK']
         );
 
-        Controls.virtualPad = virtualPad;
+        Options.virtualPad = virtualPad;
         #end
     }
 
