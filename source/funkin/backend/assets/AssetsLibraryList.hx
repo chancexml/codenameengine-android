@@ -22,7 +22,10 @@ class AssetsLibraryList extends AssetLibrary {
 	// is true if any library in `libraries` contains some kind of compressed library. 
 	public var hasCompressedLibrary(get, never):Bool;
 	function get_hasCompressedLibrary():Bool {
-		for (l in libraries) if (getCleanLibrary(l).isCompressed) return true;
+		for (l in libraries) {
+			var clean:Dynamic = getCleanLibrary(l);
+			if (clean != null && clean.isCompressed == true) return true;
+		}
 		return false;
 	}
 
