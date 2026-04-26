@@ -92,7 +92,7 @@ jobs:
         
       - name: Build APK
         run: |
-         haxelib run lime build android -clean -ONLY_V7A ${{ github.event.inputs.android_flags }}
+         haxelib run lime build android -clean ${{ github.event.inputs.android_flags }}
 
       - name: Find APK
         run: find . -name "*.apk"
