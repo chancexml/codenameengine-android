@@ -247,6 +247,8 @@
     <!-- Mobile Stuff !-->
 	<config:android minimum-sdk-version="21" />
     <config:android target-sdk-version="30" />
+
+	<architecture name="arm64" if="android" />
 		
 	<android permission="android.permission.MANAGE_EXTERNAL_STORAGE" />
 </project>
