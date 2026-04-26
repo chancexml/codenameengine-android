@@ -86,12 +86,35 @@ class ControlsUtil {
 	}
 
 	public static inline function getJustPressed(controls:Controls, name:String) {
+		#if mobile
+		var upperName = name.toUpperCase();
+		if (funkin.options.Options.controlButtons.exists(upperName)) {
+			var btn = funkin.options.Options.controlButtons.get(upperName);
+			if (btn != null && btn.justPressed) return true;
+		}
+		#end
 		return checkControl(controls, name + "_P");
 	}
+
 	public static inline function getJustReleased(controls:Controls, name:String) {
+		#if mobile
+		var upperName = name.toUpperCase();
+		if (funkin.options.Options.controlButtons.exists(upperName)) {
+			var btn = funkin.options.Options.controlButtons.get(upperName);
+			if (btn != null && btn.justReleased) return true;
+		}
+		#end
 		return checkControl(controls, name + "_R");
 	}
+
 	public static inline function getPressed(controls:Controls, name:String) {
+		#if mobile
+		var upperName = name.toUpperCase();
+		if (funkin.options.Options.controlButtons.exists(upperName)) {
+			var btn = funkin.options.Options.controlButtons.get(upperName);
+			if (btn != null && btn.pressed) return true;
+		}
+		#end
 		return checkControl(controls, name);
 	}
 
