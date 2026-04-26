@@ -7,6 +7,7 @@ import funkin.options.categories.*;
 import funkin.options.type.*;
 #if mobile
 import funkin.backend.system.Controls;
+import funkin.options.Options;
 import funkin.options.keybinds.KeybindsOptions;
 import mobile.controls.VirtualPad;
 import mobile.controls.FlxButton;
@@ -85,7 +86,7 @@ class OptionsMenu extends TreeMenu {
         ['ACCEPT', 'BACK']
         );
 
-        Controls.virtualPad = virtualPad;
+        Options.virtualPad = virtualPad;
         #end
 
 		for (i in mainOptions) if (i.name == "optionsTree.language-name" && Flags.DISABLE_LANGUAGES) mainOptions.remove(i);
