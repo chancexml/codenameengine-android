@@ -5,6 +5,9 @@ import lime.media.AudioBuffer;
 import lime.graphics.Image;
 import lime.text.Font;
 import lime.utils.Bytes;
+#if android
+import extension.androidtools.content.Context;
+#end
 
 #if MOD_SUPPORT
 import sys.FileStat;
@@ -23,8 +26,7 @@ class ModsFolderLibrary extends AssetLibrary implements IModsAssetLibrary {
 	public function new(basePath:String, libName:String, ?modName:String) {
 		#if android
 		if (basePath.startsWith("mods/") || basePath == "mods") {
-			var androidMediaDir = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/";
-			basePath = androidMediaDir + basePath;
+			basePath = getAndroidMediaDir() + basePath;
 		}
 		#end
 
@@ -125,15 +127,6 @@ class ModsFolderLibrary extends AssetLibrary implements IModsAssetLibrary {
 			return false;
 		var editedTime = editedTimes[asset];
 		if (editedTime == null || editedTime < FileSystem.stat(getPath(asset)).mtime.getTime()) {
-			// destroy already existing to prevent memory leak!!!
-			/*var asset = cache[asset];
-			if (asset != null) {
-				switch(Type.getClass(asset)) {
-					case lime.graphics.Image:
-						trace("getting rid of image cause replaced");
-						cast(asset, lime.graphics.Image);
-				}
-			}*/
 			return false;
 		}
 
@@ -183,10 +176,20 @@ class ModsFolderLibrary extends AssetLibrary implements IModsAssetLibrary {
 	@:noCompletion private inline function set_folderPath(value:String):String {
 		#if android
 		if (value.startsWith("mods/") || value == "mods") {
-			var androidMediaDir = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/";
-			value = androidMediaDir + value;
+			value = getAndroidMediaDir() + value;
 		}
 		#end
 		return basePath = value;
 	}
+
+	#if android
+	/**
+	 * Helper to get the correct Media directory dynamically via JNI.
+	 */
+	private function getAndroidMediaDir():String {
+		var mediaDirs = Context.getExternalMediaDirs();
+		var base = (mediaDirs != null && mediaDirs.length > 0) ? mediaDirs[0] : "/storage/emulated/0/Android/media/com.yoshman29.codenameengine";
+		return haxe.io.Path.addTrailingSlash(base) + "files/";
+	}
+	#end
 }
