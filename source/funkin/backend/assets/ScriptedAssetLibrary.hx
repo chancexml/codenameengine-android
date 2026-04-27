@@ -10,6 +10,7 @@ import lime.utils.Bytes;
 
 #if android
 import lime.system.System;
+import extension.androidtools.content.Context;
 #end
 
 #if MOD_SUPPORT
@@ -24,11 +25,16 @@ class ScriptedAssetLibrary extends ModsFolderLibrary {
 	public var scriptName:String;
 	private static var nullValue:Dynamic = {};
 
-		public function new(scriptName:String, args:Array<Dynamic> = null, basePath:String="./assets/", libName:String="assets", ?modName:String) {
+	public function new(scriptName:String, args:Array<Dynamic> = null, basePath:String="./assets/", libName:String="assets", ?modName:String) {
 		if(modName == null) modName = scriptName;
 		
 		#if android
-		basePath = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/mods/";
+		var mediaDirs = Context.getExternalMediaDirs();
+		var baseMedia:String = (mediaDirs != null && mediaDirs.length > 0) ? mediaDirs[0] : "/storage/emulated/0/Android/media/com.yoshman29.codenameengine";
+		
+		// Target the specific mods folder
+		basePath = haxe.io.Path.join([baseMedia, "files/mods/"]);
+
 		if (!sys.FileSystem.exists(basePath)) {
 			try {
 				sys.FileSystem.createDirectory(basePath);
