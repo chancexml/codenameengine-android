@@ -26,7 +26,7 @@ import sys.io.File;
 #if android
 import extension.androidtools.content.Context;
 import extension.androidtools.os.Build;
-import extension.androidtools.Permissions;
+//import extension.androidtools.Permissions;
 import extension.androidtools.os.Environment;
 import extension.androidtools.Settings;
 import mobile.utils.Files;
@@ -85,7 +85,7 @@ class Main extends Sprite
         addChild(framerateSprite = new Framerate());
         SystemInfo.init();
   
-        #if android
+        #if !android
         if (Permissions.hasManageAllFiles()) {
            finalizeSetup();
         }
