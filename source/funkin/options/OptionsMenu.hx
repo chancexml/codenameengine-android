@@ -82,8 +82,8 @@ class OptionsMenu extends TreeMenu {
         virtualPad = ButtonHelper.create(this, FULL, A_B);
 
         ButtonHelper.bind(virtualPad,
-        ['UP', 'DOWN', 'LEFT', 'RIGHT'],
-        ['ACCEPT', 'BACK']
+        ['up', 'down', 'left', 'right'],
+        ['accept', 'back']
         );
 
         Options.virtualPad = virtualPad;
