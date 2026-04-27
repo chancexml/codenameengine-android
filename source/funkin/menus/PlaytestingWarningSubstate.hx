@@ -85,8 +85,8 @@ class PlaytestingWarningSubstate extends MusicBeatSubstate
         virtualPad = ButtonHelper.create(this, FULL, A_B);
 
         ButtonHelper.bind(virtualPad,
-        ['UP', 'DOWN', 'LEFT', 'RIGHT'], // i dont even know what Playtesting warning is
-        ['ACCEPT', 'BACK']
+        ['ui_up', 'ui_down', 'ui_left', 'ui_right'],
+        ['accept', 'back']
         );
 
         Controls.virtualPad = virtualPad;
