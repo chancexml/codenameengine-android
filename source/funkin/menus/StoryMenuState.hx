@@ -150,8 +150,8 @@ class StoryMenuState extends MusicBeatState {
         virtualPad = ButtonHelper.create(this, FULL, A_B);
 
         ButtonHelper.bind(virtualPad,
-        ['UP', 'DOWN', 'LEFT', 'RIGHT'],
-        ['ACCEPT', 'BACK']
+        ['ui_up', 'ui_down', 'ui_left', 'ui_right'],
+        ['accept', 'back']
         );
 
         Controls.virtualPad = virtualPad;
