@@ -10,6 +10,8 @@ import funkin.backend.system.Conductor;
 import funkin.game.HealthIcon;
 import funkin.savedata.FunkinSave;
 #if mobile
+// import something
+// import something2
 import funkin.backend.system.Controls;
 import funkin.options.Options;
 import funkin.options.keybinds.KeybindsOptions;
