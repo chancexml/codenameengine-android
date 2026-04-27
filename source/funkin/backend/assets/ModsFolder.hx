@@ -29,16 +29,33 @@ class ModsFolder {
 	 * Path to the `mods` folder.
 	 */
 	#if android
-	public static var modsPath:String = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/mods/";
-	#else
-	public static var modsPath:String = "./mods/";
-	#end
+    public static var modsPath:String = {
+    var mediaDirs:Array<String> = extension.androidtools.content.Context.getExternalMediaDirs();
+    
+    var base:String = (mediaDirs != null && mediaDirs.length > 0) 
+        ? mediaDirs[0] 
+        : "/storage/emulated/0/Android/media/com.yoshman29.codenameengine";
+
+    haxe.io.Path.addTrailingSlash(base) + "files/mods/";
+    };
+    #else
+    public static var modsPath:String = "./mods/";
+    #end
+	
 
 	/**
 	 * Path to the `addons` folder.
 	 */
 	#if android
-	public static var addonsPath:String = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/addons/";
+	public static var addonsPath:String = {
+	var mediaDirs:Array<String> = extension.androidtools.content.Context.getExternalMediaDirs();
+    
+    var base:String = (mediaDirs != null && mediaDirs.length > 0) 
+        ? mediaDirs[0] 
+        : "/storage/emulated/0/Android/media/com.yoshman29.codenameengine";
+
+    haxe.io.Path.addTrailingSlash(base) + "files/addons/";
+    };
 	#else
 	public static var addonsPath:String = "./addons/";
 	#end
