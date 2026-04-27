@@ -9,6 +9,7 @@ import haxe.ds.Map;
 
 #if android
 import lime.system.System;
+import extension.androidtools.content.Context;
 #end
 
 class AssetsLibraryList extends AssetLibrary {
@@ -192,7 +193,10 @@ class AssetsLibraryList extends AssetLibrary {
 		__defaultLibraries.push(ModsFolder.loadLibraryFromFolder('assets', './${Main.pathBack}assets/', true, SOURCE));
 		#elseif USE_ADAPTED_ASSETS
 		#if android
-		var androidAssets:String = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/assets/";
+		var mediaDirs = Context.getExternalMediaDirs();
+		var baseMedia:String = (mediaDirs != null && mediaDirs.length > 0) ? mediaDirs[0] : "/storage/emulated/0/Android/media/com.yoshman29.codenameengine";
+		var androidAssets:String = haxe.io.Path.join([baseMedia, "files/assets/"]);
+		
 		if (!sys.FileSystem.exists(androidAssets)) {
 			try {
 				sys.FileSystem.createDirectory(androidAssets);
