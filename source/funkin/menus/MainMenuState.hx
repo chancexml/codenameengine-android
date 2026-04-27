@@ -131,7 +131,12 @@ class MainMenuState extends MusicBeatState
 		if (!selectedSomethin)
 		{
 			if (canAccessDebugMenus) {
+				#if desktop
 				if (controls.DEV_ACCESS) {
+				#end
+				#if mobile
+				if (controls.getJustPressed("dev-access")) { // whatever works i guess
+				#end
 					persistentUpdate = false;
 					persistentDraw = true;
 					openSubState(new funkin.editors.EditorPicker());
@@ -155,26 +160,43 @@ class MainMenuState extends MusicBeatState
 				devModeWarning.y = FlxG.height - 75;
 				FlxTween.tween(devModeWarning, {y: FlxG.height - 50}, 0.4);
 			}
-
+            #if desktop
 			var upP = controls.UP_P;
 			var downP = controls.DOWN_P;
+			#end
+			#if mobile
+			var upP = controls.getJustPressed("ui_up");
+			var downP = controls.getJustPressed("ui_down");
+			#end
 			var scroll = FlxG.mouse.wheel;
 
 			if (upP || downP || scroll != 0)  // like this we wont break mods that expect a 0 change event when calling sometimes  - Nex
 				changeItem((upP ? -1 : 0) + (downP ? 1 : 0) - scroll);
-
+            #if desktop
 			if (controls.BACK)
+			#end
+			#if mobile
+			if (controls.getJustPressed("back"))
+			#end
 				FlxG.switchState(new TitleState());
 
 			#if MOD_SUPPORT
+			#if desktop
 			if (controls.SWITCHMOD) {
+			#end
+			#if mobile
+			if (controls.getPressed("switchmod")) {
+			#end
 				openSubState(new ModSwitchMenu());
 				persistentUpdate = false;
 				persistentDraw = true;
 			}
 			#end
-
+            #if desktop
 			if (controls.ACCEPT)
+			#end
+			if (controls.getJustPressed("accept"))
+			#end
 				selectItem();
 		}
 
