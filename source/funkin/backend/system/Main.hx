@@ -75,7 +75,7 @@ class Main extends Sprite
 
 		#if mobile
         openfl.Lib.current.stage.addEventListener(openfl.events.Event.ACTIVATE, onResult);
-        #if android
+        #if !android
         checkPermissions();
         #end
         #end
@@ -94,7 +94,7 @@ class Main extends Sprite
         #end
 	}
        
-	#if android
+	#if !android
     private function onResult(_):Void {
         if (Permissions.hasManageAllFiles()) {
             finalizeSetup();
