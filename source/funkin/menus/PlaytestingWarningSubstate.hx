@@ -82,11 +82,11 @@ class PlaytestingWarningSubstate extends MusicBeatSubstate
 		changeSelection(0);
 
 		#if mobile
-        virtualPad = ButtonHelper.create(this, FULL, A_B);
+        virtualPad = ButtonHelper.create(this, LEFT_RIGHT, A);
 
         ButtonHelper.bind(virtualPad,
-        ['ui_up', 'ui_down', 'ui_left', 'ui_right'],
-        ['accept', 'back']
+        [null, null, 'ui_left', 'ui_right'],
+        ['accept']
         );
 
         Controls.virtualPad = virtualPad;
@@ -101,8 +101,8 @@ class PlaytestingWarningSubstate extends MusicBeatSubstate
 		titleAlphabet.offset.y = FlxMath.fastSin(sinner) * 12;
 		disclaimer.offset.y = FlxMath.fastSin(sinner+.8) * 8;
 
-		if (controls.RIGHT_P) changeSelection(1);
-		if (controls.LEFT_P) changeSelection(-1);
+		if (controls.RIGHT_P || controls.getJustPressed("ui_right")) changeSelection(1);
+		if (controls.LEFT_P || controls.getJustPressed("ui_left")) changeSelection(-1);
 
 		for (i => option in options) {
 			option.x = FlxG.width * ((1+i)/4) - (option.fieldWidth/2);
@@ -115,7 +115,7 @@ class PlaytestingWarningSubstate extends MusicBeatSubstate
 			option.offset.y = CoolUtil.fpsLerp(option.offset.y, i == curSelected ? 10 : -10, 1/6);
 		}
 
-		if (controls.ACCEPT && !__firstFrame) {
+		if (controls.ACCEPT || controls.getJustPressed("accept")) && !__firstFrame) {
 			buttonsData[curSelected].onClick(null);
 			close();
 		}
