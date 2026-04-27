@@ -202,11 +202,11 @@ class FreeplayState extends MusicBeatState
 		interpColor = new FlxInterpolateColor(bg.color);
 
 		#if mobile
-        virtualPad = ButtonHelper.create(this, FULL, A_B);
+        virtualPad = ButtonHelper.create(this, FULL, A_B_C);
 
         ButtonHelper.bind(virtualPad,
         ['ui_up', 'ui_down', 'ui_left', 'ui_right'],
-        ['accept', 'back']
+        ['accept', 'back', 'change-mode']
         );
 
         Controls.virtualPad = virtualPad;
@@ -261,13 +261,20 @@ class FreeplayState extends MusicBeatState
 			lerpScore = intendedScore;
 
 		if (canSelect) {
-			changeSelection((controls.UP_P ? -1 : 0) + (controls.DOWN_P ? 1 : 0) - FlxG.mouse.wheel);
-			changeDiff((controls.LEFT_P ? -1 : 0) + (controls.RIGHT_P ? 1 : 0));
-			changeCoopMode((controls.CHANGE_MODE ? 1 : 0)); // TODO: make this configurable
-			// putting it before so that its actually smooth
-			updateOptionsAlpha();
-		}
+          var up = (controls.UP_P || controls.getPressed("ui_up")) ? -1 : 0;
+          var down = (controls.DOWN_P || controls.getPressed("ui_down")) ? 1 : 0;
+          changeSelection(up + down - FlxG.mouse.wheel);
+   
+          var left = (controls.LEFT_P || controls.getPressed("ui_left")) ? -1 : 0;
+          var right = (controls.RIGHT_P || controls.getPressed("ui_right")) ? 1 : 0;
+          changeDiff(left + right);
+			
+          var changeMode = (controls.CHANGE_MODE || controls.getPressed("change-mode")) ? 1 : 0;
+          changeCoopMode(changeMode);
 
+          updateOptionsAlpha();
+		}
+		
 		scoreText.text = TEXT_FREEPLAY_SCORE.format([Math.round(lerpScore)]);
 		scoreBG.scale.set(MathUtil.maxSmart(diffText.width, scoreText.width, coopText.width) + 8, (coopText.visible ? coopText.y + coopText.height : 66));
 		scoreBG.updateHitbox();
@@ -319,7 +326,7 @@ class FreeplayState extends MusicBeatState
 		#end
 
 
-		if (controls.BACK)
+		if (controls.BACK || controls.getPressed("back"))
 		{
 			CoolUtil.playMenuSFX(CANCEL, 0.7);
 			FlxG.switchState(new MainMenuState());
@@ -330,7 +337,7 @@ class FreeplayState extends MusicBeatState
 			convertChart();
 		#end
 
-		if (controls.ACCEPT #if PRELOAD_ALL && !dontPlaySongThisFrame #end)
+		if ((controls.ACCEPT || controls.getPressed("accept")) #if PRELOAD_ALL && !dontPlaySongThisFrame #end)
 			select();
 	}
 
