@@ -5,14 +5,6 @@ import flixel.util.typeLimit.OneOfThree;
 import funkin.editors.ui.UIState;
 import funkin.options.categories.*;
 import funkin.options.type.*;
-#if mobile
-import funkin.backend.system.Controls;
-import funkin.options.Options;
-import funkin.options.keybinds.KeybindsOptions;
-import mobile.controls.VirtualPad;
-import mobile.controls.FlxButton;
-import mobile.utils.ButtonHelper;
-#end
 
 typedef OptionCategory = {
 	var name:String;
@@ -62,10 +54,6 @@ class OptionsMenu extends TreeMenu {
 	var bg:FlxSprite;
 	var debugOption:TextOption;
 
-	#if mobile
-    public var virtualPad:VirtualPad;
-    #end
-
 	override function create() {
 		super.create();
 
@@ -77,17 +65,6 @@ class OptionsMenu extends TreeMenu {
 		bg.antialiasing = true;
 		bg.scrollFactor.set();
 		updateBG();
-
-		#if mobile
-        virtualPad = ButtonHelper.create(this, FULL, A_B);
-
-        ButtonHelper.bind(virtualPad,
-        ['up', 'down', 'left', 'right'],
-        ['accept', 'back']
-        );
-
-        Options.virtualPad = virtualPad;
-        #end
 
 		for (i in mainOptions) if (i.name == "optionsTree.language-name" && Flags.DISABLE_LANGUAGES) mainOptions.remove(i);
 
