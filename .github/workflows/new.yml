@@ -17,7 +17,7 @@ on:
         default: true
       android_flags:
         description: Android Flags
-        required: true
+        required: false
         default:
 
 jobs:
