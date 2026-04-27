@@ -138,8 +138,8 @@ class PauseSubState extends MusicBeatSubstate
         virtualPad = ButtonHelper.create(this, UP_DOWN, A_B);
 
         ButtonHelper.bind(virtualPad,
-        ['UP', 'DOWN'],
-        ['ACCEPT', 'BACK']
+        ['ui_up', 'ui_down'],
+        ['accept', 'back']
         );
 
         Controls.virtualPad = virtualPad;
