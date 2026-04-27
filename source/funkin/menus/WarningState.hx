@@ -48,11 +48,11 @@ class WarningState extends MusicBeatState {
 		DiscordUtil.call("onMenuLoaded", ["Beta Warning"]);
 
 		#if mobile
-        virtualPad = ButtonHelper.create(this, FULL, A_B);
+        virtualPad = ButtonHelper.create(this, NONE, A);
 
         ButtonHelper.bind(virtualPad,
-        ['ui_up', 'ui_down', 'ui_left', 'ui_right'],
-        ['accept', 'back']
+        null,
+        ['accept']
         );
 
         Controls.virtualPad = virtualPad;
@@ -62,12 +62,12 @@ class WarningState extends MusicBeatState {
 	public override function update(elapsed:Float) {
 		super.update(elapsed);
 
-		if (controls.ACCEPT && transitioning) {
+		if (controls.ACCEPT || controls.getJustPressed("accept") && transitioning) {
 			FlxG.camera.stopFX(); FlxG.camera.visible = false;
 			goToTitle();
 		}
 
-		if (controls.ACCEPT && !transitioning) {
+		if (controls.ACCEPT || controls.getJustPressed("accept") && !transitioning) {
 			transitioning = true;
 			CoolUtil.playMenuSFX(CONFIRM);
 			FlxG.camera.flash(FlxColor.WHITE, 1, function() {
