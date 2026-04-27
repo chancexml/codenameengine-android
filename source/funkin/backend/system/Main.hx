@@ -73,7 +73,7 @@ class Main extends Sprite
 
 		CrashHandler.init();
 
-		#if mobile
+		#if !mobile
         openfl.Lib.current.stage.addEventListener(openfl.events.Event.ACTIVATE, onResult);
         #if !android
         checkPermissions();
