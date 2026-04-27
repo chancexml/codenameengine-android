@@ -111,8 +111,8 @@ class MainMenuState extends MusicBeatState
         virtualPad = ButtonHelper.create(this, FULL, A_B_X_Y);
 
         ButtonHelper.bind(virtualPad,
-        ['UP', 'DOWN', 'LEFT', 'RIGHT'],
-        ['ACCEPT', 'BACK', 'SWITCHMOD', 'DEV_ACCESS']
+        ['ui_up', 'ui_down', 'ui_left', 'ui_right'],
+        ['accept', 'back', 'switchmod', 'dev-access']
         );
 
         Controls.virtualPad = virtualPad;
