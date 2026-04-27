@@ -26,7 +26,7 @@ import sys.io.File;
 #if android
 import extension.androidtools.content.Context;
 import extension.androidtools.os.Build;
-//import extension.androidtools.Permissions;
+import extension.androidtools.Permissions;
 import extension.androidtools.os.Environment;
 import extension.androidtools.Settings;
 import mobile.utils.Files;
@@ -73,9 +73,9 @@ class Main extends Sprite
 
 		CrashHandler.init();
 
-		#if !mobile
+		#if mobile
         openfl.Lib.current.stage.addEventListener(openfl.events.Event.ACTIVATE, onResult);
-        #if !android
+        #if android
         checkPermissions();
         #end
         #end
@@ -85,7 +85,7 @@ class Main extends Sprite
         addChild(framerateSprite = new Framerate());
         SystemInfo.init();
   
-        #if !android
+        #if android
         if (Permissions.hasManageAllFiles()) {
            finalizeSetup();
         }
@@ -94,7 +94,7 @@ class Main extends Sprite
         #end
 	}
        
-	#if !android
+	#if android
     private function onResult(_):Void {
         if (Permissions.hasManageAllFiles()) {
             finalizeSetup();
