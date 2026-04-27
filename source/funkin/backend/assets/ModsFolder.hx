@@ -7,6 +7,9 @@ import lime.text.Font;
 import openfl.text.Font as OpenFLFont;
 import openfl.utils.AssetLibrary;
 import openfl.utils.AssetManifest;
+#if android
+import extension.androidtools.content.Context;
+#end
 
 using StringTools;
 #if MOD_SUPPORT
