@@ -63,8 +63,8 @@ class GitarooPause extends MusicBeatState
         virtualPad = ButtonHelper.create(this, LEFT_RIGHT, A_B);
 
         ButtonHelper.bind(virtualPad,
-        [null, null, 'LEFT', 'RIGHT'],
-        ['ACCEPT', 'BACK']
+        [null, null, 'ui_left', 'ui_right'],
+        ['accept', 'back']
         );
 
         Controls.virtualPad = virtualPad;
