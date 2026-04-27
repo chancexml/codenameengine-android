@@ -45,6 +45,15 @@ enum KeyboardScheme
 	Custom;
 }
 
+#if mobile
+typedef VirtualPadConfig = {
+	?dpadMode:Dynamic,
+	?actionMode:Dynamic,
+	?directionBindings:Array<String>,
+	?actionBindings:Array<String>
+}
+#end
+
 @:noCustomClass
 @:nullSafety
 @:build(funkin.backend.system.macros.ControlsMacro.build())
@@ -52,6 +61,7 @@ class Controls extends FlxActionSet
 {
 	#if mobile
 	public static var virtualPad:Null<VirtualPad>;
+	public static var padConfig:VirtualPadConfig = {};
 
 	private var holdTimers:Map<String, Float> = new Map();
 	private var holdStates:Map<String, Bool> = new Map();
@@ -155,12 +165,12 @@ class Controls extends FlxActionSet
 	@:pressed("reset") public var RESET_HOLD(get, set): Bool;
 	@:justReleased("reset") public var RESET_R(get, set): Bool;
 
-	@:gamepad([FlxGamepadInputID.BACK]) // select button
+	@:gamepad([FlxGamepadInputID.BACK])
 	@:justPressed("change-mode") public var CHANGE_MODE(get, set): Bool;
 	@:pressed("change-mode") public var CHANGE_MODE_HOLD(get, set): Bool;
 	@:justReleased("change-mode") public var CHANGE_MODE_R(get, set): Bool;
 
-	@:gamepad([FlxGamepadInputID.BACK]) // select button
+	@:gamepad([FlxGamepadInputID.BACK])
 	@:justPressed("switchmod") public var SWITCHMOD(get, set): Bool;
 	@:pressed("switchmod") public var SWITCHMOD_HOLD(get, set): Bool;
 	@:justReleased("switchmod") public var SWITCHMOD_R(get, set): Bool;
@@ -374,6 +384,7 @@ class Controls extends FlxActionSet
 				case "pause" | "change-mode" | "PAUSE":
 					if (pad.buttonC != null && pad.buttonC.justPressed) return true;
 				case "fps-counter" | "cheat" | "reset" | "RESET":
+					// Handle reset/fps-counter
 			}
 		}
 		#end
