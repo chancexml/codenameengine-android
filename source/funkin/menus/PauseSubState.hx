@@ -135,11 +135,11 @@ class PauseSubState extends MusicBeatSubstate
 		FlxG.cameras.add(camera, false);
 
 		#if mobile
-        virtualPad = ButtonHelper.create(this, UP_DOWN, A_B);
+        virtualPad = ButtonHelper.create(this, UP_DOWN, A);
 
         ButtonHelper.bind(virtualPad,
         ['ui_up', 'ui_down'],
-        ['accept', 'back']
+        ['accept']
         );
 
         Controls.virtualPad = virtualPad;
