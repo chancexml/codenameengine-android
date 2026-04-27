@@ -203,7 +203,7 @@ class FreeplayState extends MusicBeatState
         virtualPad = ButtonHelper.create(this, FULL, A_B);
 
         ButtonHelper.bind(virtualPad,
-        ['up', 'down', 'left', 'right'],
+        ['ui_up', 'ui_down', 'ui_left', 'ui_right'],
         ['accept', 'back']
         );
 
