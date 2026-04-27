@@ -166,17 +166,17 @@ class StoryMenuState extends MusicBeatState {
 		scoreText.text = TU.translate("story.score", [Math.round(lerpScore)]);
 
 		if (canSelect) {
-			if (leftArrow != null && leftArrow.exists) leftArrow.animation.play(controls.LEFT ? 'press' : 'idle');
-			if (rightArrow != null && rightArrow.exists) rightArrow.animation.play(controls.RIGHT ? 'press' : 'idle');
+			if (leftArrow != null && leftArrow.exists) leftArrow.animation.play(controls.LEFT || controls.getPressed("ui_left") ? 'press' : 'idle');
+			if (rightArrow != null && rightArrow.exists) rightArrow.animation.play(controls.RIGHT || controls.getPressed("ui_right") ? 'press' : 'idle');
 
-			if (controls.BACK) {
+			if (controls.BACK || controls.getJustPressed("back")) {
 				goBack();
 			}
 
-			changeDifficulty((controls.LEFT_P ? -1 : 0) + (controls.RIGHT_P ? 1 : 0));
-			changeWeek((controls.UP_P ? -1 : 0) + (controls.DOWN_P ? 1 : 0) - FlxG.mouse.wheel);
+			changeDifficulty((controls.LEFT_P || controls.getJustPressed("ui_left") ? -1 : 0) + (controls.RIGHT_P ? 1 : 0));
+			changeWeek((controls.UP_P || controls.getJustPressed("ui_up") ? -1 : 0) + (controls.DOWN_P || controls.getJustPressed("ui_down") ? 1 : 0) - FlxG.mouse.wheel);
 
-			if (controls.ACCEPT)
+			if (controls.ACCEPT || controls.getJustPressed("accept"))
 				selectWeek();
 		} else {
 			for(e in [leftArrow, rightArrow])
