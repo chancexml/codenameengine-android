@@ -76,8 +76,8 @@ jobs:
       - name: Install Android-Tools
         run: |
          haxelib remove extension-androidtools
-         #haxelib git extension-androidtools https://github.com/ChanceXML/androidTools.git
-         haxelib git extension-androidtools https://github.com/ChanceXML/extension-androidtools.git
+         haxelib git extension-androidtools https://github.com/ChanceXML/androidTools.git
+         #haxelib git extension-androidtools https://github.com/ChanceXML/extension-androidtools.git
 
       - name: Configure Gradle (5GB Safe Mode)
         run: |
