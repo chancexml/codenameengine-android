@@ -9,6 +9,9 @@ import haxe.io.Path;
 import lime.utils.AssetLibrary;
 import openfl.utils.Assets as OpenFlAssets;
 import animate.FlxAnimateFrames;
+#if android
+import extension.androidtools.content.Context;
+#end
 
 using StringTools;
 
@@ -192,31 +195,26 @@ class Paths
 
 	inline static public function getAsepriteAtlasAlt(key:String, ?ext:String)
 		return FlxAtlasFrames.fromAseprite('$key.${ext != null ? ext : Flags.IMAGE_EXT}', '$key.json');
-	
-    inline static public function getAssetsRoot():String {
-		#if android
-		var mediaPath:String = "";
-		try {
-			var getMediaDirs = lime.system.JNI.createStaticMethod("android/content/Context", "getExternalMediaDirs", "()[Ljava/io/File;");
-			var context = lime.system.JNI.createStaticMethod("org/haxe/extension/Extension", "getContext", "()Landroid/content/Context;")();
-			var files:Array<Dynamic> = getMediaDirs(context);
-			
-			if (files != null && files.length > 0) {
-				mediaPath = cast(files[0], String); 
-			}
-		} catch (e:Dynamic) {
-			var packageName = lime.app.Application.current.meta.get("packageName");
-			mediaPath = '/storage/emulated/0/Android/media/$packageName/files';
-		}
 
-		if (ModsFolder.currentModFolder != null) 
-			return Path.join([mediaPath, "mods", ModsFolder.currentModFolder]);
-		else 
-			return './assets';
-		#else
-		return ModsFolder.currentModFolder != null ? 'mods/${ModsFolder.currentModFolder}' : #if (sys && TEST_BUILD) './${Main.pathBack}assets/' #else './assets' #end;
-		#end
+	inline static public function getAssetsRoot():String {
+		if (ModsFolder.currentModFolder != null) {
+			#if android
+			var mediaDirs = extension.androidtools.content.Context.getExternalMediaDirs();
+			var basePath:String = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine";
+			
+			if (mediaDirs != null && mediaDirs.length > 0) {
+				var dir:Dynamic = mediaDirs[0];
+				basePath = Std.isOfType(dir, String) ? cast dir : dir.getAbsolutePath();
+			}
+			return '$basePath/files/mods/${ModsFolder.currentModFolder}';
+			#else
+			return '/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/mods/${ModsFolder.currentModFolder}';
+			#end
+		}
+		
+		return #if (sys && TEST_BUILD) './${Main.pathBack}assets/' #else './assets' #end;
 	}
+
 	/**
 	 * Gets frames at specified path.
 	 * @param key Path to the frames
