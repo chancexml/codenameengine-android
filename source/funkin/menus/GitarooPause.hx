@@ -73,10 +73,10 @@ class GitarooPause extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		if (controls.LEFT_P || controls.RIGHT_P)
+		if (controls.LEFT_P || controls.RIGHT_P || controls.getJustPressed("ui_left") || controls.getJustPressed("ui_right"))
 			changeThing();
 
-		if (controls.ACCEPT)
+		if (controls.ACCEPT || controls.getJustPressed("accept"))
 		{
 			if (PlayState.instance != null && PlayState.chartingMode && Charter.undos.unsaved)
 				PlayState.instance.saveWarn(false);
