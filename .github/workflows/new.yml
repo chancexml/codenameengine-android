@@ -19,6 +19,14 @@ on:
         description: Android Flags
         required: false
         default:
+      rebuild_cache:
+        description: "Rebuild Cache?"
+        required: true
+        default: "No"
+        type: choice
+        options:
+          - "Yes"
+          - "No"
 
 jobs:
   buildAndroid:
@@ -30,6 +38,21 @@ jobs:
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.6
+
+      - name: Restore cache
+        if: ${{ github.event.inputs.rebuild_cache != 'Yes' }}
+        uses: actions/cache@v4
+        with:
+         path: |
+          ~/.haxelib
+          ~/.lime
+          ~/.openfl
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          export/
+         key: codename-cache-${{ runner.os }}
+         restore-keys: |
+          codename-cache-${{ runner.os }}
 
       - name: Setup environment
         run: |
@@ -94,6 +117,19 @@ jobs:
       - name: Build APK
         run: |
          haxelib run lime build android -clean ${{ github.event.inputs.android_flags }}
+
+      - name: Save cache
+        if: ${{ github.event.inputs.rebuild_cache != 'Yes' }}
+        uses: actions/cache@v4
+        with:
+         path: |
+          ~/.haxelib
+          ~/.lime
+          ~/.openfl
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          export/
+         key: codename-cache-${{ runner.os }}
 
       - name: Find APK
         run: find . -name "*.apk"
