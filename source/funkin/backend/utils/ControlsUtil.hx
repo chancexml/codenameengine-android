@@ -111,6 +111,7 @@ class ControlsUtil {
 	}
 
 	public static inline function getPressed(controls:Controls, name:String):Bool {
+        var result:Bool = false;
         var isPhysicallyPressed:Bool = false;
     
         #if mobile
@@ -120,29 +121,28 @@ class ControlsUtil {
             if (btn != null && btn.pressed) isPhysicallyPressed = true;
         }
         #end
-      
+    
         isPhysicallyPressed = isPhysicallyPressed || checkControl(controls, name);
 
-        var currentTime:Float = haxe.Timer.stamp();
+         var currentTime:Float = haxe.Timer.stamp();
 
-        if (isPhysicallyPressed) {
+         if (isPhysicallyPressed) {
             if (!holdStates.exists(name) || holdStates.get(name) == false) {
                 holdStates.set(name, true);
                 pressTimers.set(name, currentTime + 0.15); 
-                return true;
+                result = true;
             } 
-            else {
-                if (currentTime >= pressTimers.get(name)) {
-                    pressTimers.set(name, currentTime + 0.04); 
-                    return true;
-                }
+            else if (currentTime >= pressTimers.get(name)) {
+                pressTimers.set(name, currentTime + 0.04); 
+                result = true;
             }
-        } else {
+       } else {
             holdStates.set(name, false);
+            result = false;
         }
 
-        return false;
-	}
+        return result;
+    }
 
 	public static function loadCustomControls() {
 		var xmlPath = Paths.xml("config/controls");
