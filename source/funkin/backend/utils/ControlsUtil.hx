@@ -133,7 +133,7 @@ class ControlsUtil {
                 result = true;
             } 
             else if (currentTime >= pressTimers.get(name)) {
-                pressTimers.set(name, currentTime + 0.04); 
+                pressTimers.set(name, currentTime + 0.15); 
                 result = true;
             }
        } else {
