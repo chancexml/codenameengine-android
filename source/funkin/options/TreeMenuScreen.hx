@@ -72,7 +72,7 @@ class TreeMenuScreen extends FlxSpriteGroup {
 	var curFloatOption:ITreeFloatOption;
 	var __firstFrame:Bool = true;
 
-	override function create() {
+	function create() {
 	    #if mobile
         virtualPad = ButtonHelper.create(this, FULL, A_B);
 
@@ -131,7 +131,8 @@ class TreeMenuScreen extends FlxSpriteGroup {
 			changeSelection(change);
 
 			if (length > 0 && curOption != null) {
-				if (controls.ACCEPT || controls.getPressed("accept") (!mouseControl && FlxG.mouse.justPressed && mouseOverlaps(members[curSelected]))) curOption.select();
+				if ((controls.ACCEPT || controls.getPressed("accept")) || (!mouseControl && FlxG.mouse.justPressed && mouseOverlaps(members[curSelected]))) curOption.select();
+
 				if (curFloatOption != null) {
 					if (controls.LEFT || controls.getPressed("ui_left")) curFloatOption.changeValue(-elapsed);
 					if (controls.RIGHT || controls.getPressed("ui_right")) curFloatOption.changeValue(elapsed);
@@ -142,7 +143,7 @@ class TreeMenuScreen extends FlxSpriteGroup {
 				}
 			}
 
-			if (controls.BACK || controls.getPressed("back") (FlxG.mouse.justPressedRight && Main.timeSinceFocus > 0.3)) close();
+			if ((controls.BACK || controls.getPressed("back")) || (FlxG.mouse.justPressedRight && Main.timeSinceFocus > 0.3)) close();
 		}
 
 		updateItems();
