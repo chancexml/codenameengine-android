@@ -21,9 +21,6 @@ typedef OptionCategory = {
 	var ?substate:OneOfThree<MusicBeatSubstate, Class<MusicBeatSubstate>, (name:String, desc:String) -> MusicBeatSubstate>;
 	var ?suffix:String;
 }
-#if mobile
-public var virtualPad:VirtualPad;
-#end
 	
 class OptionsMenu extends TreeMenu {
 	public static var mainOptions:Array<OptionCategory> = [
@@ -64,6 +61,10 @@ class OptionsMenu extends TreeMenu {
 
 	var bg:FlxSprite;
 	var debugOption:TextOption;
+
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 
 	override function create() {
 		super.create();
