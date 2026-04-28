@@ -195,7 +195,8 @@ class MainMenuState extends MusicBeatState
             #if desktop
 			if (controls.ACCEPT)
 			#end
-			if (controls.getJustPressed("accept"))
+			#if mobile
+			if (controls.getJustPressed("accept")) // i could change this to be more simple. but im lazy
 			#end
 				selectItem();
 		}
