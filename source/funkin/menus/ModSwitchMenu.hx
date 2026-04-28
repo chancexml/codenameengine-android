@@ -72,17 +72,17 @@ class ModSwitchMenu extends MusicBeatSubstate {
 	public override function update(elapsed:Float) {
 		super.update(elapsed);
 
-		changeSelection((controls.DOWN_P ? 1 : 0) + (controls.UP_P ? -1 : 0) - FlxG.mouse.wheel);
+		changeSelection((controls.DOWN_P || controls.getJustPressed("ui_down") ? 1 : 0) + (controls.UP_P || controls.getJustPressed("ui_up") ? -1 : 0) - FlxG.mouse.wheel);
 
-		if (controls.ACCEPT) {
+		if (controls.ACCEPT || controls.getJustPressed("accept")) {
 			ModsFolder.switchMod(mods[curSelected]);
 			close();
 		}
 
-		if (controls.BACK)
+		if (controls.BACK || controls.getJustPressed("back"))
 			close();
 	}
-
+	
 	public function changeSelection(change:Int, force:Bool = false) {
 		if (change == 0 && !force) return;
 
