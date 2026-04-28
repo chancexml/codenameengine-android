@@ -119,7 +119,7 @@ class TreeMenuScreen extends FlxSpriteGroup {
 		if (inputEnabled) {
 			for (basic in turboBasics) basic.update(elapsed);
 
-			var change = (upTurboControl.activated || controls.getPressed("ui_up") ? -1 : 0) + (downTurboControl.activated || controls.getPressed("ui_down") ? 1 : 0) - FlxG.mouse.wheel, mouseControl = false;
+			var change = (upTurboControl.activated || controls.getJustPressed("ui_up") ? -1 : 0) + (downTurboControl.activated || controls.getJustPressed("ui_down") ? 1 : 0) - FlxG.mouse.wheel, mouseControl = false;
 			if (FlxG.mouse.justPressed) {
 				for (i in CoolUtil.maxInt(curSelected - 3, 0)...CoolUtil.minInt(curSelected + 4, length))
 					if (i != curSelected && members[i] != null && mouseOverlaps(members[i])) {
