@@ -115,7 +115,7 @@ class PlaytestingWarningSubstate extends MusicBeatSubstate
 			option.offset.y = CoolUtil.fpsLerp(option.offset.y, i == curSelected ? 10 : -10, 1/6);
 		}
 
-		if (controls.ACCEPT || controls.getJustPressed("accept")) && !__firstFrame) {
+		if ((controls.ACCEPT || controls.getJustPressed("accept")) && !__firstFrame) {
 			buttonsData[curSelected].onClick(null);
 			close();
 		}
