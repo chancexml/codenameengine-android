@@ -5,6 +5,7 @@ import flixel.util.typeLimit.OneOfThree;
 import funkin.editors.ui.UIState;
 import funkin.options.categories.*;
 import funkin.options.type.*;
+import funkin.options.TreeMenuScreen;
 #if mobile
 import funkin.backend.system.Controls;
 import funkin.options.keybinds.KeybindsOptions;
