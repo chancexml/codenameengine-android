@@ -14,6 +14,8 @@ import haxe.xml.Access;
 class ControlsUtil {
 
 	private static var storedCustomControls:Array<String> = [];
+	private static var holdStates:Map<String, Bool> = new Map<String, Bool>();
+    private static var pressTimers:Map<String, Float> = new Map<String, Float>();
 
 	public static function initCustomControl(controls:Controls, name:String) {
 		if (controls.byName.exists(name)) return;
@@ -109,15 +111,37 @@ class ControlsUtil {
 	}
 
 	public static inline function getPressed(controls:Controls, name:String):Bool {
-		var active:Bool = false;
-		#if mobile
-		var upperName = name.toUpperCase();
-		if (funkin.options.Options.controlButtons.exists(upperName)) {
-			var btn = funkin.options.Options.controlButtons.get(upperName);
-			if (btn != null && btn.pressed) active = true;
-		}
-		#end
-		return active || checkControl(controls, name);
+        var isPhysicallyPressed:Bool = false;
+    
+        #if mobile
+        var upperName = name.toUpperCase();
+        if (funkin.options.Options.controlButtons.exists(upperName)) {
+            var btn = funkin.options.Options.controlButtons.get(upperName);
+            if (btn != null && btn.pressed) isPhysicallyPressed = true;
+        }
+        #end
+      
+        isPhysicallyPressed = isPhysicallyPressed || checkControl(controls, name);
+
+        var currentTime:Float = haxe.Timer.stamp();
+
+        if (isPhysicallyPressed) {
+            if (!holdStates.exists(name) || holdStates.get(name) == false) {
+                holdStates.set(name, true);
+                pressTimers.set(name, currentTime + 0.15); 
+                return true;
+            } 
+            else {
+                if (currentTime >= pressTimers.get(name)) {
+                    pressTimers.set(name, currentTime + 0.04); 
+                    return true;
+                }
+            }
+        } else {
+            holdStates.set(name, false);
+        }
+
+        return false;
 	}
 
 	public static function loadCustomControls() {
