@@ -59,7 +59,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential clang openjdk-17-jdk wget unzip
 
-          haxelib setup ~/haxelib
+          haxelib setup ~/.haxelib
 
           haxe -cp commandline -D analyzer-optimize --run Main setup -s
           
