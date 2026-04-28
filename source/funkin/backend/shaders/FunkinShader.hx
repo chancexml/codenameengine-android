@@ -52,6 +52,9 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 
 		this.glslVer = glslVer;
 		super();
+
+		if (data.hasTransform != null) data.hasTransform.value = [false];
+        if (data.hasColorTransform != null) data.hasColorTransform.value = [false];
 	}
 
 	static var IMPORT_REGEX = ~/#import\s+<(.*)>/;
@@ -278,7 +281,12 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		if (__context != null && program == null)
 		{
 			var prefixBuf = new StringBuf();
-			prefixBuf.add('#version ${glslVer}\n');
+			#if (android || ios || mobile)
+            prefixBuf.add('#version 100\n');
+            #else
+            prefixBuf.add('#version ${glslVer}\n');
+            #end
+	
 			prefixBuf.add(shaderPrefix);
 
 			var gl = __context.gl;
@@ -686,8 +694,11 @@ if(openfl_HasColorTransform) {
 	openfl_ColorMultiplierv = openfl_ColorMultiplier;
 	openfl_ColorOffsetv = openfl_ColorOffset / 255.0;
 }
-
+#if desktop
 openfl_Alphav = openfl_Alpha * alpha;
+#else
+openfl_Alphav = openfl_Alpha;
+#end
 
 if(hasColorTransform) {
 	openfl_ColorOffsetv = colorOffset / 255.0;
