@@ -9,7 +9,19 @@ import funkin.options.TreeMenu.ITreeFloatOption;
 import funkin.options.type.OptionType;
 import funkin.options.type.Separator;
 
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
+
 class TreeMenuScreen extends FlxSpriteGroup {
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
+	
 	public var persistentUpdate:Bool = false;
 	public var persistentDraw:Bool = false;
 
@@ -60,6 +72,19 @@ class TreeMenuScreen extends FlxSpriteGroup {
 	var curFloatOption:ITreeFloatOption;
 	var __firstFrame:Bool = true;
 
+	override function create() {
+	    #if mobile
+        virtualPad = ButtonHelper.create(this, FULL, A_B);
+
+        ButtonHelper.bind(virtualPad,
+        ['ui_up', 'ui_down', 'ui_left', 'ui_right'],
+        ['accept', 'back']
+        );
+
+        Controls.virtualPad = virtualPad;
+        #end
+	}
+
 	public function new(name:String, desc:String, prefix:String = "", ?objects:Array<FlxSprite>) {
 		super();
 		this.prefix = prefix;
@@ -94,7 +119,7 @@ class TreeMenuScreen extends FlxSpriteGroup {
 		if (inputEnabled) {
 			for (basic in turboBasics) basic.update(elapsed);
 
-			var change = (upTurboControl.activated ? -1 : 0) + (downTurboControl.activated ? 1 : 0) - FlxG.mouse.wheel, mouseControl = false;
+			var change = (upTurboControl.activated || controls.getPressed("ui_up") ? -1 : 0) + (downTurboControl.activated || controls.getPressed("ui_down") ? 1 : 0) - FlxG.mouse.wheel, mouseControl = false;
 			if (FlxG.mouse.justPressed) {
 				for (i in CoolUtil.maxInt(curSelected - 3, 0)...CoolUtil.minInt(curSelected + 4, length))
 					if (i != curSelected && members[i] != null && mouseOverlaps(members[i])) {
@@ -106,18 +131,18 @@ class TreeMenuScreen extends FlxSpriteGroup {
 			changeSelection(change);
 
 			if (length > 0 && curOption != null) {
-				if (controls.ACCEPT || (!mouseControl && FlxG.mouse.justPressed && mouseOverlaps(members[curSelected]))) curOption.select();
+				if (controls.ACCEPT || controls.getPressed("accept") (!mouseControl && FlxG.mouse.justPressed && mouseOverlaps(members[curSelected]))) curOption.select();
 				if (curFloatOption != null) {
-					if (controls.LEFT) curFloatOption.changeValue(-elapsed);
-					if (controls.RIGHT) curFloatOption.changeValue(elapsed);
+					if (controls.LEFT || controls.getPressed("ui_left")) curFloatOption.changeValue(-elapsed);
+					if (controls.RIGHT || controls.getPressed("ui_right")) curFloatOption.changeValue(elapsed);
 				}
 				else {
-					if (leftTurboControl.activated) curOption.changeSelection(-1);
-					if (rightTurboControl.activated) curOption.changeSelection(1);
+					if (leftTurboControl.activated || controls.getPressed("ui_left")) curOption.changeSelection(-1);
+					if (rightTurboControl.activated || controls.getPressed("ui_right")) curOption.changeSelection(1);
 				}
 			}
 
-			if (controls.BACK || (FlxG.mouse.justPressedRight && Main.timeSinceFocus > 0.3)) close();
+			if (controls.BACK || controls.getPressed("back") (FlxG.mouse.justPressedRight && Main.timeSinceFocus > 0.3)) close();
 		}
 
 		updateItems();
