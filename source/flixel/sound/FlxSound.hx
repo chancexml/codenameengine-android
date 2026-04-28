@@ -893,33 +893,35 @@ class FlxSound extends FlxBasic {
 
 	inline function getFakeTime():Float {
 		if (_source.playing && _realPitch > 0 && _lastTime != null)
-			return _time + (FlxG.game.getTicks() - _lastTime) * _realPitch * _timeInterpolation;
+			return _time + (FlxG.game.getTicks() - _lastTime) * _realPitch;
 		else
 			return _time;
 	}
+
 	function get_time():Float {
-		if (_source == null || /*AudioManager.context == null*/funkin.backend.system.Main.audioDisconnected) return _time;
+		if (_source == null || funkin.backend.system.Main.audioDisconnected) return _time;
 
 		final sourceTime = _source.currentTime - _source.offset - _offset;
+		
 		if (!_source.playing || _realPitch <= 0) {
 			_lastTime = null;
 			return _time = sourceTime;
 		}
 
-		final fakeTime = getFakeTime();
 		if (sourceTime != _time) {
 			_lastTime = FlxG.game.getTicks();
-			if ((_timeInterpolation = 1 - Math.min(fakeTime - sourceTime, 1000) * 0.001) < 1 && _timeInterpolation > .9)
-				return _time = fakeTime;
-			else {
-				_timeInterpolation = 1;
-				return _time = sourceTime;
-			}
+			return _time = sourceTime;
 		}
-		else
-			return fakeTime;
-	}
 
+		final fakeTime = getFakeTime();
+
+		if (Math.abs(fakeTime - sourceTime) > 25) {
+			return _time;
+		}
+
+		return fakeTime;
+	}
+	
 	function set_time(time:Float):Float @:privateAccess {
 		time = FlxMath.bound(time, _offset, length - 1);
 		if (_channel != null && _realPitch > 0) {
