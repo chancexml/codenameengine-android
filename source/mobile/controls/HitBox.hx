@@ -3,12 +3,11 @@ package mobile.controls;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.util.FlxColor;
 import flixel.FlxCamera;
 import flixel.math.FlxPoint;
-import flixel.math.FlxMath;
 import funkin.options.Options;
+import funkin.backend.Paths; 
 
 typedef HitboxCallback = {
     var callback:Void->Void;
@@ -53,6 +52,11 @@ class HitBox extends FlxSpriteGroup {
         hintUp    = new HitboxButton(w * 2, hintY, w, hintH, 0xFF12FA05, hitboxCamera, true);
         hintRight = new HitboxButton(w * 3, hintY, w, hintH, 0xFFF9393F, hitboxCamera, true);
 
+        hintLeft.parentButton = buttonLeft;
+        hintDown.parentButton = buttonDown;
+        hintUp.parentButton = buttonUp;
+        hintRight.parentButton = buttonRight;
+
         if (hintStyle == "Gradient") {
             applyGradientSafe([hintLeft, hintDown, hintUp, hintRight], w, hintH, true);
         }
@@ -66,18 +70,15 @@ class HitBox extends FlxSpriteGroup {
 
     private function applyGradientSafe(buttons:Array<HitboxButton>, width:Int, height:Int, isHint:Bool):Void {
         var path:String = isHint 
-            ? 'assets/images/game/hitbox/hint/hintgradient'
-            : 'assets/images/game/hitbox/gradient';
+            ? 'game/hitbox/hint/hintgradient'
+            : 'game/hitbox/gradient';
 
-        var image = openfl.utils.Assets.getBitmapData(path + ".png");
-        var xml   = openfl.utils.Assets.getText(path + ".xml");
+        var frames = Paths.getSparrowAtlas(path);
 
-        if (image == null || xml == null) {
+        if (frames == null) {
             trace("FAILED TO LOAD GRADIENT: " + path);
             return;
         }
-
-        var frames = FlxAtlasFrames.fromSparrow(image, xml);
 
         var names:Array<String> = ["left", "down", "up", "right"];
 
@@ -92,8 +93,8 @@ class HitBox extends FlxSpriteGroup {
 
             btn.setGraphicSize(width, height);
             btn.updateHitbox();
-            }  
-        }
+        }  
+    }
     
     public function setupCamera():Void {
         if (!FlxG.cameras.list.contains(hitboxCamera)) {
@@ -121,6 +122,7 @@ class HitboxButton extends FlxSprite {
     private var _touchPoint:FlxPoint = new FlxPoint();
 
     public var isHint:Bool = false;
+    public var parentButton:HitboxButton = null;
 
     public function new(x:Float, y:Float, width:Int, height:Int, color:FlxColor, camera:FlxCamera, isHint:Bool) {
         super(x, y);
@@ -150,10 +152,12 @@ class HitboxButton extends FlxSprite {
             }
         }
 
+        var effectivePressed:Bool = isPressed || (parentButton != null && parentButton.isPressed);
+
         if (isHint) {
-            alpha = isPressed ? 0.00001 : Options.hintOpacity;
+            alpha = effectivePressed ? 0.00001 : Options.hintOpacity;
         } else {
-            alpha = isPressed ? Options.hitboxOpacity : 0.00001;
+            alpha = effectivePressed ? Options.hitboxOpacity : 0.00001;
         }
 
         super.update(elapsed);
