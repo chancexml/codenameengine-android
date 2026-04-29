@@ -69,33 +69,32 @@ class HitBox extends FlxSpriteGroup {
             ? 'assets/images/game/hitbox/hint/hintgradient'
             : 'assets/images/game/hitbox/gradient';
 
-        var frames:FlxAtlasFrames = null;
+        var image = openfl.utils.Assets.getBitmapData(path + ".png");
+        var xml   = openfl.utils.Assets.getText(path + ".xml");
 
-        try {
-            frames = FlxAtlasFrames.fromSparrow(path + ".png", path + ".xml");
-        } catch (e) {
-            trace("Gradient load failed: " + path);
-        }
-
-        if (frames == null) {
-            trace("Using fallback colors (no gradient)");
+        if (image == null || xml == null) {
+            trace("FAILED TO LOAD GRADIENT: " + path);
             return;
         }
+
+        var frames = FlxAtlasFrames.fromSparrow(image, xml);
 
         var names:Array<String> = ["left", "down", "up", "right"];
 
         for (i in 0...buttons.length) {
             var btn = buttons[i];
 
+            btn.makeGraphic(1, 1, FlxColor.TRANSPARENT);
+
             btn.frames = frames;
             btn.animation.addByPrefix('idle', names[i], 24, false);
-            btn.animation.play('idle');
+            btn.animation.play('idle', true);
 
             btn.setGraphicSize(width, height);
             btn.updateHitbox();
+            }  
         }
-    }
-
+    
     public function setupCamera():Void {
         if (!FlxG.cameras.list.contains(hitboxCamera)) {
             FlxG.cameras.add(hitboxCamera, false);
