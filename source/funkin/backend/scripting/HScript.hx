@@ -114,7 +114,7 @@ class HScript extends Script {
         interp.variables.set("bindPad", function(dpad:Array<String>, actions:Array<String>) {
         if (Controls.virtualPad != null) {
             ButtonHelper.bind(Controls.virtualPad, dpad, actions);
-           }.  
+           }
         });
         #end
 
