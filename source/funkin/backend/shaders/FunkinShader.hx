@@ -276,11 +276,11 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			__processGLData(glFragmentSource, "uniform");
 		}
 
+		if (__context == null && openfl.Lib.current != null && openfl.Lib.current.stage != null && openfl.Lib.current.stage.context3D != null) {
+			__context = openfl.Lib.current.stage.context3D;
+		}
+		
 		if (__context == null) {
-			Logs.traceColored([
-				Logs.logText('[Shader] ', RED),
-				Logs.logText('Failed to initialize shader: GL context is null', RED),
-			], TRACE);
 			return;
 		}
 
@@ -559,9 +559,12 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			return Reflect.getProperty(this, name);
 		if (!Reflect.hasField(data, name))
 			return null;
+            
 		var field:Dynamic = Reflect.field(data, name);
+        
+		if (field == null) return null; 
+        
 		var cl:String = Type.getClassName(Type.getClass(field));
-
 		// little problem we are facing boys...
 
 		// cant do "field is ShaderInput" because ShaderInput has the @:generic metadata
@@ -589,6 +592,12 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		}
 
 		var field = Reflect.field(data, name);
+        
+		if (field == null) {
+			Reflect.setField(data, name, val);
+			return val;
+		}
+        
 		var cl = Type.getClassName(Type.getClass(field));
 		var isNotNull = val != null;
 		// cant do "field is ShaderInput" for some reason
