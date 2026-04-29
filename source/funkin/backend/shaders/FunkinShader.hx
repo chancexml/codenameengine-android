@@ -208,8 +208,6 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			], TRACE);
 		}
 		return program;
-
-		return program;
 	}
 
 	var glRawFragmentSource:String;
@@ -278,15 +276,24 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			__processGLData(glFragmentSource, "uniform");
 		}
 
-		if (__context != null && program == null)
+		if (__context == null) {
+        Logs.traceColored([
+            Logs.logText('[Shader] ', RED),
+            Logs.logText('Failed to initialize shader: GL context is null', RED),
+        ], TRACE);
+        return;
+    }
+
+        if (__context != null && program == null)
 		{
 			var prefixBuf = new StringBuf();
-			#if (android || ios || mobile)
+			#if mobile
             prefixBuf.add('#version 100\n');
+            prefixBuf.add('#define MOBILE 1\n');
             #else
             prefixBuf.add('#version ${glslVer}\n');
             #end
-	
+				
 			prefixBuf.add(shaderPrefix);
 
 			var gl = __context.gl;
@@ -310,30 +317,29 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 
 			var id = vertex + fragment;
 
-			if (__context.__programs.exists(id))
-			{
-				program = __context.__programs.get(id);
-			}
-			else
-			{
-				program = __context.createProgram(GLSL);
-				program.__glProgram = __createGLProgram(vertex, fragment);
-				__context.__programs.set(id, program);
-			}
+            if (__context.__programs.exists(id))
+            {
+            program = __context.__programs.get(id);
+          }
+            else
+          {
+            program = __context.createProgram(GLSL);
+            program.__glProgram = __createGLProgram(vertex, fragment);
+             __context.__programs.set(id, program);
+          }
 
-			if (program != null)
-			{
-				glProgram = program.__glProgram;
+          if (program != null && program.__glProgram != null)
+          {
+                glProgram = program.__glProgram;
 
-				for (input in __inputBitmapData) {
+                for (input in __inputBitmapData) {
 
-					if (input.__isUniform) {
-						input.index = gl.getUniformLocation(glProgram, input.name);
-					} else {
-						input.index = gl.getAttribLocation(glProgram, input.name);
-					}
-				}
-
+                if (input.__isUniform) {
+                    input.index = gl.getUniformLocation(glProgram, input.name);
+                } else {
+                   input.index = gl.getAttribLocation(glProgram, input.name);
+               } 
+           }
 				for (parameter in __paramBool) {
 					if (parameter.__isUniform) {
 						parameter.index = gl.getUniformLocation(glProgram, parameter.name);
@@ -609,7 +615,11 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 }
 
 class ShaderTemplates {
-	public static final fragHeader:String = "varying float openfl_Alphav;
+	public static final fragHeader:String = "#ifdef GL_ES
+precision mediump float;
+#endif
+
+varying float openfl_Alphav;
 varying vec4 openfl_ColorMultiplierv;
 varying vec4 openfl_ColorOffsetv;
 varying vec2 openfl_TextureCoordv;
@@ -667,7 +677,11 @@ vec4 textureCam(sampler2D bitmap, vec2 pos) {
 }";
 
 	public static final fragBody:String = "gl_FragColor = flixel_texture2D(bitmap, openfl_TextureCoordv);";
-	public static final vertHeader:String = "attribute float openfl_Alpha;
+	public static final vertHeader:String = "#ifdef GL_ES
+precision mediump float;
+#endif
+
+attribute float openfl_Alpha;
 attribute vec4 openfl_ColorMultiplier;
 attribute vec4 openfl_ColorOffset;
 attribute vec4 openfl_Position;
@@ -715,7 +729,11 @@ public static final vertBackCompatVarList:Array<EReg> = [
 	~/uniform bool hasColorTransform/
 ];
 
-public static final vertHeaderBackCompat:String = "attribute float openfl_Alpha;
+public static final vertHeaderBackCompat:String = "#ifdef GL_ES
+precision mediump float;
+#endif
+
+attribute float openfl_Alpha;
 attribute vec4 openfl_ColorMultiplier;
 attribute vec4 openfl_ColorOffset;
 attribute vec4 openfl_Position;
