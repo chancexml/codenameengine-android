@@ -1,5 +1,15 @@
 <project>
     <section if="android">
         <template path="templates/android/Tools.java" rename="app/src/main/java/org/haxe/extension/Tools.java" if="android" />
-    </section>
+
+        <manifestAdditions>
+            <![CDATA[
+            <application android:appCategory="game">
+                <meta-data
+                    android:name="android.app.category"
+                    android:value="game" />
+            </application>
+            ]]>
+        </manifestAdditions>
+     </section>
 </project>
