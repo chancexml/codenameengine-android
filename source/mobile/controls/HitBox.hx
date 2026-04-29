@@ -33,7 +33,7 @@ class HitBox extends FlxSpriteGroup {
         var w:Int = Std.int(FlxG.width / 4);
         var h:Int = Std.int(FlxG.height);
 
-        var hintH:Int = Std.int(FlxG.height / 8);
+        var hintH:Int = Std.int(FlxG.height / 10);
         var hintY:Int = FlxG.height - hintH;
 
         hitboxCamera = new FlxCamera(0, 0, FlxG.width, FlxG.height);
@@ -152,8 +152,7 @@ class HitboxButton extends FlxSprite {
         }
 
         if (isHint) {
-            var target = isPressed ? 0.00001 : Options.hintOpacity;
-            alpha = FlxMath.lerp(alpha, target, 0.25);
+            alpha = isPressed ? 0.00001 : Options.hintOpacity;
         } else {
             alpha = isPressed ? Options.hitboxOpacity : 0.00001;
         }
