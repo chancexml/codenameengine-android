@@ -458,10 +458,10 @@ class Controls extends FlxActionSet
     if (isPressed) {
         if (!holdStates.exists(name) || holdStates.get(name) == false) {
             holdStates.set(name, true);
-            holdTimers.set(name, currentTime + 0.15);
+            holdTimers.set(name, currentTime + 0.25);
             return true;
         } else if (currentTime >= holdTimers.get(name)) {
-            holdTimers.set(name, currentTime + 0.05);
+            holdTimers.set(name, currentTime + 0.1);
             return true;
         }
     } else {
