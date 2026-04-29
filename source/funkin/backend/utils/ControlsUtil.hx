@@ -76,7 +76,7 @@ class ControlsUtil {
 		}
 	}
 
-	private static inline function checkControl(controls:Controls, name:String) {
+	public static inline function checkControl(controls:Controls, name:String) {
 		var control = getControl(controls, name);
 		if (control != null) return control.check();
 		return false;
