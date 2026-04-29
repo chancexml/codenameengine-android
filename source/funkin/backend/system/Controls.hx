@@ -63,9 +63,6 @@ class Controls extends FlxActionSet
 	public static var virtualPad:Null<VirtualPad>;
 	public static var padConfig:VirtualPadConfig = {};
 
-	static var holdStates:Map<String, Bool> = [];
-    static var pressTimers:Map<String, Float> = [];
-
 	private var holdTimers:Map<String, Float> = new Map();
 	private var holdStates:Map<String, Bool> = new Map();
 
