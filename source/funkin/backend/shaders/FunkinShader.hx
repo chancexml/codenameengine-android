@@ -259,7 +259,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		super.__updateGL();
 	}
 
-	@:noCompletion private override function __initGL():Void
+		@:noCompletion private override function __initGL():Void
 	{
 		if (__glSourceDirty || __paramBool == null)
 		{
@@ -277,26 +277,42 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		}
 
 		if (__context == null) {
-        Logs.traceColored([
-            Logs.logText('[Shader] ', RED),
-            Logs.logText('Failed to initialize shader: GL context is null', RED),
-        ], TRACE);
-        return;
-    }
+			Logs.traceColored([
+				Logs.logText('[Shader] ', RED),
+				Logs.logText('Failed to initialize shader: GL context is null', RED),
+			], TRACE);
+			return;
+		}
 
-        if (__context != null && program == null)
+		if (__context != null && program == null)
 		{
 			var prefixBuf = new StringBuf();
+			var gl = __context.gl;
+
 			#if mobile
-            prefixBuf.add('#version 100\n');
-            prefixBuf.add('#define MOBILE 1\n');
-            #else
-            prefixBuf.add('#version ${glslVer}\n');
-            #end
+			var glslVersionStr:String = "";
+			try {
+				glslVersionStr = Std.string(gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
+			} catch (e:Dynamic) {}
+
+			var isES3 = glslVersionStr.indexOf("3.0") > -1 || glslVersionStr.indexOf("3.1") > -1 || glslVersionStr.indexOf("3.2") > -1;
+			
+			if (isES3) {
+				prefixBuf.add('#version 300 es\n');
+
+				prefixBuf.add('#define attribute in\n');
+				prefixBuf.add('#define varying in\n');
+				prefixBuf.add('#define texture2D texture\n');
+			} else {
+				prefixBuf.add('#version 100\n');
+			}
+			prefixBuf.add('#define MOBILE 1\n');
+			prefixBuf.add('#extension GL_OES_standard_derivatives : enable\n');
+			#else
+			prefixBuf.add('#version ${glslVer}\n');
+			#end
 				
 			prefixBuf.add(shaderPrefix);
-
-			var gl = __context.gl;
 
 			prefixBuf.add("#ifdef GL_ES\n");
 			if (precisionHint == FULL) {
@@ -306,7 +322,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 				prefixBuf.add("precision mediump float;\n");
 				prefixBuf.add("#endif\n");
 			} else {
-				prefixBuf.add("precision lowp float;\n");
+				prefixBuf.add("precision mediump float;\n");
 			}
 			prefixBuf.add("#endif\n");
 
@@ -315,31 +331,34 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			var vertex = prefix + vertexPrefix + glVertexSource;
 			var fragment = prefix + fragmentPrefix + glFragmentSource;
 
+			#if mobile
+			if (isES3) {
+				vertex = vertex.replace("#define varying in", "#define varying out");
+			}
+			#end
+
 			var id = vertex + fragment;
+			if (__context.__programs.exists(id))
+			{
+				program = __context.__programs.get(id);
+			}
+			else
+			{
+				program = __context.createProgram(GLSL);
+				program.__glProgram = __createGLProgram(vertex, fragment);
+				__context.__programs.set(id, program);
+			}
 
-            if (__context.__programs.exists(id))
-            {
-            program = __context.__programs.get(id);
-          }
-            else
-          {
-            program = __context.createProgram(GLSL);
-            program.__glProgram = __createGLProgram(vertex, fragment);
-             __context.__programs.set(id, program);
-          }
-
-          if (program != null && program.__glProgram != null)
-          {
-                glProgram = program.__glProgram;
-
-                for (input in __inputBitmapData) {
-
-                if (input.__isUniform) {
-                    input.index = gl.getUniformLocation(glProgram, input.name);
-                } else {
-                   input.index = gl.getAttribLocation(glProgram, input.name);
-               } 
-           }
+			if (program != null && program.__glProgram != null)
+			{
+				glProgram = program.__glProgram;
+				for (input in __inputBitmapData) {
+					if (input.__isUniform) {
+						input.index = gl.getUniformLocation(glProgram, input.name);
+					} else {
+						input.index = gl.getAttribLocation(glProgram, input.name);
+					} 
+				}
 				for (parameter in __paramBool) {
 					if (parameter.__isUniform) {
 						parameter.index = gl.getUniformLocation(glProgram, parameter.name);
@@ -364,7 +383,6 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 					}
 				}
 			}
-			// initInstance(vertex, fragment); // btw make sure to disable the prefixes for ._isInstance
 		}
 	}
 
@@ -616,7 +634,6 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 
 class ShaderTemplates {
 	public static final fragHeader:String = "#ifdef GL_ES
-precision mediump float;
 #endif
 
 varying float openfl_Alphav;
@@ -678,7 +695,6 @@ vec4 textureCam(sampler2D bitmap, vec2 pos) {
 
 	public static final fragBody:String = "gl_FragColor = flixel_texture2D(bitmap, openfl_TextureCoordv);";
 	public static final vertHeader:String = "#ifdef GL_ES
-precision mediump float;
 #endif
 
 attribute float openfl_Alpha;
@@ -730,7 +746,6 @@ public static final vertBackCompatVarList:Array<EReg> = [
 ];
 
 public static final vertHeaderBackCompat:String = "#ifdef GL_ES
-precision mediump float;
 #endif
 
 attribute float openfl_Alpha;
