@@ -19,10 +19,19 @@ using StringTools;
 
 class Files
 {
+	public static var useObbDir:Bool = false;
+
 	public static function getBase():String
 	{
 		#if android
-		return Context.getExternalFilesDir() + "/";
+		if (useObbDir) 
+		{
+			return Context.getObbDir() + "/";
+		} 
+		else 
+		{
+			return Context.getExternalFilesDir() + "/";
+		}
 		#elseif ios
 		return System.applicationStorageDirectory;
 		#else
@@ -30,8 +39,10 @@ class Files
 		#end
 	}
 
-	public static function init():Void  
+	public static function init(useObb:Bool = false):Void  
 	{  
+		useObbDir = useObb; 
+		
 		var base = getBase();  
 		base = Path.addTrailingSlash(base);  
 
