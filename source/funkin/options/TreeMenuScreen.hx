@@ -104,52 +104,53 @@ class TreeMenuScreen extends FlxSpriteGroup {
 	}
 
 	override function update(elapsed:Float) {
-		super.update(elapsed);
+        super.update(elapsed);
 
-		if (__firstFrame) {
-			__firstFrame = false;
-			if (members[curSelected] is ITreeOption) {
-				(curOption = cast members[curSelected]).selected = true;
-				if (curOption is ITreeFloatOption) curFloatOption = cast curOption;
-			}
-			updateItems(true);
-			return;
-		}
+        if (__firstFrame) {
+            __firstFrame = false;
+            if (members[curSelected] is ITreeOption) {
+                (curOption = cast members[curSelected]).selected = true;
+                if (curOption is ITreeFloatOption) curFloatOption = cast curOption;
+            }
+            updateItems(true);
+            return;
+        }
 
-		if (inputEnabled) {
-			for (basic in turboBasics) basic.update(elapsed);
+        if (inputEnabled) {
+            for (basic in turboBasics) basic.update(elapsed);
 
-			var change = (upTurboControl.activated || controls.getJustPressed("ui_up") ? -1 : 0) + (downTurboControl.activated || controls.getJustPressed("ui_down") ? 1 : 0) - FlxG.mouse.wheel, mouseControl = false;
-			if (FlxG.mouse.justPressed) {
-				for (i in CoolUtil.maxInt(curSelected - 3, 0)...CoolUtil.minInt(curSelected + 4, length))
-					if (i != curSelected && members[i] != null && mouseOverlaps(members[i])) {
-						change = i - curSelected;
-						mouseControl = true;
-						break;
-					}
-			}
-			changeSelection(change);
+            var change = (upTurboControl.activated || controls.getJustPressed("ui_up") ? -1 : 0)
+                       + (downTurboControl.activated || controls.getJustPressed("ui_down") ? 1 : 0);
 
-			if (length > 0 && curOption != null) {
-				if ((controls.ACCEPT || controls.getPressed("accept")) || (!mouseControl && FlxG.mouse.justPressed && mouseOverlaps(members[curSelected]))) curOption.select();
+            changeSelection(change);
 
-				if (curFloatOption != null) {
-					if (controls.LEFT || controls.getPressed("ui_left")) curFloatOption.changeValue(-elapsed);
-					if (controls.RIGHT || controls.getPressed("ui_right")) curFloatOption.changeValue(elapsed);
-				}
-				else {
-					if (leftTurboControl.activated || controls.getPressed("ui_left")) curOption.changeSelection(-1);
-					if (rightTurboControl.activated || controls.getPressed("ui_right")) curOption.changeSelection(1);
-				}
-			}
+            if (length > 0 && curOption != null) {
 
-			if ((controls.BACK || controls.getPressed("back")) || (FlxG.mouse.justPressedRight && Main.timeSinceFocus > 0.3)) close();
-		}
+                if (controls.ACCEPT || controls.getPressed("accept"))
+                    curOption.select();
+ 
+                if (curFloatOption != null) {
+                    if (controls.LEFT || controls.getPressed("ui_left"))
+                        curFloatOption.changeValue(-elapsed);
+  
+                    if (controls.RIGHT || controls.getPressed("ui_right"))
+                        curFloatOption.changeValue(elapsed);
+                } else {
+                    if (leftTurboControl.activated || controls.getPressed("ui_left"))
+                        curOption.changeSelection(-1);
 
-		updateItems();
-	}
+                    if (rightTurboControl.activated || controls.getPressed("ui_right"))
+                        curOption.changeSelection(1);
+                 }
+            }
 
-	dynamic function updateItem(object:FlxSprite, itemHeight:Float, centerY:Float, lerpRatio:Float) {
+            if (controls.BACK || controls.getPressed("back"))
+                close();
+        }
+ 
+        updateItems();
+    }
+    dynamic function updateItem(object:FlxSprite, itemHeight:Float, centerY:Float, lerpRatio:Float) {
 		object.y = CoolUtil.fpsLerp(object.y, centerY - itemHeight * 0.5, lerpRatio);
 		object.x = x + 100 - Math.pow(Math.abs((object.y - (FlxG.height - itemHeight) * 0.5) / itemHeight / FlxG.height * FlxG.initialHeight), 1.6) * 15;
 	}
