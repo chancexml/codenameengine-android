@@ -63,6 +63,9 @@ class Controls extends FlxActionSet
 	public static var virtualPad:Null<VirtualPad>;
 	public static var padConfig:VirtualPadConfig = {};
 
+	static var holdStates:Map<String, Bool> = [];
+    static var pressTimers:Map<String, Float> = [];
+
 	private var holdTimers:Map<String, Float> = new Map();
 	private var holdStates:Map<String, Bool> = new Map();
 
@@ -422,84 +425,106 @@ class Controls extends FlxActionSet
 	}
 
 	@:nullSafety(Off)
-	public function getPressed(name:String):Bool {
-		#if mobile
-		if (virtualPad != null && virtualPad.exists && name != null) {
-			var pad = virtualPad;
-			switch(name) {
-				case "up" | "note-up" | "ui_up" | "UP":
-					if (pad.buttonUp != null && pad.buttonUp.pressed) return true;
-				case "down" | "note-down" | "ui_down" | "DOWN":
-					if (pad.buttonDown != null && pad.buttonDown.pressed) return true;
-				case "left" | "note-left" | "ui_left" | "LEFT":
-					if (pad.buttonLeft != null && pad.buttonLeft.pressed) return true;
-				case "right" | "note-right" | "ui_right" | "RIGHT":
-					if (pad.buttonRight != null && pad.buttonRight.pressed) return true;
-				case "accept" | "ACCEPT":
-					if (pad.buttonA != null && pad.buttonA.pressed) return true;
-				case "back" | "BACK":
-					if (pad.buttonB != null && pad.buttonB.pressed) return true;
-				case "switchmod" | "SWITCHMOD":
-					if (pad.buttonX != null && pad.buttonX.pressed) return true;
-				case "dev-access" | "DEV_ACCESS":
-					if (pad.buttonY != null && pad.buttonY.pressed) return true;
-				case "pause" | "change-mode" | "PAUSE":
-					if (pad.buttonC != null && pad.buttonC.pressed) return true;
-			}
-		}
-		#end
-		return funkin.backend.utils.ControlsUtil.getPressed(this, name);
-	}
+    public function getPressed(name:String):Bool {
+    var isPressed:Bool = false;
 
-	public function pressedRepeat(name:String):Bool
-	{
-		#if mobile
-		var isHeld = getPressed(name);
-		var just = getJustPressed(name);
+    #if mobile
+    if (virtualPad != null && virtualPad.exists && name != null) {
+        var pad = virtualPad;
+        switch(name) {
+            case "up" | "note-up" | "ui_up" | "UP":
+                isPressed = pad.buttonUp != null && pad.buttonUp.pressed;
+            case "down" | "note-down" | "ui_down" | "DOWN":
+                isPressed = pad.buttonDown != null && pad.buttonDown.pressed;
+            case "left" | "note-left" | "ui_left" | "LEFT":
+                isPressed = pad.buttonLeft != null && pad.buttonLeft.pressed;
+            case "right" | "note-right" | "ui_right" | "RIGHT":
+                isPressed = pad.buttonRight != null && pad.buttonRight.pressed;
+            case "accept" | "ACCEPT":
+                isPressed = pad.buttonA != null && pad.buttonA.pressed;
+            case "back" | "BACK":
+                isPressed = pad.buttonB != null && pad.buttonB.pressed;
+            case "switchmod" | "SWITCHMOD":
+                isPressed = pad.buttonX != null && pad.buttonX.pressed;
+            case "dev-access" | "DEV_ACCESS":
+                isPressed = pad.buttonY != null && pad.buttonY.pressed;
+            case "pause" | "change-mode" | "PAUSE":
+                isPressed = pad.buttonC != null && pad.buttonC.pressed;
+        }
+    }
+    #end
 
-		if (!isHeld)
-		{
-			holdTimers.set(name, 0);
-			holdStates.set(name, false);
-			return false;
-		}
+    isPressed = isPressed || funkin.backend.utils.ControlsUtil.checkControl(this, name);
 
-		if (just)
-		{
-			holdTimers.set(name, 0);
-			holdStates.set(name, false);
-			return true;
-		}
+    var currentTime:Float = haxe.Timer.stamp();
 
-		var timer:Float = holdTimers.get(name) ?? 0;
-		var active:Bool = holdStates.get(name) ?? false;
+    if (isPressed) {
+        if (!holdStates.exists(name) || holdStates.get(name) == false) {
+            holdStates.set(name, true);
+            pressTimers.set(name, currentTime + 0.15);
+            return true;
+        } else if (currentTime >= pressTimers.get(name)) {
+            pressTimers.set(name, currentTime + 0.05);
+            return true;
+        }
+    } else {
+        holdStates.set(name, false);
+    }
 
-		timer += FlxG.elapsed;
+    return false;
+}
 
-		if (!active)
-		{
-			if (timer >= HOLD_DELAY)
-			{
-				holdStates.set(name, true);
-				holdTimers.set(name, 0);
-				return true;
-			}
-		}
-		else
-		{
-			if (timer >= HOLD_REPEAT)
-			{
-				holdTimers.set(name, 0);
-				return true;
-			}
-		}
+    public function pressedRepeat(name:String):Bool
+{
+    #if mobile
+    var isHeld = getPressed(name);
+    var just = getJustPressed(name);
 
-		holdTimers.set(name, timer);
-		return false;
-		#else
-		return false;
-		#end
-	}
+    if (!isHeld)
+    {
+        holdTimers.set(name, 0);
+        holdStates.set(name, false);
+        return false;
+    }
+
+    if (just)
+    {
+        holdTimers.set(name, 0);
+        holdStates.set(name, false);
+        return true;
+    }
+
+    var timer:Float = holdTimers.get(name) ?? 0;
+    var active:Bool = holdStates.get(name) ?? false;
+
+    timer += FlxG.elapsed;
+
+    if (!active)
+    {
+        if (timer >= HOLD_DELAY)
+        {
+            holdStates.set(name, true);
+            timer -= HOLD_DELAY;
+            holdTimers.set(name, timer);
+            return true;
+        }
+    }
+    else
+    {
+        if (timer >= HOLD_REPEAT)
+        {
+            timer -= HOLD_REPEAT;
+            holdTimers.set(name, timer);
+            return true;
+        }
+    }
+
+    holdTimers.set(name, timer);
+    return false;
+    #else
+    return false;
+    #end
+}
 
 	public static function updateMouseBlock():Void
 	{
