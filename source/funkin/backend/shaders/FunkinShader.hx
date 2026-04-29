@@ -279,8 +279,9 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		if (__context == null && openfl.Lib.current != null && openfl.Lib.current.stage != null && openfl.Lib.current.stage.context3D != null) {
 			__context = openfl.Lib.current.stage.context3D;
 		}
-		
+
 		if (__context == null) {
+			__glSourceDirty = true;
 			return;
 		}
 
