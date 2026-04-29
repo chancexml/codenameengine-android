@@ -694,31 +694,6 @@ class PlayState extends MusicBeatState
 
 		downscroll = Options.downscroll;
 
-		#if mobile
-		var androidPause = new mobile.controls.Pause();
-        add(androidPause);
-        androidPause.setPauseButton('true');
-
-		hitbox = new HitBox();
-        add(hitbox);
-		hitbox.setupCamera();
-		
-        hitbox.buttonLeft.onDown.callback = function() { triggerKey(LEFT, true); };
-        hitbox.buttonDown.onDown.callback = function() { triggerKey(DOWN, true); };
-        hitbox.buttonUp.onDown.callback = function() { triggerKey(UP, true); };
-        hitbox.buttonRight.onDown.callback = function() { triggerKey(RIGHT, true); };
-
-        hitbox.buttonLeft.onUp.callback = function() { triggerKey(LEFT, false); };
-        hitbox.buttonDown.onUp.callback = function() { triggerKey(DOWN, false); };
-        hitbox.buttonUp.onUp.callback = function() { triggerKey(UP, false); };
-        hitbox.buttonRight.onUp.callback = function() { triggerKey(RIGHT, false); };
-
-        hitbox.buttonLeft.onOut.callback = hitbox.buttonLeft.onUp.callback;
-        hitbox.buttonDown.onOut.callback = hitbox.buttonDown.onUp.callback;
-        hitbox.buttonUp.onOut.callback = hitbox.buttonUp.onUp.callback;
-        hitbox.buttonRight.onOut.callback = hitbox.buttonRight.onUp.callback;
-		#end
-
 		persistentUpdate = true;
 		persistentDraw = true;
 
@@ -945,6 +920,31 @@ class PlayState extends MusicBeatState
 		for(s in introSounds)
 			if (s != null)
 				FlxG.sound.load(Paths.sound(s));
+
+	    #if mobile
+		var androidPause = new mobile.controls.Pause();
+        add(androidPause);
+        androidPause.setPauseButton('true');
+
+		hitbox = new HitBox();
+        add(hitbox);
+		hitbox.setupCamera();
+		
+        hitbox.buttonLeft.onDown.callback = function() { triggerKey(LEFT, true); };
+        hitbox.buttonDown.onDown.callback = function() { triggerKey(DOWN, true); };
+        hitbox.buttonUp.onDown.callback = function() { triggerKey(UP, true); };
+        hitbox.buttonRight.onDown.callback = function() { triggerKey(RIGHT, true); };
+
+        hitbox.buttonLeft.onUp.callback = function() { triggerKey(LEFT, false); };
+        hitbox.buttonDown.onUp.callback = function() { triggerKey(DOWN, false); };
+        hitbox.buttonUp.onUp.callback = function() { triggerKey(UP, false); };
+        hitbox.buttonRight.onUp.callback = function() { triggerKey(RIGHT, false); };
+
+        hitbox.buttonLeft.onOut.callback = hitbox.buttonLeft.onUp.callback;
+        hitbox.buttonDown.onOut.callback = hitbox.buttonDown.onUp.callback;
+        hitbox.buttonUp.onOut.callback = hitbox.buttonUp.onUp.callback;
+        hitbox.buttonRight.onOut.callback = hitbox.buttonRight.onUp.callback;
+		#end
 
 		if (chartingMode) {
 			WindowUtils.prefix = Charter.undos.unsaved ? Flags.UNDO_PREFIX : "";
