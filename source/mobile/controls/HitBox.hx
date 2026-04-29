@@ -3,6 +3,7 @@ package mobile.controls;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
+import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.util.FlxColor;
 import flixel.FlxCamera;
 import flixel.math.FlxPoint;
@@ -20,32 +21,64 @@ class HitBox extends FlxSpriteGroup {
     public var buttonUp:HitboxButton;
     public var buttonRight:HitboxButton;
 
-    public function new() {
+    public var hintLeft:HitboxButton;
+    public var hintDown:HitboxButton;
+    public var hintUp:HitboxButton;
+    public var hintRight:HitboxButton;
+
+    public function new(hitboxStyle:String = "default", hintStyle:String = "default") {
         super();
 
         var w:Int = Std.int(FlxG.width / 4);
         var h:Int = Std.int(FlxG.height);
+        
+        var hintH:Int = Std.int(FlxG.height / 4); 
+        var hintY:Int = FlxG.height - hintH;
 
         hitboxCamera = new FlxCamera(0, 0, FlxG.width, FlxG.height);
         hitboxCamera.bgColor = 0x00000000;
         hitboxCamera.alpha = 1;
-        
+
         buttonLeft = new HitboxButton(0, 0, w, h, 0xFFC24B99, hitboxCamera);
         buttonDown = new HitboxButton(w, 0, w, h, 0xFF00FFFF, hitboxCamera);
         buttonUp = new HitboxButton(w * 2, 0, w, h, 0xFF12FA05, hitboxCamera);
         buttonRight = new HitboxButton(w * 3, 0, w, h, 0xFFF9393F, hitboxCamera);
 
-        add(buttonLeft);
-        add(buttonDown);
-        add(buttonUp);
-        add(buttonRight);
-
-        for (button in [buttonLeft, buttonDown, buttonUp, buttonRight]) {
-            button.cameras = [hitboxCamera];
-            button.scrollFactor.set(0, 0);
+        if (hitboxStyle == "gradient") {
+            var frames = FlxAtlasFrames.fromSparrow('assets/images/game/hitbox/gradient.png', 'assets/images/game/hitbox/gradient.xml');
+            setupGradientButtons([buttonLeft, buttonDown, buttonUp, buttonRight], frames, w, h);
         }
 
-        this.scrollFactor.set(0, 0);
+        hintLeft = new HitboxButton(0, hintY, w, hintH, 0xFFC24B99, hitboxCamera);
+        hintDown = new HitboxButton(w, hintY, w, hintH, 0xFF00FFFF, hitboxCamera);
+        hintUp = new HitboxButton(w * 2, hintY, w, hintH, 0xFF12FA05, hitboxCamera);
+        hintRight = new HitboxButton(w * 3, hintY, w, hintH, 0xFFF9393F, hitboxCamera);
+
+        if (hintStyle == "gradient") {
+            var hintFrames = FlxAtlasFrames.fromSparrow('assets/images/game/hitbox/hint/hintgradient.png', 'assets/images/game/hitbox/hint/hintgradient.xml');
+            setupGradientButtons([hintLeft, hintDown, hintUp, hintRight], hintFrames, w, hintH);
+        }
+
+        add(buttonLeft); add(buttonDown); add(buttonUp); add(buttonRight);
+        add(hintLeft); add(hintDown); add(hintUp); add(hintRight);
+
+        for (btn in [buttonLeft, buttonDown, buttonUp, buttonRight, hintLeft, hintDown, hintUp, hintRight]) {
+            btn.cameras = [hitboxCamera];
+            btn.scrollFactor.set(0, 0);
+        }
+    }
+
+    private function setupGradientButtons(buttons:Array<HitboxButton>, frames:FlxAtlasFrames, width:Int, height:Int):Void {
+        var names:Array<String> = ["left", "down", "up", "right"];
+        
+        for (i in 0...buttons.length) {
+            buttons[i].frames = frames;
+            buttons[i].animation.addByPrefix('idle', names[i], 24, false);
+            buttons[i].animation.play('idle');
+            
+            buttons[i].setGraphicSize(width, height);
+            buttons[i].updateHitbox();
+        }
     }
 
     public function setupCamera():Void {
@@ -107,11 +140,8 @@ class HitboxButton extends FlxSprite {
             }
         }
 
-        if (Options.hitboxHints) {
-            alpha = isPressed ? Options.hitboxOpacity : 0.00001;
-        } else {
-            alpha = 0.00001;
-        }
+        alpha = isPressed ? Options.hitboxOpacity : 0.00001;
+        alpha = isPressed ? 0.00001 : Options.hintOpacity;
 
         super.update(elapsed);
     }
