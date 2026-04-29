@@ -58,6 +58,65 @@ class HScript extends Script {
 		interp.variables.set("ButtonHelper", ButtonHelper);
 		interp.variables.set("VirtualPad", VirtualPad);
 		#end
+        /**
+        if u want to. you can add the virtualpad to any mod made for pc inputs
+        you just have to add
+
+        createPad(FULL, A_B); // found here // uh uh
+        bindPad(
+            ['ui_up','ui_down','ui_left','ui_right'], // variables found in Controls.hx
+            ['accept','back'] // same thing as the one above this one
+        );
+
+        you'll still need to change how the script checks for inputs
+        heres an example:
+        original
+        if (controls.ACCEPT)
+        new
+        if (controls.getJustPressed("accept"))
+        **/
+		#if mobile
+        interp.variables.set("NONE", NONE);
+		interp.variables.set("UP_DOWN", UP_DOWN);
+		interp.variables.set("LEFT_RIGHT", LEFT_RIGHT);
+		interp.variables.set("UP_LEFT_RIGHT", UP_LEFT_RIGHT);
+		interp.variables.set("DOWN_LEFT_RIGHT", DOWN_LEFT_RIGHT);
+		interp.variables.set("RIGHT_FULL", RIGHT_FULL);
+		interp.variables.set("FULL", FULL);
+        interp.variables.set("A", A);
+		interp.variables.set("B", B);
+		interp.variables.set("C", C);
+		interp.variables.set("X", X);
+		interp.variables.set("Y", Y);
+		interp.variables.set("A_B", A_B);
+		interp.variables.set("A_C", A_C);
+	    interp.variables.set("A_X", A_X);
+		interp.variables.set("A_Y", A_Y);
+		interp.variables.set("A_B_C", A_B_C);
+		interp.variables.set("A_X_Y", A_X_Y);
+		interp.variables.set("A_B_X_Y", A_B_X_Y);
+		interp.variables.set("A_C_X_Y", A_C_X_Y);
+		interp.variables.set("A_B_C_X_Y", A_B_C_X_Y);
+		interp.variables.set("B_C", B_C);
+		interp.variables.set("B_X", B_X);
+		interp.variables.set("B_X_Y", B_X_Y);
+		interp.variables.set("B_C_X_Y", B_C_X_Y);
+        #end
+
+		#if mobile
+        interp.variables.set("createPad", function(mode, buttons) {
+        var state = interp.scriptObject;
+          var pad = ButtonHelper.create(state, mode, buttons);
+            Controls.virtualPad = pad;
+          return pad;
+        });
+
+        interp.variables.set("bindPad", function(dpad:Array<String>, actions:Array<String>) {
+        if (Controls.virtualPad != null) {
+            ButtonHelper.bind(Controls.virtualPad, dpad, actions);
+           }.  
+        });
+        #end
 
 		#if GLOBAL_SCRIPT
 		funkin.backend.scripting.GlobalScript.call("onScriptCreated", [this, "hscript"]);
