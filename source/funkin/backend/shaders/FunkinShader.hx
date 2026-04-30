@@ -15,6 +15,7 @@ import openfl.display3D._internal.GLShader;
 import openfl.utils._internal.Log;
 
 using StringTools;
+
 @:access(openfl.display3D.Context3D)
 @:access(openfl.display3D.Program3D)
 @:access(openfl.display.ShaderInput)
@@ -39,9 +40,10 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 	/**
 	 * Creates a new shader from the specified fragment and vertex source.
 	 * Accepts `#pragma header`.
+	 *
 	 * @param frag Fragment source (pass `null` to use default)
 	 * @param vert Vertex source (pass `null` to use default)
-	 * @param glslVer Version of GLSL to use (defaults to 120)
+	 * @param glslVer Version of GLSL to use (defaults to 120, dynamically falls back to 100 on mobile)
 	 */
 	public override function new(frag:String, vert:String, glslVer:String = null) {
 		if (glslVer == null) glslVer = Flags.DEFAULT_GLSL_VERSION;
@@ -49,7 +51,6 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		if (vert == null) vert = ShaderTemplates.defaultVertexSource;
 		this.glFragmentSource = frag;
 		this.glVertexSource = vert;
-
 		this.glslVer = glslVer;
 		super();
 	}
@@ -78,10 +79,10 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 	static var ERROR_POS_REGEX = ~/(\d+):(\d+): (.*)/g;
 	static var ERROR_REGEX = ~/ERROR: (\d+):(\d+): (.*)/g;
 	static var ERROR_REGEX_2 = ~/(\d+)\((\d+)\) : error ([^:]+): (.*)/g;
+	
 	@:noCompletion private override function __createGLShader(source:String, type:Int):GLShader
 	{
 		var gl = __context.gl;
-
 		var shader = gl.createShader(type);
 		gl.shaderSource(shader, source);
 		gl.compileShader(shader);
@@ -93,6 +94,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		{
 			var isVertexShader = type == gl.VERTEX_SHADER;
 			var messageBuf = new StringBuf();
+
 			messageBuf.add((compileStatus == 0) ? "Error" : "Info");
 			if(isVertexShader) {
 				messageBuf.add(" compiling vertex shader");
@@ -107,6 +109,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			}
 			messageBuf.add("\n");
 			var errorPositions = [];
+
 			var regex = null;
 			var tmp = shaderInfoLog;
 			if(shaderInfoLog.contains(" : error ")) {
@@ -132,12 +135,14 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 				}
 			}
 			var splitSource = source.split("\n");
+
 			for(error in errorPositions) {
 				messageBuf.add("ERROR: Line: " + error.line);
 				if(error.column > 0) {
 					messageBuf.add(", Column: " + error.column);
 				}
 				messageBuf.add(", " + error.message);
+
 				if(error.line < splitSource.length) {
 					messageBuf.add("\nLine: ");
 					messageBuf.add(splitSource[error.line-1].trim());
@@ -150,6 +155,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			}
 			messageBuf.add(shaderInfoLog);
 			messageBuf.add("\n");
+
 			messageBuf.add(source);
 
 			var message = messageBuf.toString();
@@ -189,6 +195,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			if (gl.getProgramParameter(program, gl.LINK_STATUS) == 0)
 			{
 				var messageBuf = new StringBuf();
+
 				messageBuf.add("Unable to initialize the shader program");
 				messageBuf.add("\n");
 				messageBuf.add(gl.getProgramInfoLog(program));
@@ -205,8 +212,6 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			], TRACE);
 		}
 		return program;
-
-		return program;
 	}
 
 	var glRawFragmentSource:String;
@@ -218,6 +223,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			value = ShaderTemplates.defaultFragmentSource;
 		glRawFragmentSource = value;
 		value = processImports(value, FRAGMENT_SHADER);
+
 		value = value.replace("#pragma header", ShaderTemplates.fragHeader).replace("#pragma body", ShaderTemplates.fragBody);
 		if (value != __glFragmentSource)
 		{
@@ -235,6 +241,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		value = processImports(value, VERTEX_SHADER);
 
 		var useBackCompat:Bool = true;
+
 		for (regex in ShaderTemplates.vertBackCompatVarList) if (!regex.match(value)) {
 			useBackCompat = false;
 			break;
@@ -278,7 +285,14 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		if (__context != null && program == null)
 		{
 			var prefixBuf = new StringBuf();
-			prefixBuf.add('#version ${glslVer}\n');
+			
+			// Mobile Fix: Android/iOS use OpenGL ES, which does not support #version 120
+			var versionToUse = glslVer;
+			#if (android || ios || mobile)
+			if (versionToUse == "120") versionToUse = "100";
+			#end
+			
+			prefixBuf.add('#version ${versionToUse}\n');
 			prefixBuf.add(shaderPrefix);
 
 			var gl = __context.gl;
@@ -290,6 +304,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 				prefixBuf.add("#else\n");
 				prefixBuf.add("precision mediump float;\n");
 				prefixBuf.add("#endif\n");
+
 			} else {
 				prefixBuf.add("precision lowp float;\n");
 			}
@@ -318,7 +333,6 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 				glProgram = program.__glProgram;
 
 				for (input in __inputBitmapData) {
-
 					if (input.__isUniform) {
 						input.index = gl.getUniformLocation(glProgram, input.name);
 					} else {
@@ -350,7 +364,6 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 					}
 				}
 			}
-			// initInstance(vertex, fragment); // btw make sure to disable the prefixes for ._isInstance
 		}
 	}
 
@@ -358,6 +371,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 	@:noCompletion private override function __processGLData(source:String, storageType:String):Void
 	{
 		onProcessGLData.dispatch(source, storageType);
+
 		if (__cancelNextProcessGLData != (__cancelNextProcessGLData = false))
 			return;
 		var lastMatch = 0, position, regex, name, type;
@@ -395,6 +409,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		{
 			var input = new ShaderInput<BitmapData>();
 			input.name = name;
+
 			input.__isUniform = isUniform;
 			__inputBitmapData.push(input);
 
@@ -408,6 +423,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			}
 
 			Reflect.setField(__data, name, input);
+
 			try{Reflect.setField(this, name, input);} catch(e) {}
 		}
 		else if (!Reflect.hasField(__data, name) || Reflect.field(__data, name) == null)
@@ -436,6 +452,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 				case "mat4x3": MATRIX4X3;
 				case "mat4", "mat4x4": MATRIX4X4;
 				default: null;
+
 			}
 
 			var length = switch (parameterType)
@@ -461,6 +478,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 				case BOOL, BOOL2, BOOL3, BOOL4:
 					var parameter = new ShaderParameter<Bool>();
 					parameter.name = name;
+
 					parameter.type = parameterType;
 					parameter.__arrayLength = arrayLength;
 					parameter.__isBool = true;
@@ -478,6 +496,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 
 				case INT, INT2, INT3, INT4:
 					var parameter = new ShaderParameter<Int>();
+
 					parameter.name = name;
 					parameter.type = parameterType;
 					parameter.__arrayLength = arrayLength;
@@ -485,6 +504,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 					parameter.__isUniform = isUniform;
 					parameter.__length = length;
 					__paramInt.push(parameter);
+
 					Reflect.setField(__data, name, parameter);
 					try{Reflect.setField(this, name, parameter);} catch(e) {}
 
@@ -492,12 +512,14 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 					var parameter = new ShaderParameter<Float>();
 					parameter.name = name;
 					parameter.type = parameterType;
+
 					parameter.__arrayLength = arrayLength;
 					#if lime
 					if (arrayLength > 0) parameter.__uniformMatrix = new Float32Array(arrayLength * arrayLength);
 					#end
 					parameter.__isFloat = true;
 					parameter.__isUniform = isUniform;
+
 					parameter.__length = length;
 					__paramFloat.push(parameter);
 
@@ -525,23 +547,17 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 	public function hget(name:String):Dynamic {
 		if (__instanceFields.contains(name) || __instanceFields.contains('get_${name}'))
 			return Reflect.getProperty(this, name);
+
 		if (!Reflect.hasField(data, name))
 			return null;
+		
 		var field:Dynamic = Reflect.field(data, name);
-		var cl:String = Type.getClassName(Type.getClass(field));
-
-		// little problem we are facing boys...
-
-		// cant do "field is ShaderInput" because ShaderInput has the @:generic metadata
-		// aka instead of ShaderInput<Float> it gets built as ShaderInput_Float
-		// this should be fine tho because we check the class, and the fields don't vary based on the type
-
-		// thanks for looking in the code cne fans :D!! -lunar
-
-		if (cl.startsWith("openfl.display.ShaderParameter"))
-			return (field.__length > 1) ? field.value : field.value[0];
-		else if (cl.startsWith("openfl.display.ShaderInput"))
+		
+		if (Reflect.hasField(field, "__length") && Reflect.hasField(field, "value"))
+			return (field.__length > 1) ? field.value : (field.value != null ? field.value[0] : null);
+		else if (Reflect.hasField(field, "input") && Reflect.hasField(field, "filter"))
 			return field.input;
+		
 		return field;
 	}
 
@@ -556,44 +572,66 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			return val;
 		}
 
-		var field = Reflect.field(data, name);
-		var cl = Type.getClassName(Type.getClass(field));
+		var field:Dynamic = Reflect.field(data, name);
 		var isNotNull = val != null;
-		// cant do "field is ShaderInput" for some reason
-		if (cl.startsWith("openfl.display.ShaderParameter")) {
+
+		if (Reflect.hasField(field, "__length") && Reflect.hasField(field, "value")) {
 			if (field.__length <= 1) {
-				// that means we wait for a single number, instead of an array
 				if (field.__isInt && isNotNull && !(val is Int)) {
 					throw new ShaderTypeException(name, Type.getClass(val), 'Int');
-					return null;
-				} else
-				if (field.__isBool && isNotNull && !(val is Bool)) {
+				} else if (field.__isBool && isNotNull && !(val is Bool)) {
 					throw new ShaderTypeException(name, Type.getClass(val), 'Bool');
-					return null;
-				} else
-				if (field.__isFloat && isNotNull && !(val is Float)) {
+				} else if (field.__isFloat && isNotNull && !(val is Float)) {
 					throw new ShaderTypeException(name, Type.getClass(val), 'Float');
-					return null;
 				}
-				return field.value = isNotNull ? [val] : null;
+				
+				if (!isNotNull) {
+					field.value = null;
+				} else {
+					if (field.__isInt) field.value = [cast(val, Int)];
+					else if (field.__isBool) field.value = [cast(val, Bool)];
+					else if (field.__isFloat) field.value = [cast(val, Float)];
+					else field.value = [val];
+				}
+				return val;
 			} else {
 				if (isNotNull && !(val is Array)) {
 					throw new ShaderTypeException(name, Type.getClass(val), Array);
-					return null;
 				}
-				return field.value = val;
+				
+				if (isNotNull) {
+					var arr:Array<Dynamic> = cast val;
+					if (field.__isInt) {
+						var typedArr:Array<Int> = [];
+						for (i in arr) typedArr.push(cast(i, Int));
+						field.value = typedArr;
+					} else if (field.__isBool) {
+						var typedArr:Array<Bool> = [];
+						for (i in arr) typedArr.push(cast(i, Bool));
+						field.value = typedArr;
+					} else if (field.__isFloat) {
+						var typedArr:Array<Float> = [];
+						for (i in arr) typedArr.push(cast(i, Float));
+						field.value = typedArr;
+					} else {
+						field.value = val;
+					}
+				} else {
+					field.value = null;
+				}
+				return val;
 			}
-		} else if (cl.startsWith("openfl.display.ShaderInput")) {
-			// shader input!!
+		} else if (Reflect.hasField(field, "input") && Reflect.hasField(field, "filter")) {
 			var bitmap:BitmapData;
 			if (!isNotNull) bitmap = null;
 			else if (val is BitmapData) bitmap = val;
-			else if (val is FlxGraphic) bitmap = val.bitmap;
+			else if (val is FlxGraphic) bitmap = cast(val, FlxGraphic).bitmap;
 			else {
 				throw new ShaderTypeException(name, Type.getClass(val), BitmapData);
-				return null;
 			}
 			field.input = bitmap;
+		} else {
+			Reflect.setField(data, name, val);
 		}
 
 		return val;
@@ -626,7 +664,7 @@ vec4 applyFlixelEffects(vec4 color) {
 	color = clamp(openfl_ColorOffsetv + (color * openfl_ColorMultiplierv), 0.0, 1.0);
 
 	if(color.a > 0.0) {
-		return vec4(color.rgb * color.a * openfl_Alphav, color.a * openfl_Alphav);
+	    return vec4(color.rgb * color.a * openfl_Alphav, color.a * openfl_Alphav);
 	}
 	return vec4(0.0, 0.0, 0.0, 0.0);
 }
@@ -692,7 +730,6 @@ if(hasColorTransform) {
 
 gl_Position = openfl_Matrix * openfl_Position;";
 
-// TODO: make this ignore comments
 public static final vertBackCompatVarList:Array<EReg> = [
 	~/attribute float alpha/,
 	~/attribute vec4 colorMultiplier/,
