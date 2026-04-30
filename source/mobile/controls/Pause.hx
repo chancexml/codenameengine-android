@@ -61,10 +61,14 @@ class Pause extends FlxGroup
 
     public function setPauseButton(state:String)
 {
-    isButtonActive = (state == 'true') && Options.pauseButton;
+    isButtonActive = (state == 'true');
 
     pauseButton.visible = isButtonActive;
     pauseCircle.visible = isButtonActive;
+}
+    if (Options.pauseButton == false) {
+    pauseButton.alpha = 0;
+    pauseCircle.alpha = 0;
 }
     
     override public function update(elapsed:Float)
