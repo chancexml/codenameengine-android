@@ -32,8 +32,8 @@ class HitBox extends FlxSpriteGroup {
         var w:Int = Std.int(FlxG.width / 4);
         var h:Int = Std.int(FlxG.height);
 
-        var hintH:Int = Std.int(FlxG.height / 14);
-        var hintY:Int = FlxG.height - hintH;
+        var hintH:Int = hintStyle == "Gradient" ? h : Std.int(FlxG.height / 17);
+        var hintY:Int = hintStyle == "Gradient" ? 0 : FlxG.height - hintH;
 
         hitboxCamera = new FlxCamera(0, 0, FlxG.width, FlxG.height);
         hitboxCamera.bgColor = 0x00000000;
@@ -70,8 +70,8 @@ class HitBox extends FlxSpriteGroup {
 
     private function applyGradientSafe(buttons:Array<HitboxButton>, width:Int, height:Int, isHint:Bool):Void {
         var path:String = isHint 
-            ? 'game/hitbox/hint/hintgradient'
-            : 'game/hitbox/gradient';
+            ? 'images/game/hitbox/hint/hintgradient'
+            : 'images/game/hitbox/gradient';
 
         var frames = Paths.getSparrowAtlas(path);
 
