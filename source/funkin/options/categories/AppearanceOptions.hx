@@ -11,7 +11,7 @@ class AppearanceOptions extends TreeMenuScreen {
 
 		add(new NumOption(getNameID('fpsSize'), getDescID('fpsSize'),
 			0.1, 1, 0.1,
-			'fpsSize' __changeFPSSize
+			'fpsSize', __changeFPSSize
 		));
 		
 		add(new Checkbox(getNameID('flashingMenu'), getDescID('flashingMenu'), 'flashingMenu'));
