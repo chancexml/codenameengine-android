@@ -379,54 +379,120 @@ class StrumLine extends FlxTypedGroup<Strum> {
 	 * @param playIntroAnimation (Optional) Whenever the intro animation should be played, by default might be `true` under certain conditions.
 	 */
 	public function createStrum(i:Int, ?animPrefix:String, ?spritePath:String, ?playIntroAnimation:Bool) {
-		if (animPrefix == null)
-			animPrefix = strumAnimPrefix[i % strumAnimPrefix.length];
-		var babyArrow:Strum = new Strum(startingPos.x + (Note.swagWidth * strumScale * (data.strumSpacing != null ? data.strumSpacing : 1) * i), startingPos.y + (Note.swagWidth*0.5) - (Note.swagWidth * strumScale * 0.5));
-		babyArrow.ID = i;
-		babyArrow.strumLine = this;
+	    if (animPrefix == null)
+		    animPrefix = strumAnimPrefix[i % strumAnimPrefix.length];
 
-		if(data.scrollSpeed != null)
-			babyArrow.scrollSpeed = data.scrollSpeed;
+	    var babyArrow:Strum = new Strum(
+		    startingPos.x + (Note.swagWidth * strumScale * (data.strumSpacing != null ? data.strumSpacing : 1) * i),
+	 	    startingPos.y + (Note.swagWidth * 0.5) - (Note.swagWidth * strumScale * 0.5)
+	    );
 
-		var event = EventManager.get(StrumCreationEvent).recycle(babyArrow, PlayState.instance.strumLines.members.indexOf(this), i, animPrefix);
-		event.__doAnimation = playIntroAnimation == null ? (!MusicBeatState.skipTransIn && (PlayState.instance != null ? PlayState.instance.introLength > 0 : true)) : playIntroAnimation;
-		if (spritePath != null) event.sprite = spritePath;
-		if (PlayState.instance != null) event = PlayState.instance.gameAndCharsEvent("onStrumCreation", event);
+	    babyArrow.ID = i;
+	    babyArrow.strumLine = this;
+ 
+    	if (Options.middleScroll)
+	    {
+		    if (opponentSide)
+	    	{
+		    	babyArrow.visible = false;
+			    babyArrow.alpha = 0;
+	    	}
+		    else
+	    	{
+			    var spacing = Note.swagWidth * strumScale * (data.strumSpacing != null ? data.strumSpacing : 1);
 
-		if (!event.cancelled) {
-			babyArrow.frames = Paths.getFrames(event.sprite);
-			babyArrow.animation.addByPrefix('green', 'arrowUP');
-			babyArrow.animation.addByPrefix('blue', 'arrowDOWN');
-			babyArrow.animation.addByPrefix('purple', 'arrowLEFT');
-			babyArrow.animation.addByPrefix('red', 'arrowRIGHT');
+			    babyArrow.x = (FlxG.width / 2) - (spacing * 2) + (spacing * i);
+		    }
+	    }
 
-			babyArrow.antialiasing = true;
-			babyArrow.setGraphicSize(Std.int((babyArrow.width * Flags.DEFAULT_NOTE_SCALE) * strumScale));
+	    if (data.scrollSpeed != null)
+		    babyArrow.scrollSpeed = data.scrollSpeed;
 
-			babyArrow.animation.addByPrefix('static', 'arrow${event.animPrefix.toUpperCase()}');
-			babyArrow.animation.addByPrefix('pressed', '${event.animPrefix} press', 24, false);
-			babyArrow.animation.addByPrefix('confirm', '${event.animPrefix} confirm', 24, false);
-		}
+    	var event = EventManager.get(StrumCreationEvent).recycle(
+	  	    babyArrow,
+		    PlayState.instance.strumLines.members.indexOf(this),
+	    	i,
+		    animPrefix
+	    );
 
-		babyArrow.cpu = cpu;
-		babyArrow.updateHitbox();
-		babyArrow.scrollFactor.set();
+	    event.__doAnimation = playIntroAnimation == null
+		    ? (!MusicBeatState.skipTransIn && (PlayState.instance != null ? PlayState.instance.introLength > 0 : true))
+		    : playIntroAnimation;
 
-		if (event.__doAnimation)
-		{
-			babyArrow.y -= 10;
-			babyArrow.alpha = 0;
-			FlxTween.tween(babyArrow, {y: babyArrow.y + 10, alpha: 1}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i * (4 / (data.keyCount != null ? data.keyCount : 4)))});
-		}
-		babyArrow.playAnim('static');
+	    if (spritePath != null)
+		    event.sprite = spritePath;
 
-		insert(i, babyArrow);
+	    if (PlayState.instance != null)
+		    event = PlayState.instance.gameAndCharsEvent("onStrumCreation", event);
 
-		if (PlayState.instance != null) PlayState.instance.gameAndCharsEvent("onPostStrumCreation", event);
+    	if (!event.cancelled)
+	    {
+	    	babyArrow.frames = Paths.getFrames(event.sprite);
 
-		return babyArrow;
+	    	babyArrow.animation.addByPrefix('green', 'arrowUP');
+		    babyArrow.animation.addByPrefix('blue', 'arrowDOWN');
+	    	babyArrow.animation.addByPrefix('purple', 'arrowLEFT');
+	    	babyArrow.animation.addByPrefix('red', 'arrowRIGHT');
+
+		    babyArrow.antialiasing = true;
+
+		    babyArrow.setGraphicSize(
+			    Std.int((babyArrow.width * Flags.DEFAULT_NOTE_SCALE) * strumScale)
+		    );
+ 
+		    babyArrow.animation.addByPrefix(
+			    'static',
+			    'arrow${event.animPrefix.toUpperCase()}'
+		    );
+
+		    babyArrow.animation.addByPrefix(
+			    'pressed',
+			    '${event.animPrefix} press',
+			    24,
+			    false
+	    	);
+
+		    babyArrow.animation.addByPrefix(
+			    'confirm',
+			    '${event.animPrefix} confirm',
+		    	24,
+			    false
+		    );
+	    }
+
+	    babyArrow.cpu = cpu;
+	    babyArrow.updateHitbox();
+	    babyArrow.scrollFactor.set();
+
+	    if (event.__doAnimation)
+    	{
+		    babyArrow.y -= 10;
+		    babyArrow.alpha = 0;
+
+		    FlxTween.tween(
+			    babyArrow,
+			    {
+				    y: babyArrow.y + 10,
+				    alpha: 1
+		    	},
+			    1,
+			    {
+				    ease: FlxEase.circOut,
+				    startDelay: 0.5 + (0.2 * i * (4 / (data.keyCount != null ? data.keyCount : 4)))
+			    }
+		    );
+    	}
+
+	    babyArrow.playAnim('static');
+ 
+	    insert(i, babyArrow);
+
+	    if (PlayState.instance != null)
+		    PlayState.instance.gameAndCharsEvent("onPostStrumCreation", event);
+
+	    return babyArrow;
 	}
-
+	
 	/**
 	 * Deletes a note from this strumline.
 	 * @param note Note to delete
