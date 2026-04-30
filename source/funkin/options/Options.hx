@@ -31,7 +31,7 @@ class Options
 	public static var pauseButton:Bool = true;
 	public static var hitboxStyle:String = "Simple";
 	public static var hintStyle:String = "Simple";
-	public static var fpsSize:Int = 1;
+	public static var fpsSize:Float = 1;
 	public static var naughtyness:Bool = true;
 	public static var downscroll:Bool = false;
 	public static var ghostTapping:Bool = true;
