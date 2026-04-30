@@ -48,7 +48,7 @@ class Pause extends FlxGroup
         pauseCircle.updateHitbox();
         pauseCircle.x = ((pauseButton.x + (pauseButton.width / 2)) - (pauseCircle.width / 2));
         pauseCircle.y = ((pauseButton.y + (pauseButton.height / 2)) - (pauseCircle.height / 2));
-        pauseCircle.alpha = 0.1;
+        pauseCircle.alpha = 0.2;
         pauseCircle.scrollFactor.set();
         pauseCircle.cameras = [PauseCam];
 
@@ -65,10 +65,14 @@ class Pause extends FlxGroup
 
     pauseButton.visible = isButtonActive;
     pauseCircle.visible = isButtonActive;
-}
+
     if (Options.pauseButton == false) {
-    pauseButton.alpha = 0;
-    pauseCircle.alpha = 0;
+        pauseButton.alpha = 0;
+        pauseCircle.alpha = 0;
+    } else {
+        pauseButton.alpha = 1;
+        pauseCircle.alpha = 0.2;
+    }
 }
     
     override public function update(elapsed:Float)
