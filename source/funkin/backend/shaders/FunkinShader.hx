@@ -82,8 +82,9 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 	static var ERROR_REGEX = ~/ERROR: (\d+):(\d+): (.*)/g;
 	static var ERROR_REGEX_2 = ~/(\d+)\((\d+)\) : error ([^:]+): (.*)/g;
 	@:noCompletion private override function __createGLShader(source:String, type:Int):GLShader
-	{
-		var gl = __context.gl;
+{
+    if (__context == null) return null;
+        var gl = __context.gl;
 
 		var shader = gl.createShader(type);
 		gl.shaderSource(shader, source);
@@ -164,12 +165,12 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 	}
 
 	@:noCompletion private override function __createGLProgram(vertexSource:String, fragmentSource:String):GLProgram
-	{
-		var program:GLProgram = null;
-		try
-		{
-			var gl = __context.gl;
-
+    {
+        var program:GLProgram = null;
+        if (__context == null) return null;
+        try
+        {
+            var gl = __context.gl;
 			var vertexShader = __createGLShader(vertexSource, gl.VERTEX_SHADER);
 			var fragmentShader = __createGLShader(fragmentSource, gl.FRAGMENT_SHADER);
 
@@ -277,13 +278,27 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		}
 
 		if (__context == null && openfl.Lib.current != null && openfl.Lib.current.stage != null && openfl.Lib.current.stage.context3D != null) {
-			__context = openfl.Lib.current.stage.context3D;
-		}
+        __context = openfl.Lib.current.stage.context3D;
+    }
 
-		if (__context == null) {
-			__glSourceDirty = true;
-			return;
-		}
+        if (__context == null) {
+            if (__glSourceDirty == false && openfl.Lib.current != null && openfl.Lib.current.stage != null) {
+                __glSourceDirty = true;
+                var alreadyListening = false;
+                try {
+                    if (!alreadyListening) {
+                        openfl.Lib.current.stage.addEventListener(openfl.events.Event.RENDER, function onContextReady(e:openfl.events.Event) {
+                        if (__context != null || (openfl.Lib.current.stage.context3D != null)) {
+                            openfl.Lib.current.stage.removeEventListener(openfl.events.Event.RENDER, onContextReady);
+                            __initGL();
+                        }
+                    }, false, -10);
+                    alreadyListening = true;
+                }
+            } catch (e:Dynamic) {}
+        } 
+        return;
+    }
 
 		if (__context != null && program == null)
 		{
