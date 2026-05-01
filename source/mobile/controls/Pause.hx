@@ -101,8 +101,7 @@ class Pause extends FlxGroup
         {
             pauseButton.animation.play('confirm');
             
-            game.paused = true;
-            game.openSubState(new PauseSubState());
+            game.pauseGame();
         }
     }
 }
