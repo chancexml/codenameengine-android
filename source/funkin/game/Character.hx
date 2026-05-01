@@ -130,40 +130,53 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 	@:noCompletion var isDanceLeftDanceRight:Bool = false;
 
 	override function update(elapsed:Float) {
-		scripts.call("update", [elapsed]);
+        scripts.call("update", [elapsed]);
 
-		super.update(elapsed);
+        super.update(elapsed);
 
-		if (stunned) {
-			__stunnedTime += elapsed;
-			if (__stunnedTime > Flags.STUNNED_TIME)
-				stunned = false;
-		}
+        if (stunned) {
+            __stunnedTime += elapsed;
 
-		if (!__lockAnimThisFrame && lastAnimContext != DANCE)
-			tryDance();
+        if (__stunnedTime > Flags.STUNNED_TIME)
+            stunned = false;
+    }
 
-		__lockAnimThisFrame = false;
+        if (lastAnimContext == SING && animation.curAnim != null)
+   {
+        var anim = animation.curAnim;
 
-		scripts.call("postUpdate", [elapsed]);
+        if (anim.finished)
+        {
+            anim.paused = true;
+            anim.curFrame = anim.numFrames - 1;
+        }
+    }
+
+        if (!__lockAnimThisFrame && lastAnimContext != DANCE)
+            tryDance();
+
+        __lockAnimThisFrame = false;
+
+        scripts.call("postUpdate", [elapsed]);
 	}
 
 	private var danced:Bool = false;
 
 	public function dance() {
-	    if(debugMode) return;
+        if(debugMode) return;
 
-	    if (animation.curAnim != null)
-		    animation.curAnim.paused = false;
+        if (animation.curAnim != null)
+            animation.curAnim.paused = false;
 
-	    var event = EventManager.get(DanceEvent).recycle(danced);
-	    scripts.call("onDance", [event]);
-	    if (event.cancelled) return;
+        var event = EventManager.get(DanceEvent).recycle(danced);
+        scripts.call("onDance", [event]);
 
-    	if (isDanceLeftDanceRight)
-		    playAnim(((danced = !danced) ? 'danceLeft' : 'danceRight') + idleSuffix, DANCE);
-	    else
-		    playAnim('idle' + idleSuffix, DANCE);
+        if (event.cancelled) return;
+
+        if (isDanceLeftDanceRight)
+            playAnim(((danced = !danced) ? 'danceLeft' : 'danceRight') + idleSuffix, DANCE);
+        else
+            playAnim('idle' + idleSuffix, DANCE);
 	}
 
 	public function tryDance() {
