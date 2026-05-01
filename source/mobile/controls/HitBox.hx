@@ -32,7 +32,7 @@ class HitBox extends FlxSpriteGroup {
         var w:Int = Std.int(FlxG.width / 4);
         var h:Int = Std.int(FlxG.height);
 
-        var hintH:Int = hintStyle == "Gradient" ? h : Std.int(FlxG.height / 17);
+        var hintH:Int = hintStyle == "Gradient" ? h : Std.int(FlxG.height / 20);
         var hintY:Int = hintStyle == "Gradient" ? 0 : FlxG.height - hintH;
 
         hitboxCamera = new FlxCamera(0, 0, FlxG.width, FlxG.height);
