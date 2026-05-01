@@ -290,8 +290,20 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		onGLUpdate.dispatch();
 		super.__updateGL();
 
-	}
+		if (__context != null && glProgram != null) {
+			var gl = __context.gl;
+			
+			var alphaIndex = gl.getAttribLocation(glProgram, "alpha");
+			if (alphaIndex >= 0) gl.vertexAttrib1f(alphaIndex, 1.0);
 
+			var colorMultIndex = gl.getAttribLocation(glProgram, "colorMultiplier");
+			if (colorMultIndex >= 0) gl.vertexAttrib4f(colorMultIndex, 1.0, 1.0, 1.0, 1.0);
+
+			var colorOffIndex = gl.getAttribLocation(glProgram, "colorOffset");
+			if (colorOffIndex >= 0) gl.vertexAttrib4f(colorOffIndex, 0.0, 0.0, 0.0, 0.0);
+		}
+	}
+	
 	@:noCompletion private override function __initGL():Void
 	{
 		if (__glSourceDirty || __paramBool == null)
@@ -308,7 +320,6 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 			__processGLData(glVertexSource, "attribute");
 			__processGLData(glVertexSource, "uniform");
 			__processGLData(glFragmentSource, "uniform");
-
 		}
 
 		if (__context != null && program == null)
