@@ -221,25 +221,30 @@ class Main extends Sprite
 
 	public static function updateFramerateScale():Void {
         if (framerateSprite != null) {
-            var scale:Float = (Options.fpsSize != null) ? Options.fpsSize : 1.0;
-            framerateSprite.scaleX = scale;
-            framerateSprite.scaleY = scale;
+            var scale:Float = Options.fpsSize;
+        
+        if (scale <= 0 || Math.isNaN(scale)) {
+            scale = 1.0;
+        }
 
-            var margin:Float = 10;
+        framerateSprite.scaleX = scale;
+        framerateSprite.scaleY = scale;
 
-            if (framerateSprite.x + framerateSprite.width > 1280 - margin) {
-                framerateSprite.x = 1280 - framerateSprite.width - margin;
-            }
+        var margin:Float = 10;
 
-            if (framerateSprite.y + framerateSprite.height > 720 - margin) {
-                framerateSprite.y = 720 - framerateSprite.height - margin;
-            }
-		   
-            if (framerateSprite.x < margin) framerateSprite.x = margin;
-            if (framerateSprite.y < margin) framerateSprite.y = margin;
+        if (framerateSprite.x + framerateSprite.width > 1280 - margin) {
+            framerateSprite.x = 1280 - framerateSprite.width - margin;
+        }
+
+        if (framerateSprite.y + framerateSprite.height > 720 - margin) {
+            framerateSprite.y = 720 - framerateSprite.height - margin;
+        }
+       
+        if (framerateSprite.x < margin) framerateSprite.x = margin;
+        if (framerateSprite.y < margin) framerateSprite.y = margin;
         }
 	}
-
+	
 	public static function initTransition() {
 		var diamond:FlxGraphic = FlxGraphic.fromClass(GraphicTransTileDiamond);
 		diamond.persist = true;
