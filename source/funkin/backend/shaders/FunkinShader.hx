@@ -64,21 +64,22 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		while(IMPORT_REGEX.match(value))
 		{
 			var importPath = IMPORT_REGEX.matched(1);
-
 			var importSource = Assets.getText("assets/shaders/" + importPath);
 			if(importSource == null) {
 				var fileName = type == FRAGMENT_SHADER ? fragFileName : vertFileName;
-
 				Logs.traceColored([
 					Logs.logText('[Shader] ', RED),
 					Logs.logText('Failed to import shader ${importPath} in ${fileName}', RED),
 				]);
+				[span_1](start_span)
+				value = value.replace(IMPORT_REGEX.matched(0), "/* Failed to import: " + importPath + " */");
 			} else {
 				value = value.replace(IMPORT_REGEX.matched(0), importSource);
 			}
 		}
 		return value;
 	}
+	
 
 	static var ERROR_POS_REGEX = ~/(\d+):(\d+): (.*)/g;
 	static var ERROR_REGEX = ~/ERROR: (\d+):(\d+): (.*)/g;
@@ -735,7 +736,11 @@ vec4 applyFlixelEffects(vec4 color) {
 		return color * openfl_Alphav;
 	}
 
-	color.rgb = color.rgb / color.a;
+    [span_3](start_span)// FIX: Safeguard against near-zero division causing NaN color rendering[span_3](end_span)
+	if(color.a > 0.00001) {
+		color.rgb = color.rgb / color.a;
+	}
+    
 	color = clamp(openfl_ColorOffsetv + (color * openfl_ColorMultiplierv), 0.0, 1.0);
 
 	if(color.a > 0.0) {
