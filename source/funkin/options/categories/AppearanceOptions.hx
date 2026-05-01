@@ -16,7 +16,7 @@ class AppearanceOptions extends TreeMenuScreen {
 
 		add(new NumOption(getNameID('fpsSize'), getDescID('fpsSize'),
 			0.1, 1, 0.1,
-			'fpsSize', __changeFPSSize
+			'fpsSize',
 		));
 		
 		add(new Checkbox(getNameID('flashingMenu'), getDescID('flashingMenu'), 'flashingMenu'));
@@ -33,63 +33,6 @@ class AppearanceOptions extends TreeMenuScreen {
 		if (FlxG.updateFramerate < framerate) FlxG.drawFramerate = FlxG.updateFramerate = framerate;
 		else FlxG.updateFramerate = FlxG.drawFramerate = framerate;
 	}
-
-	private function __changeFPSSize(value:Float) {
-        if (Framerate.fpsCounter != null) {
-            var numSize = Std.int(18 * value);
-            var labelSize = Std.int(12 * value);
-
-            var numFormat = new openfl.text.TextFormat(Framerate.fontName, numSize, -1);
-            var labelFormat = new openfl.text.TextFormat(Framerate.fontName, labelSize, -1);
-
-            var fps = Framerate.fpsCounter;
-
-            fps.fpsNum.defaultTextFormat = numFormat;
-            fps.fpsLabel.defaultTextFormat = labelFormat;
-
-            fps.fpsNum.setTextFormat(numFormat);
-            fps.fpsLabel.setTextFormat(labelFormat);
-
-            fps.fpsNum.text = fps.fpsNum.text;
-            fps.fpsLabel.text = fps.fpsLabel.text;
-        }
-
-        if (Framerate.memoryCounter != null) {
-            var memSize = Std.int(12 * value);
-            var memFormat = new openfl.text.TextFormat(Framerate.fontName, memSize, -1);
-
-            var mem = Framerate.memoryCounter;
-
-            mem.memoryText.defaultTextFormat = memFormat;
-            mem.memoryPeakText.defaultTextFormat = memFormat;
-
-            mem.memoryText.setTextFormat(memFormat);
-            mem.memoryPeakText.setTextFormat(memFormat);
-
-            mem.memoryText.text = mem.memoryText.text;
-            mem.memoryPeakText.text = mem.memoryPeakText.text;
-        }
-
-        #if SHOW_BUILD_ON_FPS
-        if (Framerate.codenameBuildField != null) {
-            var buildSize = Std.int(12 * value);
-
-            Framerate.textFormat = new openfl.text.TextFormat(
-                Framerate.fontName,
-                buildSize,
-                -1
-            );
-
-            var build = Framerate.codenameBuildField;
-
-            build.defaultTextFormat = Framerate.textFormat;
-            build.setTextFormat(Framerate.textFormat);
-
-            build.text = build.text;
-        }
-        #end
-    }
-}
 
 class AdvancedAppearanceOptions extends TreeMenuScreen {
 	var qualityOptions:Array<OptionType> = [];
