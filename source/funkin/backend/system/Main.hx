@@ -86,8 +86,7 @@ class Main extends Sprite
         addChild(framerateSprite = new Framerate());
         SystemInfo.init();
 
-		framerateSprite.scaleX = Options.fpsSize;
-		framerateSprite.scaleY = Options.fpsSize;
+		updateFramerateScale(); 
   
         #if android
         if (Permissions.hasManageAllFiles()) {
@@ -218,6 +217,27 @@ class Main extends Sprite
 		}
 
 		game.addChildAt(game.soundTray = daSndTray, index);
+	}
+
+	public static function updateFramerateScale():Void {
+        if (framerateSprite != null) {
+            var scale:Float = (Options.fpsSize != null) ? Options.fpsSize : 1.0;
+            framerateSprite.scaleX = scale;
+            framerateSprite.scaleY = scale;
+
+            var margin:Float = 10;
+
+            if (framerateSprite.x + framerateSprite.width > 1280 - margin) {
+                framerateSprite.x = 1280 - framerateSprite.width - margin;
+            }
+
+            if (framerateSprite.y + framerateSprite.height > 720 - margin) {
+                framerateSprite.y = 720 - framerateSprite.height - margin;
+            }
+		   
+            if (framerateSprite.x < margin) framerateSprite.x = margin;
+            if (framerateSprite.y < margin) framerateSprite.y = margin;
+        }
 	}
 
 	public static function initTransition() {
