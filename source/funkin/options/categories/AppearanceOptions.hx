@@ -27,6 +27,7 @@ class AppearanceOptions extends TreeMenuScreen {
 		add(new TextOption('optionsMenu.advanced', 'optionsTree.appearance.advanced-desc', ' >', () ->
 			parent.addMenu(new AdvancedAppearanceOptions())));
 	}
+}
 
 	private function __changeFPS(value:Float) {
 		var framerate = Math.floor(value);
@@ -56,8 +57,7 @@ class AdvancedAppearanceOptions extends TreeMenuScreen {
 
 		updateQualityOptions();
 	}
-}
-
+	
 	private function updateQualityOptions() {
 		for (option in qualityOptions) {
 			option.locked = Options.quality != 2;
