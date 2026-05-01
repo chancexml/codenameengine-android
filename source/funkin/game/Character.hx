@@ -130,64 +130,50 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 	@:noCompletion var isDanceLeftDanceRight:Bool = false;
 
 	override function update(elapsed:Float) {
-        scripts.call("update", [elapsed]);
+		scripts.call("update", [elapsed]);
 
-        super.update(elapsed);
+		super.update(elapsed);
 
-        if (stunned) {
-            __stunnedTime += elapsed;
+		if (stunned) {
+			__stunnedTime += elapsed;
+			if (__stunnedTime > Flags.STUNNED_TIME)
+				stunned = false;
+		}
 
-        if (__stunnedTime > Flags.STUNNED_TIME)
-            stunned = false;
-    }
+		if (!__lockAnimThisFrame && lastAnimContext != DANCE)
+			tryDance();
 
-        if (lastAnimContext == SING && animation.curAnim != null)
-   {
-        var anim = animation.curAnim;
+		__lockAnimThisFrame = false;
 
-        if (anim.finished)
-        {
-            anim.paused = true;
-            anim.curFrame = anim.numFrames - 1;
-        }
-    }
-
-        if (!__lockAnimThisFrame && lastAnimContext != DANCE)
-            tryDance();
-
-        __lockAnimThisFrame = false;
-
-        scripts.call("postUpdate", [elapsed]);
+		scripts.call("postUpdate", [elapsed]);
 	}
 
 	private var danced:Bool = false;
 
 	public function dance() {
-        if(debugMode) return;
+		if(debugMode) return;
 
-        if (animation.curAnim != null)
-            animation.curAnim.paused = false;
+		var event = EventManager.get(DanceEvent).recycle(danced);
+		scripts.call("onDance", [event]);
+		if (event.cancelled) return;
 
-        var event = EventManager.get(DanceEvent).recycle(danced);
-        scripts.call("onDance", [event]);
-
-        if (event.cancelled) return;
-
-        if (isDanceLeftDanceRight)
-            playAnim(((danced = !danced) ? 'danceLeft' : 'danceRight') + idleSuffix, DANCE);
-        else
-            playAnim('idle' + idleSuffix, DANCE);
+		if (isDanceLeftDanceRight)
+			playAnim(((danced = !danced) ? 'danceLeft' : 'danceRight') + idleSuffix, DANCE);
+		else
+			playAnim('idle' + idleSuffix, DANCE);
 	}
 
 	public function tryDance() {
 		var event = new CancellableEvent();
 		scripts.call("onTryDance", [event]);
 		if (event.cancelled)
-			return;
+		return;
 
 		switch (lastAnimContext) {
 			case SING | MISS:
-				if (lastHit + (Conductor.stepCrochet * holdTime) < Conductor.songPosition)
+				var holdDelay:Float = Options.repeatHold ? (Conductor.stepCrochet * holdTime) : 1000;
+				
+				if (lastHit + holdDelay < Conductor.songPosition)
 					dance();
 			case DANCE:
 				dance();
@@ -199,7 +185,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 					dance();
 		}
 	}
-
+	
 	/**
 	 * Whenever the character should dance on beat or not.
 	 */
@@ -295,42 +281,23 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		playSingAnimUnsafe(event.direction, hasAnimation(event.animName) ? event.suffix : "", event.context, event.force, event.reversed, event.frame);
 	}
 
-	public function playSingAnimUnsafe(direction:Int, suffix:String = "", Context:PlayAnimContext = SING, Force:Bool = true, Reversed:Bool = false, Frame:Int = 0)
-{
-	var event = EventManager.get(DirectionAnimEvent).recycle(
-		getSingAnim(direction, suffix),
-		direction,
-		suffix,
-		Context,
-		Reversed,
-		Frame,
-		Force
-	);
+	public function playSingAnimUnsafe(direction:Int, suffix:String = "", Context:PlayAnimContext = SING, Force:Bool = true, Reversed:Bool = false, Frame:Int = 0) {
+		var event = EventManager.get(DirectionAnimEvent).recycle(getSingAnim(direction, suffix), direction, suffix, Context, Reversed, Frame, Force);
+		scripts.call("playSingAnimUnsafe", [event]);
+		if (event.cancelled) return;
 
-	scripts.call("playSingAnimUnsafe", [event]);
-
-	if (event.cancelled)
-		return;
-
-	if (!Options.repeatHold && Context == SING)
-	{
-		if (animation.curAnim != null)
-		{
-			if (animation.curAnim.name == event.animName)
-			{
-				animation.curAnim.paused = true;
-				return;
-			}
-		}
+		playAnim(event.animName, event.force, event.context, event.reversed, event.frame);
 	}
-
-	playAnim(event.animName, event.force, event.context, event.reversed, event.frame);
-}
 
 	public override function playAnim(AnimName:String, ?Force:Bool, Context:PlayAnimContext = NONE, Reversed:Bool = false, Frame:Int = 0) {
 		var event = EventManager.get(PlayAnimEvent).recycle(AnimName, Force, Reversed, Frame, Context);
 		scripts.call("onPlayAnim", [event]);
 		if (event.cancelled) return;
+
+		var isHold:Bool = (Conductor.songPosition - lastHit) < 50;
+		if (!Options.repeatHold && event.context == SING && getAnimName() == event.animName && isHold) {
+			event.force = false;
+	}
 
 		super.playAnim(event.animName, event.force, event.context, event.reverse, event.startingFrame);
 
@@ -338,7 +305,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		if (event.context == SING || event.context == MISS)
 			lastHit = Conductor.songPosition;
 	}
-
+	
 	public inline function getCameraPosition() {
 		var midpoint:FlxPoint = getMidpoint();
 		var event = EventManager.get(PointEvent).recycle(
