@@ -65,13 +65,15 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		{
 			var importPath = IMPORT_REGEX.matched(1);
 			var importSource = Assets.getText("assets/shaders/" + importPath);
+			
 			if(importSource == null) {
 				var fileName = type == FRAGMENT_SHADER ? fragFileName : vertFileName;
+				
 				Logs.traceColored([
 					Logs.logText('[Shader] ', RED),
 					Logs.logText('Failed to import shader ${importPath} in ${fileName}', RED),
 				]);
-				[span_1](start_span)
+				
 				value = value.replace(IMPORT_REGEX.matched(0), "/* Failed to import: " + importPath + " */");
 			} else {
 				value = value.replace(IMPORT_REGEX.matched(0), importSource);
@@ -79,7 +81,6 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 		}
 		return value;
 	}
-	
 
 	static var ERROR_POS_REGEX = ~/(\d+):(\d+): (.*)/g;
 	static var ERROR_REGEX = ~/ERROR: (\d+):(\d+): (.*)/g;
