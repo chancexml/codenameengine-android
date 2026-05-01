@@ -41,6 +41,7 @@ class Options
 	public static var fpsCounter:Bool = true;
 	public static var autoPause:Bool = true;
 	public static var antialiasing:Bool = true;
+	public static var repeatHold:Bool = true;
 	public static var volume:Float = 1;
 	public static var volumeMusic:Float = 1;
 	public static var volumeSFX:Float = 1;
