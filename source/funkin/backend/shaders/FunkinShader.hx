@@ -801,8 +801,12 @@ attribute vec4 colorMultiplier;
 attribute vec4 colorOffset;
 uniform bool hasColorTransform;";
 
-	public static final vertBody:String = "openfl_Alphav = openfl_Alpha;
+		public static final vertBody:String = "openfl_Alphav = openfl_Alpha;
 openfl_TextureCoordv = openfl_TextureCoord;
+
+// Default initialization prevents garbage data on strict mobile GPUs
+openfl_ColorMultiplierv = vec4(1.0, 1.0, 1.0, 1.0);
+openfl_ColorOffsetv = vec4(0.0, 0.0, 0.0, 0.0);
 
 if(openfl_HasColorTransform) {
 	openfl_ColorMultiplierv = openfl_ColorMultiplier;
@@ -813,7 +817,6 @@ openfl_Alphav = openfl_Alpha * alpha;
 
 if(hasColorTransform) {
 	openfl_ColorOffsetv = colorOffset / 255.0;
-
 	openfl_ColorMultiplierv = colorMultiplier;
 }
 
@@ -847,14 +850,17 @@ uniform vec2 openfl_TextureSize;";
 public static final vertBodyBackCompat:String = "openfl_Alphav = openfl_Alpha;
 openfl_TextureCoordv = openfl_TextureCoord;
 
+// default initialization 
+openfl_ColorMultiplierv = vec4(1.0, 1.0, 1.0, 1.0);
+openfl_ColorOffsetv = vec4(0.0, 0.0, 0.0, 0.0);
+
 if(openfl_HasColorTransform) {
 	openfl_ColorMultiplierv = openfl_ColorMultiplier;
-
 	openfl_ColorOffsetv = openfl_ColorOffset / 255.0;
 }
 
 gl_Position = openfl_Matrix * openfl_Position;";
-
+	
 	public static final defaultVertexSource:String = "#pragma header
 
 void main(void) {
