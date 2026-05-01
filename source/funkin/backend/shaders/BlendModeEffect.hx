@@ -19,18 +19,30 @@ class BlendModeEffect
 
 	public function new(shader:BlendModeShader, color:FlxColor):Void
 	{
-		shader.uBlendColor.value = [];
 		this.shader = shader;
+		
+		if (this.shader != null && this.shader.uBlendColor != null)
+		{
+			this.shader.uBlendColor.value = [0.0, 0.0, 0.0, 0.0];
+		}
+		
 		this.color = color;
 	}
 
 	function set_color(color:FlxColor):FlxColor
 	{
-		shader.uBlendColor.value[0] = color.redFloat;
-		shader.uBlendColor.value[1] = color.greenFloat;
-		shader.uBlendColor.value[2] = color.blueFloat;
-		shader.uBlendColor.value[3] = color.alphaFloat;
+		this.color = color;
 
-		return this.color = color;
+		if (shader != null && shader.uBlendColor != null)
+		{
+			shader.uBlendColor.value = [
+				color.redFloat,
+				color.greenFloat,
+				color.blueFloat,
+				color.alphaFloat
+			];
+		}
+
+		return this.color;
 	}
 }
