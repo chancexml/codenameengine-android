@@ -151,16 +151,19 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 	private var danced:Bool = false;
 
 	public function dance() {
-		if(debugMode) return;
+	    if(debugMode) return;
 
-		var event = EventManager.get(DanceEvent).recycle(danced);
-		scripts.call("onDance", [event]);
-		if (event.cancelled) return;
+	    if (animation.curAnim != null)
+		    animation.curAnim.paused = false;
 
-		if (isDanceLeftDanceRight)
-			playAnim(((danced = !danced) ? 'danceLeft' : 'danceRight') + idleSuffix, DANCE);
-		else
-			playAnim('idle' + idleSuffix, DANCE);
+	    var event = EventManager.get(DanceEvent).recycle(danced);
+	    scripts.call("onDance", [event]);
+	    if (event.cancelled) return;
+
+    	if (isDanceLeftDanceRight)
+		    playAnim(((danced = !danced) ? 'danceLeft' : 'danceRight') + idleSuffix, DANCE);
+	    else
+		    playAnim('idle' + idleSuffix, DANCE);
 	}
 
 	public function tryDance() {
@@ -279,13 +282,37 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		playSingAnimUnsafe(event.direction, hasAnimation(event.animName) ? event.suffix : "", event.context, event.force, event.reversed, event.frame);
 	}
 
-	public function playSingAnimUnsafe(direction:Int, suffix:String = "", Context:PlayAnimContext = SING, Force:Bool = true, Reversed:Bool = false, Frame:Int = 0) {
-		var event = EventManager.get(DirectionAnimEvent).recycle(getSingAnim(direction, suffix), direction, suffix, Context, Reversed, Frame, Force);
-		scripts.call("playSingAnimUnsafe", [event]);
-		if (event.cancelled) return;
+	public function playSingAnimUnsafe(direction:Int, suffix:String = "", Context:PlayAnimContext = SING, Force:Bool = true, Reversed:Bool = false, Frame:Int = 0)
+{
+	var event = EventManager.get(DirectionAnimEvent).recycle(
+		getSingAnim(direction, suffix),
+		direction,
+		suffix,
+		Context,
+		Reversed,
+		Frame,
+		Force
+	);
 
-		playAnim(event.animName, event.force, event.context, event.reversed, event.frame);
+	scripts.call("playSingAnimUnsafe", [event]);
+
+	if (event.cancelled)
+		return;
+
+	if (!Options.repeatHold && Context == SING)
+	{
+		if (animation.curAnim != null)
+		{
+			if (animation.curAnim.name == event.animName)
+			{
+				animation.curAnim.paused = true;
+				return;
+			}
+		}
 	}
+
+	playAnim(event.animName, event.force, event.context, event.reversed, event.frame);
+}
 
 	public override function playAnim(AnimName:String, ?Force:Bool, Context:PlayAnimContext = NONE, Reversed:Bool = false, Frame:Int = 0) {
 		var event = EventManager.get(PlayAnimEvent).recycle(AnimName, Force, Reversed, Frame, Context);
