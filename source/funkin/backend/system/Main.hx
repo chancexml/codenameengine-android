@@ -23,6 +23,7 @@ import openfl.text.TextFormat;
 import openfl.utils.AssetLibrary;
 import sys.FileSystem;
 import sys.io.File;
+import funkin.options.Options;
 #if android
 import extension.androidtools.content.Context;
 import extension.androidtools.os.Build;
@@ -84,6 +85,9 @@ class Main extends Sprite
 
         addChild(framerateSprite = new Framerate());
         SystemInfo.init();
+
+		framerateSprite.scaleX = Options.fpsSize;
+		framerateSprite.scaleY = Options.fpsSize;
   
         #if android
         if (Permissions.hasManageAllFiles()) {
