@@ -45,18 +45,18 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 	 * @param vert Vertex source (pass `null` to use default)
 	 * @param glslVer Version of GLSL to use (defaults to 120, dynamically falls back to 100 on mobile)
 	 */
+	
 	public override function new(frag:String, vert:String, glslVer:String = null) {
 		if (glslVer == null) glslVer = Flags.DEFAULT_GLSL_VERSION;
-
 		if (frag == null) frag = ShaderTemplates.defaultFragmentSource;
 		if (vert == null) vert = ShaderTemplates.defaultVertexSource;
 		this.glFragmentSource = frag;
 		this.glVertexSource = vert;
-
 		this.glslVer = glslVer;
 		super();
+		this.precisionHint = FULL;
 	}
-
+	
 	static var IMPORT_REGEX = ~/#import\s+<(.*)>/;
 
 	private function processImports(value:String, type:Int):String
@@ -346,7 +346,7 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 				prefixBuf.add("#endif\n");
 
 			} else {
-				prefixBuf.add("precision lowp float;\n");
+				prefixBuf.add("precision mediump float;\n");
 			}
 			prefixBuf.add("#endif\n");
 
