@@ -1,4 +1,4 @@
-package funkin.backend.shaders;
+lpackage funkin.backend.shaders;
 
 import flixel.system.FlxAssets.FlxShader;
 
@@ -9,7 +9,7 @@ class OverlayShader extends FlxShader
 #pragma header
 uniform vec4 uBlendColor;
 
-vec3 blendLighten(base:Vec3, blend:Vec3) : Vec3 {
+vec3 blendLighten(vec3 base, vec3 blend) {
 	return mix(
 		1.0 - 2.0 * (1.0 - base) * (1.0 - blend),
 		2.0 * base * blend,
@@ -17,15 +17,16 @@ vec3 blendLighten(base:Vec3, blend:Vec3) : Vec3 {
 	);
 }
 
-vec4 blendLighten(vec4 base, vec4 blend, float opacity)
+vec4 applyOverlay(vec4 base, vec4 blend, float opacity)
 {
-	return (blendLighten(base, blend) * opacity + base * (1.0 - opacity));
+	vec3 blendedRGB = blendLighten(base.rgb, blend.rgb);
+	return vec4(blendedRGB * opacity + base.rgb * (1.0 - opacity), base.a);
 }
 
 void main()
 {
 	vec4 base = texture2D(bitmap, openfl_TextureCoordv);
-	gl_FragColor = blendLighten(base, uBlendColor, uBlendColor.a);
+	gl_FragColor = applyOverlay(base, uBlendColor, uBlendColor.a);
 }')
 	public function new()
 	{
