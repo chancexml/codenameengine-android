@@ -56,6 +56,7 @@ class AdvancedAppearanceOptions extends TreeMenuScreen {
 
 		updateQualityOptions();
 	}
+}
 
 	private function updateQualityOptions() {
 		for (option in qualityOptions) {
