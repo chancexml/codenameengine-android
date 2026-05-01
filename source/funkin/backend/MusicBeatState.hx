@@ -288,10 +288,10 @@ class MusicBeatState extends FlxState implements IBeatCancellableReceiver
 	}
 
 	public override function destroy() {
-		super.destroy();
-		graphicCache.destroy();
-		call("destroy");
-		stateScripts = FlxDestroyUtil.destroy(stateScripts);
+	    call("destroy");
+	    stateScripts = FlxDestroyUtil.destroy(stateScripts);
+	    graphicCache.destroy();
+	    super.destroy();
 	}
 
 	public override function draw() {
