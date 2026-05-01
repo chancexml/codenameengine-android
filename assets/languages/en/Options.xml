@@ -68,14 +68,20 @@
 	</group>
 	
    <group name="AndroidOptions" prefix="AndroidOptions">
+   	    <str id="pauseButton-name">Pause Button</str>
+	    <str id="pauseButton-desc">If unchecked. the pause button will become invisible</str>
+	
+        <str id="hintStyle-name">Hint Style</str>
+        <str id="hintStyle-desc">Changes the look of the hints.</str>
+        
+        <str id="hitboxStyle-name">Hint Style</str>
+        <str id="hitboxStyle-desc">Changes the look of the hitbox.</str>
+	
         <str id="hintOpacity-name">Hint Opacity</str>
         <str id="hintOpacity-desc">Changes the opacity of the hints. put on 0 if u dont want them.</str>
     
         <str id="hitboxOpacity-name">Hitbox Opacity</str>
         <str id="hitboxOpacity-desc">Pretty self explanatory, isn't it?</str>
-
-	    <str id="pauseButton-name">Pause Button</str>
-	    <str id="pauseButton-desc">If unchecked. the pause button will become invisible</str>
 
 	   <!-- <str id=" -->
    </group>
