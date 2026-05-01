@@ -297,33 +297,32 @@ public function justReleased(action:String):Bool
     return false;
 }
 	
-	override public function destroy():Void
+override public function destroy():Void
 {
 	#if mobile
-	exists = false;
-		
 	if (Controls.virtualPad == this)
 		Controls.virtualPad = null;
 	#end
 
-	if (boundActions != null) {
+	if (boundActions != null)
+	{
 		boundActions.clear();
 		boundActions = null;
 	}
 
 	if (virtualpadCamera != null)
 	{
-		FlxG.cameras.remove(virtualpadCamera, true);
-		
-		// virtualpadCamera.destroy();
-		
+		if (FlxG.cameras.list.contains(virtualpadCamera))
+			FlxG.cameras.remove(virtualpadCamera);
+
 		virtualpadCamera = null;
 	}
 
 	this.cameras = null;
 	atlasFrames = null;
 
-	buttonA = buttonB = buttonC = buttonX = buttonY = buttonLeft = buttonDown = buttonUp = buttonRight = null;
+	buttonA = buttonB = buttonC = buttonX = buttonY = null;
+	buttonLeft = buttonDown = buttonUp = buttonRight = null;
 
 	super.destroy();
 }
