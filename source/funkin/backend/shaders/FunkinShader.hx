@@ -289,22 +289,25 @@ class FunkinShader extends FlxShader implements IHScriptCustomBehaviour {
 	}
 
 	override function __updateGL():Void {
-		onGLUpdate.dispatch();
-		super.__updateGL();
+        onGLUpdate.dispatch();
+        super.__updateGL();
 
-		if (__context != null && glProgram != null) {
-			var gl = __context.gl;
-			
-			var alphaIndex = gl.getAttribLocation(glProgram, "alpha");
-			if (alphaIndex >= 0) gl.vertexAttrib1f(alphaIndex, 1.0);
+        if (__context != null && glProgram != null) {
+            var gl = __context.gl;
+        
+            var alphaUniformIndex = gl.getUniformLocation(glProgram, "alpha");
+            if (alphaUniformIndex >= 0) gl.uniform1f(alphaUniformIndex, 1.0);
 
-			var colorMultIndex = gl.getAttribLocation(glProgram, "colorMultiplier");
-			if (colorMultIndex >= 0) gl.vertexAttrib4f(colorMultIndex, 1.0, 1.0, 1.0, 1.0);
+            var colorMultUniformIndex = gl.getUniformLocation(glProgram, "colorMultiplier");
+            if (colorMultUniformIndex >= 0) gl.uniform4f(colorMultUniformIndex, 1.0, 1.0, 1.0, 1.0);
 
-			var colorOffIndex = gl.getAttribLocation(glProgram, "colorOffset");
-			if (colorOffIndex >= 0) gl.vertexAttrib4f(colorOffIndex, 0.0, 0.0, 0.0, 0.0);
-		}
-	}
+            var colorOffUniformIndex = gl.getUniformLocation(glProgram, "colorOffset");
+            if (colorOffUniformIndex >= 0) gl.uniform4f(colorOffUniformIndex, 0.0, 0.0, 0.0, 0.0);
+        
+            var hasColorTransformIndex = gl.getUniformLocation(glProgram, "hasColorTransform");
+            if (hasColorTransformIndex >= 0) gl.uniform1i(hasColorTransformIndex, 0);
+        }
+  	}
 	
 	@:noCompletion private override function __initGL():Void
 	{
@@ -796,10 +799,9 @@ uniform mat4 openfl_Matrix;
 uniform bool openfl_HasColorTransform;
 uniform vec2 openfl_TextureSize;
 
-attribute float alpha;
-
-attribute vec4 colorMultiplier;
-attribute vec4 colorOffset;
+uniform float alpha;
+uniform vec4 colorMultiplier;
+uniform vec4 colorOffset;
 uniform bool hasColorTransform;";
 
 	public static final vertBody:String = "openfl_Alphav = openfl_Alpha;
