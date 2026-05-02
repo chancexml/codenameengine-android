@@ -67,7 +67,7 @@
 		</group>
 	</group>
 	
-   <group name="AndroidOptions" prefix="AndroidOptions.">
+    <group name="AndroidOptions" prefix="AndroidOptions.">
    	    <str id="pauseButton-name">Pause Button</str>
 	    <str id="pauseButton-desc">If unchecked. the pause button will become invisible</str>
 	
@@ -84,7 +84,7 @@
         <str id="hitboxOpacity-desc">Pretty self explanatory, isn't it?</str>
 
 	   <!-- <str id=" -->
-   </group>
+    </group>
 	<group name="AppearanceOptions" prefix="AppearanceOptions.">
 		<str id="framerate-name">Framerate</str>
 		<str id="framerate-desc">Pretty self explanatory, isn't it?</str>
