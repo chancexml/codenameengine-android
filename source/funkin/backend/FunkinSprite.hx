@@ -147,6 +147,7 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
             }
         }
     }
+}
 	
 	override function initVars() {
 		super.initVars();
