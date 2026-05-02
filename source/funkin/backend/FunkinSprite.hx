@@ -132,9 +132,8 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
         {
 	    var repeatHold:Bool = true;
 
-	    if (Options != null && Options.options != null)
-		    repeatHold = Options.options.repeatHold;
-
+	    repeatHold = Options.repeatHold;
+			
 	    if (repeatHold)
 	    {
 		    var name = getAnimName() + '-loop';
