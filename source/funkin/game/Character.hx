@@ -171,7 +171,9 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 
 		switch (lastAnimContext) {
 			case SING | MISS:
-				var holdDelay:Float = Options.repeatHold ? (Conductor.stepCrochet * holdTime) : 1000;
+				var holdDelay:Float = Options.repeatHold
+                  ? (Conductor.stepCrochet * holdTime)
+                  : 1000;
 				
 				if (lastHit + holdDelay < Conductor.songPosition)
 					dance();
