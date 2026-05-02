@@ -56,7 +56,7 @@ class Framerate extends Sprite {
 
 		instance = this;
 
-		textFormat = new TextFormat(fontName, Options.fpsSize, -1);
+		textFormat = new TextFormat(fontName, Std.int(Options.fpsSize), -1);
 
 		isLoaded = true;
 
@@ -88,7 +88,7 @@ class Framerate extends Sprite {
 	}
 
 	public function reload() {
-		textFormat = new TextFormat(fontName, Options.fpsSize, -1);
+		textFormat = new TextFormat(fontName, Std.int(Options.fpsSize), -1);
 
 		for (c in categories)
 			c.reload();
