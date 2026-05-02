@@ -96,4 +96,5 @@ class CustomShader extends FunkinShader {
 	}
 
 	return code;
+    }
 }
