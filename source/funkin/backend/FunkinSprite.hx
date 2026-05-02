@@ -123,23 +123,36 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 		return spr;
 	}
 
-		public override function update(elapsed:Float)
+	public override function update(elapsed:Float)
 	{
 		super.update(elapsed);
 
-		if (!debugMode && isAnimFinished())
+		if (!debugMode && animation.curAnim != null)
 		{
 			if (lastAnimContext == SING || lastAnimContext == MISS)
 			{
-				if (Options.repeatHold)
+				animation.curAnim.looped = false;
+
+				if (isAnimFinished() || animation.curAnim.curFrame >= animation.curAnim.frames.length - 1)
 				{
-					var name = getAnimName() + '-loop';
-					if (hasAnim(name))
-						playAnim(name, null, lastAnimContext);
-				}
-				else
-				{
-					if (animation.curAnim != null)
+					if (Options.repeatHold)
+					{
+						var animName = animation.curAnim.name;
+						
+						if (!StringTools.endsWith(animName, '-loop'))
+						{
+							var loopName = animName + '-loop';
+							if (hasAnim(loopName))
+								playAnim(loopName, true, lastAnimContext);
+							else
+								playAnim(animName, true, lastAnimContext);
+						}
+						else
+						{
+							playAnim(animName, true, lastAnimContext);
+						}
+					}
+					else
 					{
 						animation.curAnim.paused = true;
 						animation.curAnim.curFrame = animation.curAnim.frames.length - 1;
@@ -148,7 +161,7 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 			}
 		}
 	}
-	
+			
 	override function initVars() {
 		super.initVars();
 		_rect2 = FlxRect.get();
