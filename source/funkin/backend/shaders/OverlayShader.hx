@@ -6,28 +6,30 @@ import flixel.system.FlxAssets.FlxShader;
 class OverlayShader extends FlxShader
 {
 	@:glFragmentSource('
-#pragma header
-uniform vec4 uBlendColor;
+	#pragma header
 
-vec3 blendLighten(vec3 base, vec3 blend) {
-	return mix(
-		1.0 - 2.0 * (1.0 - base) * (1.0 - blend),
-		2.0 * base * blend,
-		step( base, vec3(0.5) )
-	);
-}
+	uniform vec4 uBlendColor;
 
-vec4 applyOverlay(vec4 base, vec4 blend, float opacity)
-{
-	vec3 blendedRGB = blendLighten(base.rgb, blend.rgb);
-	return vec4(blendedRGB * opacity + base.rgb * (1.0 - opacity), base.a);
-}
+	vec3 overlay(vec3 base, vec3 blend)
+	{
+		return mix(
+			2.0 * base * blend,
+			1.0 - 2.0 * (1.0 - base) * (1.0 - blend),
+			step(0.5, base)
+		);
+	}
 
-void main()
-{
-	vec4 base = texture2D(bitmap, openfl_TextureCoordv);
-	gl_FragColor = applyOverlay(base, uBlendColor, uBlendColor.a);
-}')
+	void main()
+	{
+		vec4 tex = flixel_texture2D(bitmap, openfl_TextureCoordv);
+
+		vec3 color = overlay(tex.rgb, uBlendColor.rgb);
+
+		color = mix(tex.rgb, color, uBlendColor.a);
+
+		gl_FragColor = vec4(color, tex.a);
+	}
+	')
 	public function new()
 	{
 		super();
