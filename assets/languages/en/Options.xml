@@ -67,7 +67,7 @@
 		</group>
 	</group>
 	
-    <group name="AndroidOptions" prefix="AndroidOptions.">
+    <group name="android" prefix="android.">
    	    <str id="pauseButton-name">Pause Button</str>
 	    <str id="pauseButton-desc">If unchecked. the pause button will become invisible</str>
 	
