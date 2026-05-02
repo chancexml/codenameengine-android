@@ -123,31 +123,31 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 		return spr;
 	}
 
-	public override function update(elapsed:Float)
-    {
-	    super.update(elapsed);
+		public override function update(elapsed:Float)
+	{
+		super.update(elapsed);
 
-	    // hate how it looks like but hey at least its optimized and fast  - Nex
-	    if (!debugMode && isAnimFinished())
-    {
-        if (Options.repeatHold)
-    {
-            var name = getAnimName() + '-loop';
-
-            if (hasAnim(name))
-                playAnim(name, null, lastAnimContext);
-        }
-        else
-        {
-            if (animation.curAnim != null)
-            {
-                animation.curAnim.paused = true;
-                animation.curAnim.curFrame =
-                 animation.curAnim.frames.length - 1;
-            }
-        }
-    }
-}
+		if (!debugMode && isAnimFinished())
+		{
+			if (lastAnimContext == SING || lastAnimContext == MISS)
+			{
+				if (Options.repeatHold)
+				{
+					var name = getAnimName() + '-loop';
+					if (hasAnim(name))
+						playAnim(name, null, lastAnimContext);
+				}
+				else
+				{
+					if (animation.curAnim != null)
+					{
+						animation.curAnim.paused = true;
+						animation.curAnim.curFrame = animation.curAnim.frames.length - 1;
+					}
+				}
+			}
+		}
+	}
 	
 	override function initVars() {
 		super.initVars();
