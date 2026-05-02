@@ -9,6 +9,9 @@ import haxe.io.Path;
 import lime.utils.AssetLibrary;
 import openfl.utils.Assets as OpenFlAssets;
 import animate.FlxAnimateFrames;
+#if sys
+import sys.FileSystem;
+#end
 #if android
 import extension.androidtools.content.Context;
 #end
@@ -20,11 +23,47 @@ class Paths
 	public static var assetsTree:AssetsLibraryList;
 
 	public static var tempFramesCache:Map<String, FlxFramesCollection> = [];
+	
+	#if sys
+	public static var fileModTimes:Map<String, Float> = new Map();
+	#end
 
 	public static function init() {
 		FlxG.signals.preStateSwitch.add(function() {
 			tempFramesCache.clear();
 		});
+	}
+
+	public static function checkFileChanged(path:String):Bool {
+		#if sys
+		if (path == null) return false;
+		
+		if (FileSystem.exists(path)) {
+			var currentModTime = FileSystem.stat(path).mtime.getTime();
+			
+			if (fileModTimes.exists(path)) {
+				if (currentModTime > fileModTimes.get(path)) {
+					fileModTimes.set(path, currentModTime);
+					return true;
+				}
+			} else {
+				fileModTimes.set(path, currentModTime);
+			}
+		}
+		#end
+		return false;
+	}
+	
+	public static function cacheImage(key:String, ?library:String):FlxGraphic {
+		var path = image(key, library);
+		if (!FlxG.bitmap.checkCache(path)) {
+			var graph = FlxG.bitmap.add(path, false, path);
+			if (graph != null) {
+				graph.persist = true;
+			}
+			return graph;
+		}
+		return FlxG.bitmap.get(path);
 	}
 
 	public static inline function getPath(file:String, ?library:String) {
@@ -143,10 +182,6 @@ class Paths
 		return getPath('data/characters/$character.xml', null);
 	}
 
-	/**
-	 * Gets the name of a registered font.
-	 * @param font The font's path (if it's already passed as a font name, the same name will be returned)
-	 */
 	inline static public function getFontName(font:String) {
 		return OpenFlAssets.exists(font, FONT) ? OpenFlAssets.getFont(font).fontName : font;
 	}
@@ -216,11 +251,25 @@ class Paths
 	}
 
 	/**
-	 * Gets frames at specified path.
-	 * @param key Path to the frames
-	 * @param library (Additional) library to load the frames from.
+	 * Gets frames at specified path. Includes Hot-Reload functionality.
 	 */
 	public static function getFrames(key:String, assetsPath:Bool = false, ?library:String, ?ext:String = null, ?animateSettings:FlxAnimateSettings) {
+		var path = assetsPath ? key : Paths.image(key, library, true, ext);
+
+		#if sys
+		var noExt = Path.withoutExtension(path);
+		if (checkFileChanged(path) || checkFileChanged(noExt + ".xml") || checkFileChanged(noExt + ".json")) {
+			tempFramesCache.remove(key);
+			
+			if (FlxG.bitmap.checkCache(path)) {
+				var graphicToClear = FlxG.bitmap.get(path);
+				FlxG.bitmap.remove(graphicToClear);
+			}
+			
+			@:privateAccess OpenFlAssets.cache.removeBitmapData(path);
+		}
+		#end
+
 		if (tempFramesCache.exists(key)) {
 			var frames = tempFramesCache[key];
 			if (frames != null && frames.parent != null && frames.parent.bitmap != null && frames.parent.bitmap.readable)
@@ -228,17 +277,12 @@ class Paths
 			else
 				tempFramesCache.remove(key);
 		}
-		return tempFramesCache[key] = loadFrames(assetsPath ? key : Paths.image(key, library, true, ext), false, null, false, ext, animateSettings);
+		
+		var loadedFrames = loadFrames(path, false, null, false, false, ext, animateSettings);
+		tempFramesCache[key] = loadedFrames;
+		return loadedFrames;
 	}
 
-	/**
-	 * Checks if the images needed for using getFrames() exist.
-	 * @param key Path to the image
-	 * @param checkAtlas Whenever to check for the Animation.json file (used in FlxAnimate)
-	 * @param assetsPath Whenever to use the raw path or to pass it through Paths.image()
-	 * @param library (Additional) library to load the frames from.
-	 * @return True if the images exist, false otherwise.
-	**/
 	public static function framesExists(key:String, checkAtlas:Bool = false, checkMulti:Bool = true, assetsPath:Bool = false, ?library:String) {
 		var path = assetsPath ? key : Paths.image(key, library, true);
 		var noExt = Path.withoutExtension(path);
@@ -255,29 +299,16 @@ class Paths
 		return false;
 	}
 
-	/**
-	 * Loads frames from a specific image path. Supports Sparrow Atlases, Packer Atlases, and multiple spritesheets.
-	 * @param path Path to the image
-	 * @param Unique Whenever the image should be unique in the cache
-	 * @param Key Key to the image in the cache
-	 * @param SkipAtlasCheck Whenever the atlas check should be skipped.
-	 * @param SkipMultiCheck Whenever the multi spritesheet check should be skipped.
-	 * @param Ext Extension of the image.
-	 * @return FlxFramesCollection Frames
-	 */
 	static function loadFrames(path:String, Unique:Bool = false, Key:String = null, SkipAtlasCheck:Bool = false, SkipMultiCheck:Bool = false, ?Ext:String = null, ?animateSettings:FlxAnimateSettings):FlxFramesCollection {
 		var noExt = Path.withoutExtension(path);
 		var ext = Ext != null ? Ext : Flags.IMAGE_EXT;
 
 		if (!SkipMultiCheck && Assets.exists('$noExt/1.${ext}')) {
-			// MULTIPLE SPRITESHEETS!!
-
 			var graphic = FlxG.bitmap.add("flixel/images/logo/default.png", false, '$noExt/mult');
 			var frames = MultiFramesCollection.findFrame(graphic);
 			if (frames != null)
 				return frames;
 
-			trace("no frames yet for multiple atlases!!");
 			var cur = 1;
 			var finalFrames = new MultiFramesCollection(graphic);
 			while(Assets.exists('$noExt/$cur.${ext}')) {
@@ -311,8 +342,8 @@ class Paths
 		}
 		return content;
 	}
+	
 	static public function getFolderContent(key:String, addPath:Bool = false, source:AssetSource = BOTH, noExtension:Bool = false):Array<String> {
-		// designed to work both on windows and web
 		if (!key.endsWith("/")) key += "/";
 		var content = assetsTree.getFiles('assets/$key', source);
 		for (k => e in content) {
@@ -322,7 +353,6 @@ class Paths
 		return content;
 	}
 
-	// Used in Script.hx
 	@:noCompletion public static function getFilenameFromLibFile(path:String) {
 		var file = new haxe.io.Path(path);
 		if(file.file.startsWith("LIB_")) {
