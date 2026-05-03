@@ -3,6 +3,7 @@ package funkin.game;
 import sys.FileSystem;
 import flixel.util.FlxSpriteUtil;
 import openfl.display.Graphics;
+import openfl.utils.AssetLibrary;
 import flixel.util.typeLimit.OneOfTwo;
 import flixel.graphics.frames.FlxFrame;
 import flixel.math.FlxPoint;
