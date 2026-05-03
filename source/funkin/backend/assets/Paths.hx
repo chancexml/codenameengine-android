@@ -243,22 +243,41 @@ class Paths
 		return FlxAtlasFrames.fromAseprite('$key.${ext != null ? ext : Flags.IMAGE_EXT}', '$key.json');
 
 	inline static public function getAssetsRoot():String {
-		if (ModsFolder.currentModFolder != null) {
-			#if android
-			var mediaDirs = extension.androidtools.content.Context.getExternalMediaDirs();
-			var basePath:String = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine";
-			
-			if (mediaDirs != null && mediaDirs.length > 0) {
-				var dir:Dynamic = mediaDirs[0];
-				basePath = Std.isOfType(dir, String) ? cast dir : dir.getAbsolutePath();
-			}
-			return '$basePath/files/mods/${ModsFolder.currentModFolder}';
-			#else
-			return '/storage/emulated/0/Android/media/com.yoshman29.codenameengine/files/mods/${ModsFolder.currentModFolder}';
-			#end
-		}
-		
-		return #if (sys && TEST_BUILD) './${Main.pathBack}assets/' #else './assets' #end;
+        #if android
+
+        if (ModsFolder.currentModFolder != null) {
+            var mediaDirs = extension.androidtools.content.Context.getExternalMediaDirs();
+            var mediaPath:String = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine";
+
+            if (mediaDirs != null && mediaDirs.length > 0) {
+                var dir:Dynamic = mediaDirs[0];
+                mediaPath = Std.isOfType(dir, String)
+                    ? cast dir
+                    : dir.getAbsolutePath();
+            }
+
+            return Path.normalize(mediaPath + "/mods/" + ModsFolder.currentModFolder);
+        }
+
+        var dataPath:String = Path.normalize(lime.system.System.applicationStorageDirectory);
+
+        if (!dataPath.endsWith("files"))
+            dataPath += "/files";
+
+        return Path.normalize(dataPath + "/assets");
+
+        #else
+
+        if (ModsFolder.currentModFolder != null)
+            return "./mods/" + ModsFolder.currentModFolder;
+
+        return #if (sys && TEST_BUILD)
+            "./" + Main.pathBack + "assets/"
+        #else
+            "./assets"
+        #end;
+
+        #end
 	}
 
 	public static function getFrames(key:String, assetsPath:Bool = false, ?library:String, ?ext:String = null, ?animateSettings:FlxAnimateSettings) {
