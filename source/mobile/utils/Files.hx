@@ -23,7 +23,7 @@ class Files
 	public static function getAssetsDir():String
 	{
 		#if android
-		if (Build.VERSION.SDK_INT >= 30) 
+		if (VERSION.SDK_INT >= 30) 
 		{
 			return Context.getObbDir() + "/";
 		} 
