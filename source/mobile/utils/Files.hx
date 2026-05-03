@@ -1,7 +1,8 @@
-package mobile.utils;
+package android.utils;
 
 #if android
 import extension.androidtools.content.Context;
+import extension.androidtools.os.Build;
 #end
 
 import openfl.Assets;
@@ -19,12 +20,10 @@ using StringTools;
 
 class Files
 {
-	public static var useObbDir:Bool = false;
-
-	public static function getBase():String
+	public static function getAssetsDir():String
 	{
 		#if android
-		if (useObbDir) 
+		if (Build.VERSION.SDK_INT >= 30) 
 		{
 			return Context.getObbDir() + "/";
 		} 
@@ -39,73 +38,83 @@ class Files
 		#end
 	}
 
-	public static function init(useObb:Bool = false):Void  
-	{  
-		useObbDir = useObb; 
-		
-		var base = getBase();  
-		base = Path.addTrailingSlash(base);  
+	public static function getModsDir():String
+	{
+		#if android
+		return Context.getExternalMediaDir() + "/";
+		#elseif ios
+		return System.applicationStorageDirectory;
+		#else
+		return Sys.getCwd();
+		#end
+	}
 
-		trace("Base path: " + base);  
+	public static function init():Void
+	{
+		var assetsBase = Path.addTrailingSlash(getAssetsDir());
+		var modsBase = Path.addTrailingSlash(getModsDir());
 
-		copyFolderOnce("assets", base + "files/");  
-		copyFolderOnce("mods", base + "media/");  
-	}  
+		trace("Assets target path: " + assetsBase);
+		trace("Mods target path: " + modsBase);
 
-	static function copyFolderOnce(folder:String, target:String):Void  
-	{  
-		#if sys  
-		if (FileSystem.exists(target))  
-		{  
-			trace(folder + " already exists, skipping.");  
-			return;  
-		}  
-		#end  
+		copyFolderOnce("assets", assetsBase + "assets/");
+		copyFolderOnce("mods", modsBase + "mods/");
+	}
 
-		trace("Copying " + folder + "...");  
-		copyAssets(folder, target);  
-	}  
+	static function copyFolderOnce(folder:String, target:String):Void
+	{
+		#if sys
+		if (FileSystem.exists(target))
+		{
+			trace(folder + " already exists, skipping.");
+			return;
+		}
+		#end
 
-	static function copyAssets(source:String, target:String):Void  
-	{  
-		var list = Assets.list();  
+		trace("Copying " + folder + "...");
+		copyAssets(folder, target);
+	}
 
-		for (asset in list)  
-		{  
-			if (!asset.startsWith(source)) continue;  
+	static function copyAssets(source:String, target:String):Void
+	{
+		var list = Assets.list();
 
-			var relative = asset.substr(source.length);  
-			if (relative.startsWith("/")) relative = relative.substr(1);  
+		for (asset in list)
+		{
+			if (!asset.startsWith(source)) continue;
 
-			var outPath = Path.addTrailingSlash(target) + relative;  
+			var relative = asset.substr(source.length);
+			if (relative.startsWith("/")) relative = relative.substr(1);
 
-			createDirRecursive(Path.directory(outPath));  
+			var outPath = Path.addTrailingSlash(target) + relative;
 
-			try {  
-				var bytes:Bytes = Assets.getBytes(asset);  
+			createDirRecursive(Path.directory(outPath));
 
-				if (bytes != null)  
-					File.saveBytes(outPath, bytes);  
-				else  
-					File.saveContent(outPath, Assets.getText(asset));  
+			try {
+				var bytes:Bytes = Assets.getBytes(asset);
 
-			} catch (e:Dynamic) {  
-				trace("Failed: " + asset + " -> " + e);  
-			}  
-		}  
+				if (bytes != null)
+					File.saveBytes(outPath, bytes);
+				else
+					File.saveContent(outPath, Assets.getText(asset));
 
-		trace("Finished copying " + source);  
-	}  
+			} catch (e:Dynamic) {
+				trace("Failed: " + asset + " -> " + e);
+			}
+		}
 
-	static function createDirRecursive(path:String):Void  
-	{  
-		#if sys  
-		if (path == null || path == "") return;  
+		trace("Finished copying " + source);
+	}
 
-		path = Path.normalize(path);  
+	static function createDirRecursive(path:String):Void
+	{
+		#if sys
+		if (path == null || path == "") return;
 
-		if (!FileSystem.exists(path)) 
-			FileSystem.createDirectory(path);  
-		#end  
+		path = Path.normalize(path);
+
+		if (!FileSystem.exists(path))
+			FileSystem.createDirectory(path);
+		#end
 	}
 }
