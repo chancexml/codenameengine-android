@@ -125,17 +125,19 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 	}
 
 	public override function update(elapsed:Float)
-{
-    super.update(elapsed);
+	{
+		super.update(elapsed);
 
-    if (!debugMode && isAnimFinished()) {
-        if (Options.repeatHold) { 
-            var loopName = getAnimName() + '-loop';
-            if (hasAnim(loopName))
-                playAnim(loopName, null, lastAnimContext);
-        }
-    }
-}
+		var curName = getAnimName();
+
+		if (!debugMode && isAnimFinished() && curName != null) {
+			if (Options.repeatHold) { 
+				var loopName = curName + '-loop';
+				if (hasAnim(loopName))
+					playAnim(loopName, null, lastAnimContext);
+			}
+		}
+	}
 	
 	override function initVars() {
 		super.initVars();
@@ -159,8 +161,9 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 {
     if(!animEnabled) return;
 
-    if (!Options.repeatHold && lastAnimContext == SING) {
-        var curName = getAnimName();
+    var curName = getAnimName();
+
+    if (!Options.repeatHold && lastAnimContext == SING && curName != null) {
         if (!curName.endsWith("-end")) {
             var endAnim = curName + "-end";
             if (hasAnim(endAnim)) {
@@ -177,7 +180,6 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
             playAnim(anim.name, anim.forced);
     }
 }
-			
 
 	public function stepHit(curBeat:Int)
 	{
@@ -275,23 +277,28 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 	public var lastAnimContext:PlayAnimContext = DANCE;
 
 	public function playAnim(AnimName:String, ?Force:Null<Bool>, Context:PlayAnimContext = NONE, Reversed:Bool = false, Frame:Int = 0):Void
-	{
-		if (AnimName == null || (!hasAnim(AnimName) && !debugMode))
-			return;
+{
+    if (AnimName == null || (!hasAnim(AnimName) && !debugMode))
+        return;
 
-		if (Force == null) {
-			var anim = animDatas.get(AnimName);
-			Force = anim != null && anim.forced;
-		}
+    if (Force == null) {
+        var anim = animDatas.get(AnimName);
+        Force = anim != null && anim.forced;
+    }
 
-		animation.play(AnimName, Force, Reversed, Frame);
+    animation.play(AnimName, Force, Reversed, Frame);
 
-		var daOffset = getAnimOffset(AnimName);
-		frameOffset.set(daOffset.x, daOffset.y);
-		daOffset.putWeak();
+    if (!Options.repeatHold && animation.curAnim != null) {
+        animation.curAnim.looped = false;
+    }
 
-		lastAnimContext = Context;
-	}
+    var daOffset = getAnimOffset(AnimName);
+    frameOffset.set(daOffset.x, daOffset.y);
+    daOffset.putWeak();
+
+    lastAnimContext = Context;
+}
+			
 
 	public inline function addAnim(name:String, prefix:String, frameRate:Float = 24, ?looped:Bool, ?forced:Bool, ?indices:Array<Int>, x:Float = 0, y:Float = 0, animType:XMLAnimType = NONE, animateAtlasLabel:Bool = false)
 	{
