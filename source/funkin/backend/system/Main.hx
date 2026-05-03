@@ -24,6 +24,7 @@ import openfl.utils.AssetLibrary;
 import sys.FileSystem;
 import sys.io.File;
 import funkin.options.Options;
+import funkin.backend.system.FPSCounter;
 #if android
 import extension.androidtools.content.Context;
 import extension.androidtools.os.Build;
@@ -83,15 +84,23 @@ class Main extends Sprite
 
         addChild(game = new FunkinGame(gameWidth, gameHeight, MainState, Options.framerate, Options.framerate, skipSplash, startFullscreen));
 
-        addChild(framerateSprite = new Framerate());
-        SystemInfo.init();
-
+        if (Options.newFPS)
+    {
+    	var statsCounter = new FPSMemCounter(10, 10);
+        addChild(statsCounter);
+    }
+        else
+    {
+	    addChild(framerateSprite = new Framerate());
+    	SystemInfo.init();
+    }
+		
         #if android
         if (Permissions.hasManageAllFiles()) {
            finalizeSetup();
-        }
+    }
         #else
-           finalizeSetup();
+        finalizeSetup();
         #end
 	}
        
