@@ -285,26 +285,38 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 	}
 
 	public override function playAnim(AnimName:String, ?Force:Bool, Context:PlayAnimContext = NONE, Reversed:Bool = false, Frame:Int = 0)
-	{
-		var event = EventManager.get(PlayAnimEvent).recycle(AnimName, Force, Reversed, Frame, Context);
-		scripts.call("onPlayAnim", [event]);
-		if (event.cancelled) return;
+    {
+	    var event = EventManager.get(PlayAnimEvent).recycle(AnimName, Force, Reversed, Frame, Context);
+	    scripts.call("onPlayAnim", [event]);
+	    if (event.cancelled) return;
+ 
+	    if (event.context == SING && getAnimName() == event.animName && isAnimFinished()) {
+	    	event.force = false;
+    	}
 
-		if (event.context == SING && getAnimName() == event.animName && isAnimFinished()) {
-			event.force = false;
-		}
+	    super.playAnim(event.animName, event.force, event.context, event.reverse, event.startingFrame);
 
-		super.playAnim(event.animName, event.force, event.context, event.reverse, event.startingFrame);
+    	if (event.context == SING && animation.curAnim != null) {
+		    animation.curAnim.looped = Options.repeatHold;
+	    }
+ 
+	    var daOffset = animOffsets.get(event.animName);
+	    if (daOffset != null) {
+		    offset.set(daOffset.x, daOffset.y);
+    	} else {
+		    offset.set(0, 0);
+	    }
 
-		if (event.context == SING && animation.curAnim != null) {
-			animation.curAnim.looped = Options.repeatHold;
-		}
+	    if (isPlayer != playerOffsets)
+		    offset.x += globalOffset.x;
+	    else
+		    offset.x -= globalOffset.x;
 
-		offset.set((isPlayer != playerOffsets) ? globalOffset.x : -globalOffset.x, -globalOffset.y);
+	    offset.y -= globalOffset.y;
 
-		if (event.context == SING || event.context == MISS)
-			lastHit = Conductor.songPosition;
-	}
+	    if (event.context == SING || event.context == MISS)
+		    lastHit = Conductor.songPosition;
+    }
 	
 	public inline function getCameraPosition() {
 		var midpoint:FlxPoint = getMidpoint();
