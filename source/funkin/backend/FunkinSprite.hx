@@ -9,6 +9,7 @@ import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.util.typeLimit.OneOfTwo;
+import funkin.backend.options.Options;
 import funkin.backend.scripting.events.sprite.PlayAnimContext;
 import funkin.backend.system.interfaces.IBeatReceiver;
 import funkin.backend.system.interfaces.IOffsetCompatible;
@@ -124,17 +125,18 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 	}
 
 	public override function update(elapsed:Float)
-	{
-		super.update(elapsed);
+{
+    super.update(elapsed);
 
-		// hate how it looks like but hey at least its optimized and fast  - Nex
-		if (!debugMode && isAnimFinished()) {
-			var name = getAnimName() + '-loop';
-			if (hasAnim(name))
-				playAnim(name, null, lastAnimContext);
-		}
-	}
-
+    if (!debugMode && isAnimFinished()) {
+        if (repeatHold) { 
+            var loopName = getAnimName() + '-loop';
+            if (hasAnim(loopName))
+                playAnim(loopName, null, lastAnimContext);
+        }
+    }
+}
+	
 	override function initVars() {
 		super.initVars();
 		_rect2 = FlxRect.get();
@@ -154,16 +156,28 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 
 	private var countedBeat = 0;
 	public function beatHit(curBeat:Int)
-	{
-		if(!animEnabled) return;
-		if (lastAnimContext != LOCK && beatAnims.length > 0 && (curBeat + beatOffset) % beatInterval == 0)
-		{
-			// TODO: find a solution without countedBeat
-			var anim = beatAnims[FlxMath.wrap(countedBeat++, 0, beatAnims.length - 1)];
-			if (anim.name != null && anim.name != "null" && anim.name != "none")
-				playAnim(anim.name, anim.forced);
-		}
-	}
+{
+    if(!animEnabled) return;
+
+    if (!repeatHold && lastAnimContext == SING) {
+        var curName = getAnimName();
+        if (!curName.endsWith("-end")) {
+            var endAnim = curName + "-end";
+            if (hasAnim(endAnim)) {
+                playAnim(endAnim, true, NONE);
+                return;
+            }
+        }
+    }
+
+    if (lastAnimContext != LOCK && beatAnims.length > 0 && (curBeat + beatOffset) % beatInterval == 0)
+    {
+        var anim = beatAnims[FlxMath.wrap(countedBeat++, 0, beatAnims.length - 1)];
+        if (anim.name != null && anim.name != "null" && anim.name != "none")
+            playAnim(anim.name, anim.forced);
+    }
+}
+			
 
 	public function stepHit(curBeat:Int)
 	{
