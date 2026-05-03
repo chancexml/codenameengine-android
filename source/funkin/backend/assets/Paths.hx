@@ -21,9 +21,10 @@ using StringTools;
 class Paths
 {
 	public static var assetsTree:AssetsLibraryList;
-
 	public static var tempFramesCache:Map<String, FlxFramesCollection> = [];
-	
+	public static var pathCache:Map<String, String> = new Map();
+	public static var folderContentCache:Map<String, Array<String>> = new Map();
+
 	#if sys
 	public static var fileModTimes:Map<String, Float> = new Map();
 	#end
@@ -66,11 +67,17 @@ class Paths
 		return FlxG.bitmap.get(path);
 	}
 
-	public static inline function getPath(file:String, ?library:String) {
+	public static function getPath(file:String, ?library:String) {
+		var cacheKey = library != null ? '$library:$file' : file;
+		if (pathCache.exists(cacheKey)) return pathCache.get(cacheKey);
+
 		var returnedPath:String = library != null ? '$library:assets/$library/$file' : 'assets/$file';
 		#if (sys && !windows)
 		returnedPath = Path.normalize(returnedPath);
-		if (OpenFlAssets.exists(returnedPath)) return returnedPath;
+		if (OpenFlAssets.exists(returnedPath)) {
+			pathCache.set(cacheKey, returnedPath);
+			return returnedPath;
+		}
 		var fixedPath:String = library != null ? '$library:assets/$library/' : 'assets/';
 		var parts:Array<String> = returnedPath.split("/");
 		for (it=>part in parts) {
@@ -78,15 +85,20 @@ class Paths
 			var entries:Array<String> = null;
 			if (Path.extension(part) == "") entries = assetsTree.getFolders(fixedPath);
 			else entries = assetsTree.getFiles(fixedPath);
-			for (entry in entries) {
-				if (entry.toLowerCase() == part.toLowerCase()) {
-					fixedPath += entry + (it != parts.length - 1 ? "/" : "");
-					break;
+			
+			if (entries != null) {
+				for (entry in entries) {
+					if (entry.toLowerCase() == part.toLowerCase()) {
+						fixedPath += entry + (it != parts.length - 1 ? "/" : "");
+						break;
+					}
 				}
 			}
 		}
 		if (returnedPath.toLowerCase() == fixedPath.toLowerCase()) returnedPath = fixedPath;
 		#end
+		
+		pathCache.set(cacheKey, returnedPath);
 		return returnedPath;
 	}
 
@@ -174,7 +186,6 @@ class Paths
 	static public function chart(song:String, ?difficulty:String, ?variant:String):String
 	{
 		difficulty = (difficulty != null ? difficulty : Flags.DEFAULT_DIFFICULTY);
-
 		return getPath('songs/$song/charts/${variant != null ? variant + "/" : ""}$difficulty.json', null);
 	}
 
@@ -250,23 +261,22 @@ class Paths
 		return #if (sys && TEST_BUILD) './${Main.pathBack}assets/' #else './assets' #end;
 	}
 
-	/**
-	 * Gets frames at specified path. Includes Hot-Reload functionality.
-	 */
 	public static function getFrames(key:String, assetsPath:Bool = false, ?library:String, ?ext:String = null, ?animateSettings:FlxAnimateSettings) {
 		var path = assetsPath ? key : Paths.image(key, library, true, ext);
 
 		#if sys
-		var noExt = Path.withoutExtension(path);
-		if (checkFileChanged(path) || checkFileChanged(noExt + ".xml") || checkFileChanged(noExt + ".json")) {
-			tempFramesCache.remove(key);
-			
-			if (FlxG.bitmap.checkCache(path)) {
-				var graphicToClear = FlxG.bitmap.get(path);
-				FlxG.bitmap.remove(graphicToClear);
+		if (tempFramesCache.exists(key) || FlxG.bitmap.checkCache(path)) {
+			var noExt = Path.withoutExtension(path);
+			if (checkFileChanged(path) || checkFileChanged(noExt + ".xml") || checkFileChanged(noExt + ".json")) {
+				tempFramesCache.remove(key);
+				
+				if (FlxG.bitmap.checkCache(path)) {
+					var graphicToClear = FlxG.bitmap.get(path);
+					FlxG.bitmap.remove(graphicToClear);
+				}
+				
+				@:privateAccess OpenFlAssets.cache.removeBitmapData(path);
 			}
-			
-			@:privateAccess OpenFlAssets.cache.removeBitmapData(path);
 		}
 		#end
 
@@ -344,13 +354,23 @@ class Paths
 	}
 	
 	static public function getFolderContent(key:String, addPath:Bool = false, source:AssetSource = BOTH, noExtension:Bool = false):Array<String> {
-		if (!key.endsWith("/")) key += "/";
-		var content = assetsTree.getFiles('assets/$key', source);
-		for (k => e in content) {
-			if (noExtension) e = Path.withoutExtension(e);
-			content[k] = addPath ? '$key$e' : e;
-		}
-		return content;
+	    if (!key.endsWith("/")) key += "/";
+
+	    var cacheKey = key + ":" + source + ":" + addPath + ":" + noExtension;
+    
+	    if (folderContentCache.exists(cacheKey)) {
+		    return folderContentCache.get(cacheKey);
+	    }
+  
+	    var content = assetsTree.getFiles('assets/$key', source);
+
+	    for (k => e in content) {
+	    	if (noExtension) e = Path.withoutExtension(e);
+		    content[k] = addPath ? '$key$e' : e;
+	}
+
+	folderContentCache.set(cacheKey, content);
+	return content;
 	}
 
 	@:noCompletion public static function getFilenameFromLibFile(path:String) {
