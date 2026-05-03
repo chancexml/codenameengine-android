@@ -40,6 +40,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 
 	public var lastHit:Float = Math.NEGATIVE_INFINITY;
 	public var holdTime:Float = 4;
+	public var repeatHold:Bool = false;
 
 	public var playerOffsets:Bool = false;
 
@@ -140,6 +141,13 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 				stunned = false;
 		}
 
+		if (!repeatHold && getAnimName() != null) {
+			var animName = getAnimName();
+			if (isAnimFinished() && !animName.endsWith("-hold") && hasAnimation(animName + "-hold")) {
+				playAnim(animName + "-hold", true, lastAnimContext);
+			}
+		}
+
 		if (!__lockAnimThisFrame && lastAnimContext != DANCE)
 			tryDance();
 
@@ -164,32 +172,40 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 	}
 
 	public function tryDance() {
-	    var event = new CancellableEvent();
-	    scripts.call("onTryDance", [event]);
+		var event = new CancellableEvent();
+		scripts.call("onTryDance", [event]);
+		if (event.cancelled)
+			return;
 
-	    if (event.cancelled)
-		    return;
+		switch (lastAnimContext) {
+			case SING | MISS:
+				if (lastHit + (Conductor.stepCrochet * holdTime) < Conductor.songPosition) {
+					if (!repeatHold) {
+						var curAnim = getAnimName();
+						if (curAnim != null) {
+							if (curAnim.endsWith("-hold"))
+								curAnim = curAnim.substring(0, curAnim.length - 5);
 
-	    switch (lastAnimContext) {
-		    case SING | MISS:
-		     	var holdDelay:Float = Conductor.stepCrochet * holdTime;
-
-			    if (lastHit + holdDelay < Conductor.songPosition)
-			    	dance();
-
-	    	case DANCE:
-			    dance();
- 
-		    case LOCK:
-			    if (getAnimName() == null)
-				    dance();
-
-		    default:
-			    if (getAnimName() == null || isAnimFinished())
-				    dance();
-	    }
+							var endAnim = curAnim + "-end";
+							if (hasAnimation(endAnim)) {
+								playAnim(endAnim, true, NONE); 
+								return; 
+							}
+						}
+					}
+					dance();
+				}
+			case DANCE:
+				dance();
+			case LOCK:
+				if (getAnimName() == null)
+					dance();
+			default:
+				if (getAnimName() == null || isAnimFinished())
+					dance();
+		}
 	}
-	
+
 	/**
 	 * Whenever the character should dance on beat or not.
 	 */
@@ -293,71 +309,18 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		playAnim(event.animName, event.force, event.context, event.reversed, event.frame);
 	}
 
-	public override function playAnim(
-	AnimName:String,
-	?Force:Bool,
-	Context:PlayAnimContext = NONE,
-	Reversed:Bool = false,
-	Frame:Int = 0)
-{
-	var event = EventManager.get(PlayAnimEvent).recycle(
-		AnimName,
-		Force,
-		Reversed,
-		Frame,
-		Context
-	);
+	public override function playAnim(AnimName:String, ?Force:Bool, Context:PlayAnimContext = NONE, Reversed:Bool = false, Frame:Int = 0) {
+		var event = EventManager.get(PlayAnimEvent).recycle(AnimName, Force, Reversed, Frame, Context);
+		scripts.call("onPlayAnim", [event]);
+		if (event.cancelled) return;
 
-	scripts.call("onPlayAnim", [event]);
+		super.playAnim(event.animName, event.force, event.context, event.reverse, event.startingFrame);
 
-	if (event.cancelled)
-		return;
-
-	if (
-		!Options.repeatHold
-		&& event.context == SING
-		&& getAnimName() == event.animName
-		&& !isAnimFinished()
-	)
-	{
-		return;
+		offset.set((isPlayer != playerOffsets) ? globalOffset.x : -globalOffset.x, -globalOffset.y);
+		if (event.context == SING || event.context == MISS)
+			lastHit = Conductor.songPosition;
 	}
 
-	if (
-		event.context == SING
-		&& getAnimName() == event.animName
-		&& isAnimFinished()
-	)
-	{
-		event.force = true;
-	}
-
-	super.playAnim(
-		event.animName,
-		event.force,
-		event.context,
-		event.reverse,
-		event.startingFrame
-	);
-
-	var daOffset = animOffsets.get(event.animName);
-
-	if (daOffset != null)
-		offset.set(daOffset.x, daOffset.y);
-	else
-		offset.set(0, 0);
-
-	if (isPlayer != playerOffsets)
-		offset.x += globalOffset.x;
-	else
-		offset.x -= globalOffset.x;
-
-	offset.y -= globalOffset.y;
-
-	if (event.context == SING || event.context == MISS)
-		lastHit = Conductor.songPosition;
-}
-	
 	public inline function getCameraPosition() {
 		var midpoint:FlxPoint = getMidpoint();
 		var event = EventManager.get(PointEvent).recycle(
@@ -405,6 +368,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		playerOffsets = false;
 		flipX = false;
 		holdTime = 4;
+		repeatHold = false;
 		iconColor = null;
 
 		animation.destroyAnimations();
@@ -435,6 +399,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		if (xml.x.exists("camx")) cameraOffset.x = Std.parseFloat(xml.x.get("camx"));
 		if (xml.x.exists("camy")) cameraOffset.y = Std.parseFloat(xml.x.get("camy"));
 		if (xml.x.exists("holdTime")) holdTime = Std.parseFloat(xml.x.get("holdTime")).getDefaultFloat(4);
+		if (xml.x.exists("repeatHold")) repeatHold = (xml.x.get("repeatHold") == "true");
 		if (xml.x.exists("flipX")) flipX = (xml.x.get("flipX") == "true");
 		if (xml.x.exists("icon")) icon = xml.x.get("icon");
 		if (xml.x.exists("color")) iconColor = FlxColor.fromString(xml.x.get("color"));
@@ -498,7 +463,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 	public static var characterProperties:Array<String> = [
 		"x", "y", "sprite", "scale", "antialiasing",
 		"flipX", "camx", "camy", "isPlayer", "icon",
-		"color", "gameOverChar", "holdTime", "applyStageMatrix"
+		"color", "gameOverChar", "holdTime", "repeatHold", "applyStageMatrix"
 	];
 	public static var characterAnimProperties:Array<String> = [
 		"name", "anim", "label", "x", "y", "fps", "loop", "indices"
@@ -515,6 +480,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		if (cameraOffset.y != 0) xml.set("camy", Std.string(FlxMath.roundDecimal(cameraOffset.y, 2)));
 
 		if (holdTime != 4) xml.set("holdTime", Std.string(FlxMath.roundDecimal(holdTime, 4)));
+		if (repeatHold) xml.set("repeatHold", "true");
 
 		var realFlipped:Bool = isPlayer ? !__baseFlipped : __baseFlipped;
 		if (realFlipped) xml.set("flipX", "true");
@@ -582,7 +548,6 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		return stunned = b;
 	}
 
-	// ---- Backwards compat ----
 	// Interval at which the character will dance (higher number = slower dance)
 	@:noCompletion public var danceInterval(get, set):Int;
 	@:noCompletion private function set_danceInterval(v:Int)
@@ -607,7 +572,6 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 
 		return this.script = script;
 	}
-	// ---- end of Backwards compat ----
 
 
 	public static function getXMLFromCharName(character:OneOfTwo<String, Character>):Access {
