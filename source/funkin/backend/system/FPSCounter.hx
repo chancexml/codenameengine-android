@@ -51,7 +51,7 @@ class FPSMemCounter extends TextField
 		];
 
 		updateScale();
-
+  
 		addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		addEventListener(Event.RESIZE, onResize);
 	}
@@ -62,21 +62,27 @@ class FPSMemCounter extends TextField
 	}
 
 	function updateScale()
-	{
-		var userScale:Float = Options.fpsSize;
+    {
+   	    var userScale:Float = Options.fpsSize;
 
-		var scaleXRatio = Lib.current.stage.stageWidth / 1280;
-		var scaleYRatio = Lib.current.stage.stageHeight / 720;
+	    var stageWidth = Lib.current.stage.stageWidth;
+	    var stageHeight = Lib.current.stage.stageHeight;
 
-		var screenScale = Math.min(scaleXRatio, scaleYRatio);
+	    var scaleXRatio = stageWidth / 1280;
+	    var scaleYRatio = stageHeight / 720;
 
-		scaleX = userScale * screenScale;
-		scaleY = userScale * screenScale;
+	    var screenScale = Math.min(scaleXRatio, scaleYRatio);
 
-		x = 10 * screenScale;
-		y = 10 * screenScale;
-	}
+	    scaleX = userScale * screenScale;
+	    scaleY = userScale * screenScale;
 
+	    var offsetX = (stageWidth - (1280 * screenScale)) / 2;
+	    var offsetY = (stageHeight - (720 * screenScale)) / 2;
+  
+	    x = offsetX + (10 * screenScale);
+	    y = offsetY + (10 * screenScale);
+    }
+	
 	function onEnterFrame(_)
 	{
 		var now = Lib.getTimer();
