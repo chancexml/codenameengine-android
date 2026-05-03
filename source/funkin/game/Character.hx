@@ -203,16 +203,16 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		scripts.call("stepHit", [curStep]);
 
 	@:noCompletion var __reverseDrawProcedure:Bool = false;
-	public override function getScreenBounds(?newRect:FlxCamera):FlxRect {
-		if (isFlippedOffsets()) {
-			flipX = !flipX;
-			scale.x *= -1;
-			var bounds:FlxRect = super.getScreenBounds(newRect, camera);
-			flipX = !flipX;
-			scale.x *= -1;
-			return bounds;
-		}
-		return super.getScreenBounds(newRect, camera);
+	public override function getScreenBounds(?newRect:FlxRect, ?camera:FlxCamera):FlxRect {
+    	if (isFlippedOffsets()) {
+		    flipX = !flipX;
+		    scale.x *= -1;
+		    var bounds:FlxRect = super.getScreenBounds(newRect, camera);
+	    	flipX = !flipX;
+	    	scale.x *= -1;
+		    return bounds;
+	}
+	return super.getScreenBounds(newRect, camera);
 	}
 
 	public override function isOnScreen(?camera:FlxCamera):Bool {
@@ -296,10 +296,8 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 
 	    super.playAnim(event.animName, event.force, event.context, event.reverse, event.startingFrame);
 
-    	if (event.context == SING && animation.curAnim != null) {
-            var anim = animation.getByName(animation.curAnim.name);
-            if (anim != null)
-                anim.looped = Options.repeatHold;
+    	if (event.context == SING && getAnimName() == event.animName && !Options.repeatHold && isAnimFinished()) {
+	        event.force = false;
 		}
 		
 	    var daOffset = animOffsets.get(event.animName);
