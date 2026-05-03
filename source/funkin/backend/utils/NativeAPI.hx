@@ -214,7 +214,7 @@ class NativeAPI {
 		}
 	}
 }
-
+/**
 class FileAttributeWrapper {
 	var value:Int;
 	public function new(val:Int) {
@@ -224,7 +224,7 @@ class FileAttributeWrapper {
 		return value;
 	}
 }
-
+**/
 enum abstract FileAttribute(Int) from Int to Int {
 	var ARCHIVE = 0x20;
 	var HIDDEN = 0x2;
