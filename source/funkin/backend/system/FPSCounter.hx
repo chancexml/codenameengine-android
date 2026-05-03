@@ -32,19 +32,23 @@ class FPSMemCounter extends TextField
 		autoSize = TextFieldAutoSize.LEFT;
 
 		var fontName:String = "_sans";
+		var customFontLoaded:Bool = false;
 
 		try
 		{
 			var font = Assets.getFont("fonts/milkchoco.otf");
 
 			if (font != null)
+			{
 				fontName = font.fontName;
+				customFontLoaded = true;
+			}
 		}
 		catch (e:Dynamic) {}
 
 		defaultTextFormat = new TextFormat(fontName, 14, 0xFFFFFF);
 
-		embedFonts = true;
+		embedFonts = customFontLoaded; 
 
 		filters = [
 			new DropShadowFilter(1, 45, 0x000000, 1, 2, 2, 10)
@@ -54,6 +58,15 @@ class FPSMemCounter extends TextField
   
 		addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		addEventListener(Event.RESIZE, onResize);
+        
+		addEventListener(Event.REMOVED_FROM_STAGE, onRemove); 
+	}
+
+	function onRemove(_)
+	{
+		removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+		removeEventListener(Event.RESIZE, onResize);
+		removeEventListener(Event.REMOVED_FROM_STAGE, onRemove);
 	}
 
 	function onResize(_)
@@ -76,15 +89,14 @@ class FPSMemCounter extends TextField
 	    scaleX = userScale * screenScale;
 	    scaleY = userScale * screenScale;
 
-	    var offsetX = (stageWidth - (1280 * screenScale)) / 2;
-	    var offsetY = (stageHeight - (720 * screenScale)) / 2;
-  
-	    x = offsetX + (10 * screenScale);
-	    y = offsetY + (10 * screenScale);
+	    x = 10 * screenScale;
+	    y = 10 * screenScale;
     }
 	
 	function onEnterFrame(_)
 	{
+        if (!visible) return; 
+
 		var now = Lib.getTimer();
 
 		times.push(now);
