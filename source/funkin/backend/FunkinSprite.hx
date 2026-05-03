@@ -129,7 +129,7 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
     super.update(elapsed);
 
     if (!debugMode && isAnimFinished()) {
-        if (repeatHold) { 
+        if (Options.repeatHold) { 
             var loopName = getAnimName() + '-loop';
             if (hasAnim(loopName))
                 playAnim(loopName, null, lastAnimContext);
@@ -159,7 +159,7 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 {
     if(!animEnabled) return;
 
-    if (!repeatHold && lastAnimContext == SING) {
+    if (!Options.repeatHold && lastAnimContext == SING) {
         var curName = getAnimName();
         if (!curName.endsWith("-end")) {
             var endAnim = curName + "-end";
