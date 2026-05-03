@@ -7,6 +7,9 @@ import funkin.backend.utils.native.*;
 import flixel.util.typeLimit.OneOfTwo;
 import flixel.util.typeLimit.OneOfThree;
 import flixel.util.FlxColor;
+#if android
+import extension.androidtools.Tools;
+#end
 
 /**
  * Class for functions that talk to a lower level than haxe, such as message boxes, and more.
