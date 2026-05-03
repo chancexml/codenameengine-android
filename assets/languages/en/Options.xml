@@ -92,6 +92,9 @@
 		<str id="fpsSize-name">Fps Size</str>
 		<str id="fpsSize-name">Changes the size of the fps info depeding on the user's provided number.</str>
 
+		<str id="newFPS-name">New FPS System</str>
+		<str id="newFPS-desc">Changes the codename fps overlay to a new one.</str>
+
 		<str id="flashingMenu-name">Flashing Menu</str>
 		<str id="flashingMenu-desc">If unchecked, will disable menu flashing when you select an option in the Main Menu, and other flashes will be slower.</str>
 
