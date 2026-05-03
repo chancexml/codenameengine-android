@@ -63,7 +63,7 @@ class FPSMemCounter extends TextField
 
 	function updateScale()
 	{
-		var userScale:Float = Options.fpsSize != null ? Options.fpsSize : 1.0;
+		var userScale:Float = Options.fpsSize;
 
 		var scaleXRatio = Lib.current.stage.stageWidth / 1280;
 		var scaleYRatio = Lib.current.stage.stageHeight / 720;
