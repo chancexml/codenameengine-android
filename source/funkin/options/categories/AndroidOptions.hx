@@ -27,7 +27,7 @@ class AndroidOptions extends TreeMenuScreen {
             getDescID('hintStyle'),
             ['Simple', 'Gradient'],
             ['Simple', 'Gradient'],
-            'hinrStyle'
+            'hintStyle'
         ));
 
         add(new ArrayOption(
