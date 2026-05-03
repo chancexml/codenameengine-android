@@ -297,9 +297,11 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 	    super.playAnim(event.animName, event.force, event.context, event.reverse, event.startingFrame);
 
     	if (event.context == SING && animation.curAnim != null) {
-		    animation.curAnim.looped = Options.repeatHold;
-	    }
- 
+            var anim = animation.getByName(animation.curAnim.name);
+            if (anim != null)
+                anim.looped = Options.repeatHold;
+		}
+		
 	    var daOffset = animOffsets.get(event.animName);
 	    if (daOffset != null) {
 		    offset.set(daOffset.x, daOffset.y);
