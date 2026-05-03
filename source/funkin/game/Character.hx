@@ -169,7 +169,10 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 
 		switch (lastAnimContext) {
 			case SING | MISS:
-				var holdDelay:Float = Options.repeatHold ? (Conductor.stepCrochet * holdTime) : 1000;
+				var holdDelay:Float = Conductor.stepCrochet * holdTime;
+				if (!Options.repeatHold) {
+					holdDelay += 1000;
+				}
 				
 				if (lastHit + holdDelay < Conductor.songPosition)
 					dance();
@@ -200,7 +203,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		scripts.call("stepHit", [curStep]);
 
 	@:noCompletion var __reverseDrawProcedure:Bool = false;
-	public override function getScreenBounds(?newRect:FlxRect, ?camera:FlxCamera):FlxRect {
+	public override function getScreenBounds(?newRect:FlxCamera):FlxRect {
 		if (isFlippedOffsets()) {
 			flipX = !flipX;
 			scale.x *= -1;
@@ -294,7 +297,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		super.playAnim(event.animName, event.force, event.context, event.reverse, event.startingFrame);
 
 		if (event.context == SING && animation.curAnim != null) {
-			animation.curAnim.looped = false;
+			animation.curAnim.looped = Options.repeatHold;
 		}
 
 		offset.set((isPlayer != playerOffsets) ? globalOffset.x : -globalOffset.x, -globalOffset.y);
