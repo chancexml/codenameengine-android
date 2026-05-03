@@ -125,19 +125,23 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 	}
 
 	public override function update(elapsed:Float)
-	{
-		super.update(elapsed);
+{
+    super.update(elapsed);
 
-		var curName = getAnimName();
+    var curName = getAnimName();
+    if (curName == null || debugMode) return;
 
-		if (!debugMode && isAnimFinished() && curName != null) {
-			if (Options.repeatHold) { 
-				var loopName = curName + '-loop';
-				if (hasAnim(loopName))
-					playAnim(loopName, null, lastAnimContext);
-			}
-		}
-	}
+    if (isAnimFinished() || isAnimAtEnd()) {
+        if (Options.repeatHold) { 
+            var loopName = curName + '-loop';
+            if (hasAnim(loopName))
+                playAnim(loopName, null, lastAnimContext);
+        } else {
+            if (animation.curAnim != null)
+                animation.pause(); 
+        }
+    }
+}
 	
 	override function initVars() {
 		super.initVars();
@@ -180,7 +184,7 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
             playAnim(anim.name, anim.forced);
     }
 }
-
+			
 	public function stepHit(curBeat:Int)
 	{
 	}
@@ -288,17 +292,12 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 
     animation.play(AnimName, Force, Reversed, Frame);
 
-    if (!Options.repeatHold && animation.curAnim != null) {
-        animation.curAnim.looped = false;
-    }
-
     var daOffset = getAnimOffset(AnimName);
     frameOffset.set(daOffset.x, daOffset.y);
     daOffset.putWeak();
 
     lastAnimContext = Context;
 }
-			
 
 	public inline function addAnim(name:String, prefix:String, frameRate:Float = 24, ?looped:Bool, ?forced:Bool, ?indices:Array<Int>, x:Float = 0, y:Float = 0, animType:XMLAnimType = NONE, animateAtlasLabel:Bool = false)
 	{
