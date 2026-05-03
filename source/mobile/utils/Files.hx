@@ -41,7 +41,7 @@ class Files
 	public static function getModsDir():String
 	{
 		#if android
-		return Context.getExternalMediaDir() + "/";
+		return Context.getExternalMediaDirs()[0] + "/";
 		#elseif ios
 		return System.applicationStorageDirectory;
 		#else
