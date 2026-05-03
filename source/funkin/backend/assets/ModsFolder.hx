@@ -105,7 +105,7 @@ class ModsFolder {
 			FlxG.switchState(new MainState());
 		__firstTime = false;
 	}
-
+	
 	/**
 	 * Loads a mod library from the specified path. Supports folders and zips.
 	 * @param modName Name of the mod
@@ -113,34 +113,49 @@ class ModsFolder {
 	 */
 	public static function loadModLib(path:String, force:Bool = false, ?modName:String) {
 		#if MOD_SUPPORT
-		for (ext in Flags.ALLOWED_ZIP_EXTENSIONS) {
-			if (!FileSystem.exists('$path.$ext')) continue;
-			return loadLibraryFromZip('$path'.toLowerCase(), '$path.$ext', force, modName);
-		}
-		return loadLibraryFromFolder('$path'.toLowerCase(), '$path', force, modName);
+		var lowerPath = path.toLowerCase();
 
+		if (FileSystem.exists(path) && FileSystem.isDirectory(path)) {
+			return loadLibraryFromFolder(lowerPath, path, force, modName);
+		}
+
+		for (ext in Flags.ALLOWED_ZIP_EXTENSIONS) {
+			var fullPath = '$path.$ext';
+			if (!FileSystem.exists(fullPath)) continue;
+			return loadLibraryFromZip(lowerPath, fullPath, force, modName);
+		}
+		
+		return null;
 		#else
 		return null;
 		#end
 	}
-
+	
 	public static function getModsList():Array<String> {
 		var mods:Array<String> = [];
 		#if MOD_SUPPORT
-		// Mods directory does not exist yet, create it
 		if (!FileSystem.exists(modsPath)) FileSystem.createDirectory(modsPath);
 		
 		final modsList:Array<String> = FileSystem.readDirectory(modsPath);
 
-		if (modsList == null || modsList.length <= 0) return mods;
+		if (modsList == null || modsList.length == 0) return mods;
 
 		for (modFolder in modsList) {
-			if (FileSystem.isDirectory(modsPath + modFolder)) mods.push(modFolder);
-			else if (Flags.ALLOWED_ZIP_EXTENSIONS.contains(Path.extension(modFolder))) mods.push(Path.withoutExtension(modFolder));
+			var fullPath = modsPath + modFolder;
+			
+			if (FileSystem.isDirectory(fullPath)) {
+				mods.push(modFolder);
+			} else {
+				var ext = Path.extension(modFolder);
+				if (Flags.ALLOWED_ZIP_EXTENSIONS.contains(ext)) {
+					mods.push(Path.withoutExtension(modFolder));
+				}
+			}
 		}
 		#end
 		return mods;
 	}
+	
 	public static function getLoadedModsLibs(skipTranslated:Bool = false):Array<IModsAssetLibrary> {
 		var libs = [];
 		for (i in Paths.assetsTree.libraries) {
