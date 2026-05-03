@@ -1,4 +1,4 @@
-package android.utils;
+package mobile.utils;
 
 #if android
 import extension.androidtools.content.Context;
