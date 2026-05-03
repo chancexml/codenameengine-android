@@ -23,7 +23,7 @@ class Files
 	public static function getAssetsDir():String
 	{
 		#if android
-		if (VERSION.SDK_INT >= 30) 
+		if (extension.androidtools.os.VERSION.SDK_INT >= extension.androidtools.os.VERSION_CODES.R) 
 		{
 			return Context.getObbDir() + "/";
 		} 
@@ -41,14 +41,18 @@ class Files
 	public static function getModsDir():String
 	{
 		#if android
-		return Context.getExternalMediaDirs()[0] + "/";
+		var dirs = Context.getExternalMediaDirs();
+		if (dirs != null && dirs.length > 0) {
+			return dirs[0] + "/";
+		}
+		return Context.getExternalFilesDir() + "/";
 		#elseif ios
 		return System.applicationStorageDirectory;
 		#else
 		return Sys.getCwd();
 		#end
 	}
-
+	
 	public static function init():Void
 	{
 		var assetsBase = Path.addTrailingSlash(getAssetsDir());
