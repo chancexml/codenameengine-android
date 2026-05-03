@@ -1,4 +1,4 @@
-package backend;
+package funkin.backend.utils;
 
 import openfl.ui.Mouse;
 import openfl.ui.MouseCursor;
