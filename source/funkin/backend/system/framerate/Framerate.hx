@@ -5,8 +5,9 @@ import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.DisplayObject;
 import openfl.display.Sprite;
+import openfl.events.KeyboardEvent;
 import openfl.text.TextFormat;
-import openfl.Lib;
+import openfl.ui.Keyboard;
 
 class Framerate extends Sprite {
 	public static var instance:Framerate;
@@ -15,17 +16,11 @@ class Framerate extends Sprite {
 	public static var textFormat:TextFormat;
 	public static var fpsCounter:FramerateCounter;
 	public static var memoryCounter:MemoryCounter;
-
 	#if SHOW_BUILD_ON_FPS
 	public static var codenameBuildField:CodenameBuildField;
 	#end
 
-	public static var fontName:String =
-		#if windows
-		'${Sys.getEnv("windir")}\\Fonts\\consola.ttf'
-		#else
-		"_typewriter"
-		#end;
+	public static var fontName:String = #if windows '${Sys.getEnv("windir")}\\Fonts\\consola.ttf' #else "_typewriter" #end;
 
 	/**
 	 * 0: FPS INVISIBLE
@@ -43,20 +38,15 @@ class Framerate extends Sprite {
 
 	private static function get___bitmap():BitmapData {
 		if (__bitmap == null)
-			__bitmap = new BitmapData(1, 1, false, 0xFF000000);
-
+			__bitmap = new BitmapData(1, 1, 0xFF000000);
 		return __bitmap;
 	}
 
 	public function new() {
 		super();
-
-		if (instance != null)
-			throw "Cannot create another instance";
-
+		if (instance != null) throw "Cannot create another instance";
 		instance = this;
-
-		textFormat = new TextFormat(fontName, Std.int(Options.fpsSize), -1);
+		textFormat = new TextFormat(fontName, 12, -1);
 
 		isLoaded = true;
 
@@ -64,7 +54,7 @@ class Framerate extends Sprite {
 		y = 2;
 
 		if (__bitmap == null)
-			__bitmap = new BitmapData(1, 1, false, 0xFF000000);
+			__bitmap = new BitmapData(1, 1, 0xFF000000);
 
 		bgSprite = new Bitmap(__bitmap);
 		bgSprite.alpha = 0;
@@ -72,11 +62,9 @@ class Framerate extends Sprite {
 
 		__addToList(fpsCounter = new FramerateCounter());
 		__addToList(memoryCounter = new MemoryCounter());
-
 		#if SHOW_BUILD_ON_FPS
 		__addToList(codenameBuildField = new CodenameBuildField());
 		#end
-
 		__addCategory(new ConductorInfo());
 		__addCategory(new FlixelInfo());
 		__addCategory(new SystemInfo());
@@ -88,15 +76,11 @@ class Framerate extends Sprite {
 	}
 
 	public function reload() {
-		textFormat = new TextFormat(fontName, Std.int(Options.fpsSize), -1);
-
-		for (c in categories)
+		for(c in categories)
 			c.reload();
-
 		#if SHOW_BUILD_ON_FPS
 		codenameBuildField.reload();
 		#end
-
 		memoryCounter.reload();
 		fpsCounter.reload();
 	}
@@ -105,91 +89,49 @@ class Framerate extends Sprite {
 		categories.push(category);
 		__addToList(category);
 	}
-
 	private var __lastAddedSprite:DisplayObject = null;
-
 	private function __addToList(spr:DisplayObject) {
 		spr.x = 0;
-		spr.y = __lastAddedSprite != null
-			? (__lastAddedSprite.y + __lastAddedSprite.height)
-			: 4;
-
+		spr.y = __lastAddedSprite != null ? (__lastAddedSprite.y + __lastAddedSprite.height) : 4;
+		//spr.y += offset.y;
 		__lastAddedSprite = spr;
 		addChild(spr);
 	}
 
-	var debugAlpha:Float = 0;
 
+	var debugAlpha:Float = 0;
 	public override function __enterFrame(t:Int) {
 		alpha = CoolUtil.fpsLerp(alpha, debugMode > 0 ? 1 : 0, 0.5);
 		debugAlpha = CoolUtil.fpsLerp(debugAlpha, debugMode > 1 ? 1 : 0, 0.5);
 
-		if (alpha < 0.05)
-			return;
-
+		if (alpha < 0.05) return;
 		super.__enterFrame(t);
-
 		bgSprite.alpha = debugAlpha * 0.5;
 
 		x = 10 + offset.x;
 		y = 2 + offset.y;
 
-		var width = MathUtil.maxSmart(
-			fpsCounter.width,
-			memoryCounter.width
-			#if SHOW_BUILD_ON_FPS
-			, codenameBuildField.width
-			#end
-		) + (x * 2);
-
-		var height =
-			#if SHOW_BUILD_ON_FPS
-			codenameBuildField.y + codenameBuildField.height
-			#else
-			memoryCounter.y + memoryCounter.height
-			#end;
-
-		var stageWidth = Lib.current.stage.stageWidth;
-		var stageHeight = Lib.current.stage.stageHeight;
-
-		if (x + width > stageWidth)
-			x = stageWidth - width;
-
-		if (y + height > stageHeight)
-			y = stageHeight - height;
-
-		if (x < 0)
-			x = 0;
-
-		if (y < 0)
-			y = 0;
-
+		var width = MathUtil.maxSmart(fpsCounter.width, memoryCounter.width #if SHOW_BUILD_ON_FPS , codenameBuildField.width #end) + (x*2);
+		var height = #if SHOW_BUILD_ON_FPS codenameBuildField.y + codenameBuildField.height #else memoryCounter.y + memoryCounter.height #end;
 		bgSprite.x = -x;
 		bgSprite.y = offset.x;
 		bgSprite.scaleX = width;
 		bgSprite.scaleY = height;
 
 		var selectable = debugMode == 2;
-
-		{
-			memoryCounter.memoryText.selectable =
-			memoryCounter.memoryPeakText.selectable =
-			fpsCounter.fpsNum.selectable =
-			fpsCounter.fpsLabel.selectable =
-			#if SHOW_BUILD_ON_FPS
-			codenameBuildField.selectable =
-			#end
-			selectable;
+		{  // idk i tried to make it more readable:sob:  - Nex
+			memoryCounter.memoryText.selectable = memoryCounter.memoryPeakText.selectable =
+			fpsCounter.fpsNum.selectable = fpsCounter.fpsLabel.selectable =
+			#if SHOW_BUILD_ON_FPS codenameBuildField.selectable = #end selectable;
 		}
 
-		var yy:Float = height + 4;
-
-		for (c in categories) {
+		var y:Float = height + 4;
+		for(c in categories) {
 			c.title.selectable = c.text.selectable = selectable;
 			c.alpha = debugAlpha;
 			c.x = FlxMath.lerp(-c.width - offset.x, 0, debugAlpha);
-			c.y = yy;
-			yy = c.y + c.height + 4;
+			c.y = y;
+			y = c.y + c.height + 4;
 		}
 	}
 }
