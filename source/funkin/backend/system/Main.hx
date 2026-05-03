@@ -87,7 +87,7 @@ class Main extends Sprite
         if (Options.newFPS)
     {
     	var statsCounter = new FPSMemCounter(10, 10);
-        FlxG.game.addChild(statsCounter);
+        addChild(statsCounter);
     }
         else
     {
