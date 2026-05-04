@@ -48,8 +48,8 @@ class VirtualMouse extends FlxSprite {
         updateMovement();
         
         #if mobile
-        FlxG.mouse.x = this.x;
-        FlxG.mouse.y = this.y;
+        @:privateAccess FlxG.mouse.x = Std.int(this.x);
+        @:privateAccess FlxG.mouse.y = Std.int(this.y);
         #end
 
         autoDetectHover();
@@ -96,7 +96,8 @@ class VirtualMouse extends FlxSprite {
             if (foundClickable || member == this) return; 
 
             if (Std.isOfType(member, FlxGroup)) {
-                cast(member, FlxGroup).forEachAlive(checkMember);
+                var group:FlxGroup = cast member;
+                group.forEachAlive(checkMember);
             } 
             else if (Std.isOfType(member, FlxObject)) {
                 var obj:FlxObject = cast member;
@@ -110,7 +111,8 @@ class VirtualMouse extends FlxSprite {
 
                 if (!isPadButton) {
                     var isActuallyClickable = Std.isOfType(obj, FlxButton) || (Reflect.hasField(obj, "inputEnabled") && Reflect.field(obj, "inputEnabled") == true);
-                    if (isActuallyClickable && FlxG.mouse.overlaps(obj)) {
+                    
+                    if (isActuallyClickable && this.overlaps(obj)) {
                         foundClickable = true;
                     }
                 }
