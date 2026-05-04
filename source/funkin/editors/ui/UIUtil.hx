@@ -7,13 +7,15 @@ import funkin.editors.ui.UIContextMenu.UIContextMenuOption;
 import flixel.group.FlxGroup;
 import flixel.FlxSprite;
 import flixel.FlxG;
-#if mobile
 import funkin.backend.system.Controls;
+
+#if mobile
 import funkin.options.keybinds.KeybindsOptions;
 import mobile.controls.VirtualPad;
 import mobile.controls.FlxButton;
 import mobile.utils.ButtonHelper;
 #end
+	
 
 @:access(flixel.FlxSprite)
 class UIUtil {
@@ -55,10 +57,13 @@ class UIUtil {
 	public static function getKeyState(key:FlxKey, Status:FlxInputState):Bool {
 		var action = keyToActionString(fixKey(key));
 
-		// Fallback to Flixel's default key check for standard editor typing/shortcuts
 		if (action == "") {
 			return FlxG.keys.checkStatus(fixKey(key), Status);
 		}
+
+		var controls = Controls.instance;
+
+		if (controls == null) return false;
 
 		return switch(Status) {
 			case JUST_PRESSED: controls.getJustPressed(action);
