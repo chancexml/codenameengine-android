@@ -24,6 +24,15 @@ import haxe.Json;
 import sys.FileSystem;
 #end
 import flixel.util.FlxColor;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.Options;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+import mobile.controls.Mouse;
+#end
 
 class Charter extends UIState {
 	public static var __song:String;
@@ -360,7 +369,7 @@ class Charter extends UIState {
 				childs: [
 					{
 						label: translate("playback.play"),
-						keybind: [SPACE],
+						keybind: [P],
 						onSelect: _playback_play
 					},
 					null,
@@ -381,12 +390,12 @@ class Charter extends UIState {
 					null,
 					{
 						label: translate("playback.sectionBack"),
-						keybind: [A],
+						keybind: [LEFT],
 						onSelect: _playback_back
 					},
 					{
 						label: translate("playback.sectionForward"),
-						keybind: [D],
+						keybind: [RIGHT],
 						onSelect: _playback_forward
 					},
 					{
@@ -397,12 +406,12 @@ class Charter extends UIState {
 					null,
 					{
 						label: translate("playback.backStep"),
-						keybind: [W],
+						keybind: [UP],
 						onSelect: _playback_back_step
 					},
 					{
 						label: translate("playback.forwardStep"),
-						keybind: [S],
+						keybind: [DOWN],
 						onSelect: _playback_forward_step
 					},
 					null,
@@ -569,8 +578,10 @@ class Charter extends UIState {
 		add(noteTypeText);
 		// add the ui group
 		add(uiGroup);
+		
+        #if mobile
+		Call.Mouse();
 
-		#if mobile
         virtualPad = ButtonHelper.create(this, FULL, A_B_X_Y_C);
 
         ButtonHelper.bind(virtualPad,
