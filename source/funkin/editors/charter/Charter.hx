@@ -91,6 +91,10 @@ class Charter extends UIState {
 
 	public var vocals:FlxSound;
 
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
+
 	public var quant:Int = 16;
 	public var quants:Array<Int> = [4, 8, 12, 16, 20, 24, 32, 48, 64, 192]; // different quants
 
