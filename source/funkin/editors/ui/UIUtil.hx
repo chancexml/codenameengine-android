@@ -7,6 +7,13 @@ import funkin.editors.ui.UIContextMenu.UIContextMenuOption;
 import flixel.group.FlxGroup;
 import flixel.FlxSprite;
 import flixel.FlxG;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 @:access(flixel.FlxSprite)
 class UIUtil {
