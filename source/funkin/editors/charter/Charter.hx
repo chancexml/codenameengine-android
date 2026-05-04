@@ -570,6 +570,17 @@ class Charter extends UIState {
 		// add the ui group
 		add(uiGroup);
 
+		#if mobile
+        virtualPad = ButtonHelper.create(this, FULL, A_B_X_Y_C);
+
+        ButtonHelper.bind(virtualPad,
+        ['up','down','left','right'],
+        ['accept','back','dev-access','switchmod']
+        );
+
+        Controls.virtualPad = virtualPad;
+        #end
+
 		loadSong();
 
 		if (Framerate.isLoaded) {
@@ -1407,7 +1418,7 @@ class Charter extends UIState {
 					if (FlxG.keys.pressed.CONTROL) {
 						zoom += 0.25 * FlxG.mouse.wheel;
 						__camZoom = Math.pow(2, zoom);
-					} else if (FlxG.keys.pressed.SHIFT) {
+					} else if (controls.getJustPressed("dev-access")) {
 						sideScroll -= 40 * FlxG.mouse.wheel;
 					} else {
 						if (!FlxG.sound.music.playing) {
