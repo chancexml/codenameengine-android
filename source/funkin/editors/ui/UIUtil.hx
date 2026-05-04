@@ -5,6 +5,8 @@ import flixel.input.FlxInput.FlxInputState;
 import flixel.input.keyboard.FlxKey;
 import funkin.editors.ui.UIContextMenu.UIContextMenuOption;
 import flixel.group.FlxGroup;
+import flixel.FlxSprite;
+import flixel.FlxG;
 
 @:access(flixel.FlxSprite)
 class UIUtil {
@@ -28,8 +30,36 @@ class UIUtil {
 		}
 	}
 
+	public static function keyToActionString(key:FlxKey):String {
+		return switch(key) {
+			case UP: "up";
+			case DOWN: "down";
+			case LEFT: "left";
+			case RIGHT: "right";
+			case ENTER: "accept";
+			case ESCAPE, BACKSPACE: "back";
+			case P: "pause";
+			case R: "reset";
+			case TAB: "change-mode";
+			default: ""; // Return empty if there's no custom control mapping
+		}
+	}
+
 	public static function getKeyState(key:FlxKey, Status:FlxInputState):Bool {
-		return FlxG.keys.checkStatus(fixKey(key), Status);
+		var action = keyToActionString(fixKey(key));
+
+		// Fallback to Flixel's default key check for standard editor typing/shortcuts
+		if (action == "") {
+			return FlxG.keys.checkStatus(fixKey(key), Status);
+		}
+
+		return switch(Status) {
+			case JUST_PRESSED: controls.getJustPressed(action);
+			case PRESSED: controls.getPressed(action);
+			case JUST_RELEASED: controls.getJustReleased(action); 
+			case RELEASED: !controls.getPressed(action);
+			default: false;
+		}
 	}
 
 	/**
@@ -60,13 +90,16 @@ class UIUtil {
 						if(!shouldPress) key = -key;
 
 						var k = fixKey(key);
-						if (FlxG.keys.checkStatus(k, shouldPress ? JUST_PRESSED : JUST_RELEASED)) {
+						
+						if (getKeyState(k, shouldPress ? JUST_PRESSED : JUST_RELEASED)) {
 							justPressed = true;
-						} else if (!FlxG.keys.checkStatus(k, shouldPress ? PRESSED : RELEASED)) {
+						} else if (!getKeyState(k, shouldPress ? PRESSED : RELEASED)) {
 							pressed = false;
 							break;
 						}
 					}
+					
+					// i dont have shift
 					if (!needsShift && FlxG.keys.pressed.SHIFT) continue;
 					if (!pressed || !justPressed) continue;
 
