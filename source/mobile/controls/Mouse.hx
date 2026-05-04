@@ -6,8 +6,13 @@ import flixel.math.FlxPoint;
 import flixel.ui.FlxButton;
 import flixel.group.FlxGroup;
 import flixel.FlxObject;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
 import mobile.controls.VirtualPad;
 import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 class Call {
     public static var virtualMouse:VirtualMouse;
