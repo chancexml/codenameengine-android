@@ -55,25 +55,27 @@ class UIUtil {
 	}
 
 	public static function getKeyState(key:FlxKey, Status:FlxInputState):Bool {
-		var action = keyToActionString(fixKey(key));
+        var control = keyToControl(fixKey(key));
 
-		if (action == "") {
-			return FlxG.keys.checkStatus(fixKey(key), Status);
-		}
+        if (control == NONE) {
+            return FlxG.keys.checkStatus(fixKey(key), Status);
+        }
 
-		var controls = Controls.instance;
+        var controls:Controls = null;
+        if (Std.isOfType(FlxG.state, funkin.backend.MusicBeatState)) {
+            controls = (cast FlxG.state).controls;
+        } 
+        else if (FlxG.state.subState != null && Std.isOfType(FlxG.state.subState, funkin.backend.MusicBeatState)) {
+            controls = (cast FlxG.state.subState).controls;
+        }
 
-		if (controls == null) return false;
+        if (controls != null) {
+            return controls.checkStatus(control, Status);
+        }
 
-		return switch(Status) {
-			case JUST_PRESSED: controls.getJustPressed(action);
-			case PRESSED: controls.getPressed(action);
-			case JUST_RELEASED: controls.getJustReleased(action); 
-			case RELEASED: !controls.getPressed(action);
-			default: false;
-		}
+        return false;
 	}
-
+	
 	/**
 	 * Process all options with shortcuts present in a `Array<UIContextMenuOption>`. Also checks children.
 	 * @param topMenuOptions
