@@ -55,11 +55,11 @@ class UIUtil {
 	}
 
 	public static function getKeyState(key:FlxKey, Status:FlxInputState):Bool {
-        var control = keyToControl(fixKey(key));
+        var control = funkin.backend.system.Controls;
 
         if (control == NONE) {
             return FlxG.keys.checkStatus(fixKey(key), Status);
-        }
+        } 
 
         var controls:Controls = null;
         if (Std.isOfType(FlxG.state, funkin.backend.MusicBeatState)) {
@@ -70,7 +70,13 @@ class UIUtil {
         }
 
         if (controls != null) {
-            return controls.checkStatus(control, Status);
+            return switch (Status) {
+                case JUST_PRESSED: controls.justPressed(control);
+                case PRESSED:      controls.pressed(control);
+                case JUST_RELEASED: controls.justReleased(control);
+                case RELEASED:     !controls.pressed(control);
+                default:           false;
+            };
         }
 
         return false;
