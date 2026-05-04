@@ -14,6 +14,7 @@ import extension.androidtools.Tools;
 import extension.androidtools.content.Context;
 import mobile.utils.ButtonHelper;
 import mobile.controls.VirtualPad;
+import funkin.backend.utils.NativeAPI;
 #end
 
 class HScript extends Script {
@@ -41,7 +42,7 @@ class HScript extends Script {
 			var errorMsg = 'Error while reading $path: ${Std.string(e)}';
 			Logs.error(errorMsg);
 			#if android
-			NativeAPI.showMessageBox("Reading Error", fn + "\n" + Std.string(err), "Got It!");
+			NativeAPI.showMessageBox("Error!", errorMsg, "Got It!");
 			#end
 		}
 		
