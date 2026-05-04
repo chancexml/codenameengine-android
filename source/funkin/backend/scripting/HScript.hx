@@ -10,11 +10,13 @@ import funkin.backend.system.Controls;
 import funkin.backend.utils.NativeAPI;
 
 #if mobile
+import funkin.backend.system.Controls;
 import extension.androidtools.Tools;
 import extension.androidtools.content.Context;
 import mobile.utils.ButtonHelper;
 import mobile.controls.VirtualPad;
 import funkin.backend.utils.NativeAPI;
+import mobile.controls.Mouse;
 #end
 
 class HScript extends Script {
