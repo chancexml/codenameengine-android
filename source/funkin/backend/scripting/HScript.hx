@@ -41,7 +41,7 @@ class HScript extends Script {
 			var errorMsg = 'Error while reading $path: ${Std.string(e)}';
 			Logs.error(errorMsg);
 			#if android
-			Tools.showAlertDialog("Error!", errorMsg, "Got It!");
+			NativeAPI.showMessageBox("Reading Error", fn + "\n" + Std.string(err), "Got It!");
 			#end
 		}
 		
@@ -200,7 +200,7 @@ class HScript extends Script {
 		], ERROR);
 		
 		#if android
-		Tools.showAlertDialog("HScript Error", fn + err, "Got it!");
+		NativeAPI.showMessageBox("Warning!", fn + "\n" + Std.string(err), "Got It!");
 		#end
 	}
 
@@ -222,7 +222,7 @@ class HScript extends Script {
 	], WARNING);
 
 	#if android
-	Tools.showAlertDialog("Warning!", fn + err, "Continue");
+	NativeAPI.showMessageBox("Reading Error", fn + "\n" + Std.string(err), "Got It!");
 	#end
 	}
 
