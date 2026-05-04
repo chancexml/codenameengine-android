@@ -41,7 +41,7 @@ class HScript extends Script {
 			var errorMsg = 'Error while reading $path: ${Std.string(e)}';
 			Logs.error(errorMsg);
 			#if android
-			extension.androidtools.Tools.showAlertDialog("Error!", errorMsg, "Got It!");
+			Tools.showAlertDialog("Error!", errorMsg, "Got It!");
 			#end
 		}
 		
@@ -200,7 +200,7 @@ class HScript extends Script {
 		], ERROR);
 		
 		#if android
-		extension.androidtools.Tools.showAlertDialog("HScript Error", fn + err, "Got it!");
+		Tools.showAlertDialog("HScript Error", fn + err, "Got it!");
 		#end
 	}
 
@@ -222,7 +222,7 @@ class HScript extends Script {
 	], WARNING);
 
 	#if android
-	extension.androidtools.Tools.showAlertDialog("Warning!", fn + err, "Continue");
+	Tools.showAlertDialog("Warning!", fn + err, "Continue");
 	#end
 	}
 
