@@ -373,7 +373,7 @@ class Charter extends UIState {
 				childs: [
 					{
 						label: translate("playback.play"),
-						keybind: [P],
+						keybind: [ESCAPE],
 						onSelect: _playback_play
 					},
 					null,
@@ -586,11 +586,11 @@ class Charter extends UIState {
         #if mobile
 		Call.Mouse();
 
-        virtualPad = ButtonHelper.create(this, FULL, A_B_X_Y_C);
+        virtualPad = ButtonHelper.create(this, FULL, A_B_X_Y);
 
         ButtonHelper.bind(virtualPad,
         ['up','down','left','right'],
-        ['accept','back','dev-access','switchmod']
+        ['accept','back','dev-access','pause']
         );
 
         Controls.virtualPad = virtualPad;
