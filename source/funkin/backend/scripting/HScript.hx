@@ -10,6 +10,8 @@ import funkin.backend.system.Controls;
 import funkin.backend.utils.NativeAPI;
 
 #if mobile
+import extension.androidtools.Tools;
+import extension.androidtools.content.Context;
 import mobile.utils.ButtonHelper;
 import mobile.controls.VirtualPad;
 #end
@@ -35,8 +37,14 @@ class HScript extends Script {
 
 		try {
 			if(Assets.exists(rawPath)) code = Assets.getText(rawPath);
-		} catch(e) Logs.error('Error while reading $path: ${Std.string(e)}');
-
+		} catch(e) {
+			var errorMsg = 'Error while reading $path: ${Std.string(e)}';
+			Logs.error(errorMsg);
+			#if android
+			extension.androidtools.Tools.showAlertDialog("Error!", errorMsg, "Got It!");
+			#end
+		}
+		
 		parser = initParser();
 		__importedPaths = [path];
 
@@ -186,10 +194,14 @@ class HScript extends Script {
 		if (err.startsWith(fn)) err = err.substr(fn.length);
 	}
 
-	Logs.traceColored([		    
-        Logs.logText(fn, GREEN),
-        Logs.logText(err, RED)
-	], ERROR);
+		Logs.traceColored([
+		  Logs.logText(fn, GREEN),
+		  Logs.logText(err, RED)
+		], ERROR);
+		
+		#if android
+		extension.androidtools.Tools.showAlertDialog("HScript Error", fn + err, "Got it!");
+		#end
 	}
 
 	private function _warnHandler(error:Error) {
@@ -208,6 +220,10 @@ class HScript extends Script {
 	    Logs.logText(fn, GREEN),
         Logs.logText(err, YELLOW)
 	], WARNING);
+
+	#if android
+	extension.androidtools.Tools.showAlertDialog("Warning!", fn + err, "Continue");
+	#end
 	}
 
 	public override function setParent(parent:Dynamic) {
