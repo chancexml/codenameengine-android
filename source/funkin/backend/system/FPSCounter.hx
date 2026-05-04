@@ -1,5 +1,6 @@
 package funkin.backend.system;
 
+import flixel.FlxG;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.text.TextFieldAutoSize;
@@ -19,10 +20,15 @@ class FPSMemCounter extends TextField
 	var cachedFPS:Int = 0;
 	var cachedMem:Float = 0;
 
+	public var offsetX:Float;
+	public var offsetY:Float;
+
 	public function new(x:Float = 10, y:Float = 10)
 	{
 		super();
 
+		this.offsetX = x;
+		this.offsetY = y;
 		this.x = x;
 		this.y = y;
 
@@ -75,27 +81,29 @@ class FPSMemCounter extends TextField
 	}
 
 	function updateScale()
-    {
-   	    var userScale:Float = Options.fpsSize;
+	{
+		var userScale:Float = Options.fpsSize;
 
-	    var stageWidth = Lib.current.stage.stageWidth;
-	    var stageHeight = Lib.current.stage.stageHeight;
+		var stageWidth = Lib.current.stage.stageWidth;
+		var stageHeight = Lib.current.stage.stageHeight;
 
-	    var scaleXRatio = stageWidth / 1280;
-	    var scaleYRatio = stageHeight / 720;
+		var scaleXRatio = stageWidth / 1280;
+		var scaleYRatio = stageHeight / 720;
 
-	    var screenScale = Math.min(scaleXRatio, scaleYRatio);
+		var screenScale = Math.min(scaleXRatio, scaleYRatio);
 
-	    scaleX = userScale * screenScale;
-	    scaleY = userScale * screenScale;
-
-	    x = 10 * screenScale;
-	    y = 10 * screenScale;
-    }
+		scaleX = userScale * screenScale;
+		scaleY = userScale * screenScale;
+	}
 	
 	function onEnterFrame(_)
 	{
-        if (!visible) return; 
+		if (!visible) return; 
+
+		if (FlxG.game != null) {
+			this.x = FlxG.game.x + (offsetX * this.scaleX);
+			this.y = FlxG.game.y + (offsetY * this.scaleY);
+		}
 
 		var now = Lib.getTimer();
 
