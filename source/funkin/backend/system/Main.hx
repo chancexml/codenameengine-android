@@ -32,6 +32,7 @@ import extension.androidtools.Permissions;
 import extension.androidtools.os.Environment;
 import extension.androidtools.Settings;
 import mobile.utils.Files;
+import mobile.utils.MobileKeyboard;
 #end
 
 class Main extends Sprite
@@ -79,6 +80,7 @@ class Main extends Sprite
         openfl.Lib.current.stage.addEventListener(openfl.events.Event.ACTIVATE, onResult);
         #if android
         checkPermissions();
+		mobile.utils.MobileKeyboard.init();
         #end
         #end
 
