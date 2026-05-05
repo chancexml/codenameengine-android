@@ -2,11 +2,21 @@ package funkin.editors;
 
 import flixel.addons.display.FlxBackdrop;
 import funkin.options.type.OptionType;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 class EditorTreeMenu extends funkin.options.TreeMenu {
 	public var bg:FlxBackdrop;
 	public var bgType:String = "default";
 	public var bgMovement:FlxPoint = new FlxPoint();
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 
 	override function create() {
 		super.create();
