@@ -595,7 +595,7 @@ class Charter extends UIState {
 
 		loadSong();
        
-		if (Framerate.isLoaded && !newFPS) {
+		if (Framerate.isLoaded && !Options.newFPS) {
 			Framerate.fpsCounter.alpha = 0.4;
 			Framerate.memoryCounter.alpha = 0.4;
 			Framerate.codenameBuildField.alpha = 0.4;
