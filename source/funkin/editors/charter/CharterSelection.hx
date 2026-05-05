@@ -24,6 +24,13 @@ class CharterSelection extends EditorTreeMenu {
 		DiscordUtil.call("onEditorTreeLoaded", ["Chart Editor"]);
 		addMenu(new CharterSelectionScreen());
 		bgType = 'charter';
+		#if mobile
+        virtualPad = ButtonHelper.create(this, UP_DOWN, A_B);
+
+        ButtonHelper.bind(virtualPad, ['up', 'down'], ['accept','back']);
+
+        Controls.virtualPad = virtualPad;
+        #end
 	}
 }
 
@@ -89,14 +96,6 @@ class CharterSelectionScreen extends EditorTreeMenuScreen {
 		freeplayList = FreeplaySonglist.get(false);
 
 		for (i => s in freeplayList.songs) add(makeSongOption(s));
-
-        #if mobile
-        virtualPad = ButtonHelper.create(this, UP_DOWN, A_B);
-
-        ButtonHelper.bind(virtualPad, ['up', 'down'], ['accept','back']);
-
-        Controls.virtualPad = virtualPad;
-        #end
 	}
 
 	#if sys
