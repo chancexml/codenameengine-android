@@ -14,7 +14,14 @@ import funkin.game.HealthIcon;
 import haxe.Json;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
-
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
+	
 typedef SongCreationData = {
 	var meta:ChartMetaData;
 	var instBytes:Bytes;
@@ -25,7 +32,9 @@ typedef SongCreationData = {
 
 class SongCreationScreen extends UISubstateWindow {
 	private var onSave:Null<SongCreationData> -> Null<String -> Void> -> Void = null;
-
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 	public var songNameTextBox:UITextBox;
 	public var bpmStepper:UINumericStepper;
 	public var beatsPerMeasureStepper:UINumericStepper;
@@ -91,6 +100,14 @@ class SongCreationScreen extends UISubstateWindow {
 		winHeight = 520;
 
 		super.create();
+
+		#if mobile
+        virtualPad = ButtonHelper.create(this, UP_DOWN, A_B);
+
+        ButtonHelper.bind(virtualPad, ['up', 'down'], ['accept','back']);
+
+        Controls.virtualPad = virtualPad;
+        #end
 
 		function addLabelOn(ui:UISprite, text:String):UIText {
 			var label:UIText = new UIText(ui.x, ui.y - 24, 0, text);
