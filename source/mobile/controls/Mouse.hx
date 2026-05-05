@@ -18,11 +18,15 @@ class Call {
     public static var virtualMouse:VirtualMouse;
 
     public static function Mouse():Void {
+        if (virtualMouse != null && !virtualMouse.exists) {
+            virtualMouse = null; 
+        }
+
         if (virtualMouse == null) {
             virtualMouse = new VirtualMouse(FlxG.width / 2, FlxG.height / 2);
             FlxG.state.add(virtualMouse);
         } else {
-            FlxG.state.remove(virtualMouse);
+            FlxG.state.remove(virtualMouse, true);
             FlxG.state.add(virtualMouse);
         }
     }
@@ -42,16 +46,31 @@ class VirtualMouse extends FlxSprite {
         #if mobile
         FlxG.mouse.visible = false; 
         #end
+
+        FlxG.signals.preUpdate.add(onPreUpdate);
     }
 
-    override public function update(elapsed:Float):Void {
+    override public function destroy():Void {
+        if (FlxG.signals.preUpdate.has(onPreUpdate)) {
+            FlxG.signals.preUpdate.remove(onPreUpdate);
+        }
+        super.destroy();
+    }
+
+    private function onPreUpdate():Void {
         updateMovement();
         
         #if mobile
-        @:privateAccess FlxG.mouse.x = Std.int(this.x);
-        @:privateAccess FlxG.mouse.y = Std.int(this.y);
+        @:privateAccess {
+            FlxG.mouse.x = Std.int(this.x);
+            FlxG.mouse.y = Std.int(this.y);
+            FlxG.mouse.screenX = Std.int(this.x);
+            FlxG.mouse.screenY = Std.int(this.y);
+        }
         #end
+    }
 
+    override public function update(elapsed:Float):Void {
         autoDetectHover();
         super.update(elapsed);
     }
