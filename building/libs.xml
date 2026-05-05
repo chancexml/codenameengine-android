@@ -19,7 +19,7 @@
 
 		<!-- Documentation and other features -->
 		<git name="extension-androidtools" url="https://github.com/ChanceXML/androidTools"/>
-		<git name="virtual-mouse" url="https://github.com/ChanceXML/virtual-mouse" />
+		<git name="virtual-cursor" url="https://github.com/ChanceXML/virtual-cursor" />
 		<git name="away3d" url="https://github.com/CodenameCrew/away3d" />
 		<!-- <lib name="dox" /> -->
 		<lib name="markdown" />
