@@ -59,15 +59,6 @@ class VirtualMouse extends FlxSprite {
 
     private function onPreUpdate():Void {
         updateMovement();
-        
-        #if mobile
-        @:privateAccess {
-            FlxG.mouse.x = Std.int(this.x);
-            FlxG.mouse.y = Std.int(this.y);
-            FlxG.mouse.screenX = Std.int(this.x);
-            FlxG.mouse.screenY = Std.int(this.y);
-        }
-        #end
     }
 
     override public function update(elapsed:Float):Void {
@@ -76,6 +67,9 @@ class VirtualMouse extends FlxSprite {
     }
 
     private function updateMovement():Void {
+        var clickedJustNow:Bool = false;
+        var releasedJustNow:Bool = false;
+
         for (touch in FlxG.touches.list) {
             var touchingPad:Bool = false;
             
@@ -89,6 +83,7 @@ class VirtualMouse extends FlxSprite {
 
             if (touch.justPressed) {
                 lastTouch.set(touch.screenX, touch.screenY);
+                clickedJustNow = true;
             } 
             else if (touch.pressed) {
                 var deltaX = touch.screenX - lastTouch.x;
@@ -103,9 +98,31 @@ class VirtualMouse extends FlxSprite {
                 if (this.y > FlxG.height - height) this.y = FlxG.height - height;
 
                 lastTouch.set(touch.screenX, touch.screenY);
-                break; 
+            }
+            
+            if (touch.justReleased) {
+                releasedJustNow = true;
+            }
+
+            @:privateAccess {
+                touch.screenX = -1000;
+                touch.screenY = -1000;
+                touch.x = -1000;
+                touch.y = -1000;
             }
         }
+
+        #if mobile
+        @:privateAccess {
+            FlxG.mouse.x = Std.int(this.x);
+            FlxG.mouse.y = Std.int(this.y);
+            FlxG.mouse.screenX = Std.int(this.x);
+            FlxG.mouse.screenY = Std.int(this.y);
+
+            if (clickedJustNow) FlxG.mouse._leftButton.press();
+            if (releasedJustNow) FlxG.mouse._leftButton.release();
+        }
+        #end
     }
 
     private function autoDetectHover():Void {
@@ -131,7 +148,7 @@ class VirtualMouse extends FlxSprite {
                 if (!isPadButton) {
                     var isActuallyClickable = Std.isOfType(obj, FlxButton) || (Reflect.hasField(obj, "inputEnabled") && Reflect.field(obj, "inputEnabled") == true);
                     
-                    if (isActuallyClickable && this.overlaps(obj)) {
+                    if (isActuallyClickable && FlxG.mouse.overlaps(obj)) {
                         foundClickable = true;
                     }
                 }
