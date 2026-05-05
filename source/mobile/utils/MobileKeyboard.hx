@@ -3,6 +3,7 @@ package mobile.utils;
 import flixel.FlxG;
 import openfl.Lib;
 import openfl.text.TextField;
+import flixel.group.FlxGroup;
 
 class MobileKeyboard {
     public static var isKeyboardShown:Bool = false;
