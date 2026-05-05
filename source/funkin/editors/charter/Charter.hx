@@ -585,12 +585,13 @@ class Charter extends UIState {
 		
         #if mobile
 		Call.Mouse();
-
+        /**
         virtualPad = ButtonHelper.create(this, FULL, A_B_X_Y);
 
         ButtonHelper.bind(virtualPad,['up','down','left','right'],['accept','back','dev-access','pause']);
 
         Controls.virtualPad = virtualPad;
+        **/
         #end
 
 		loadSong();
