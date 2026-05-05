@@ -140,8 +140,9 @@
 	<haxelib name="hxdiscord_rpc" if="DISCORD_RPC"/>
 	<haxelib name="markdown" />
 	<haxelib name="hxcpp-debug-server" if="TEST_BUILD debug" />
-	<haxelib name="extension-androidtools" />
-
+	<haxelib name="extension-androidtools" if="android" />
+    <haxelib name="virtual-mouse" if="android || ios" />
+	
 	<!-- _____________________________ Path Settings ____________________________ -->
 
 	<set name="BUILD_DIR" value="export/debug" if="debug" />
