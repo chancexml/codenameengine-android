@@ -394,12 +394,12 @@ class Charter extends UIState {
 					null,
 					{
 						label: translate("playback.sectionBack"),
-						keybind: [LEFT],
+						keybind: [A],
 						onSelect: _playback_back
 					},
 					{
 						label: translate("playback.sectionForward"),
-						keybind: [RIGHT],
+						keybind: [D],
 						onSelect: _playback_forward
 					},
 					{
@@ -410,12 +410,12 @@ class Charter extends UIState {
 					null,
 					{
 						label: translate("playback.backStep"),
-						keybind: [UP],
+						keybind: [W],
 						onSelect: _playback_back_step
 					},
 					{
 						label: translate("playback.forwardStep"),
-						keybind: [DOWN],
+						keybind: [S],
 						onSelect: _playback_forward_step
 					},
 					null,
@@ -588,17 +588,14 @@ class Charter extends UIState {
 
         virtualPad = ButtonHelper.create(this, FULL, A_B_X_Y);
 
-        ButtonHelper.bind(virtualPad,
-        ['up','down','left','right'],
-        ['accept','back','dev-access','pause']
-        );
+        ButtonHelper.bind(virtualPad,['up','down','left','right'],['accept','back','dev-access','pause']);
 
         Controls.virtualPad = virtualPad;
         #end
 
 		loadSong();
-
-		if (Framerate.isLoaded) {
+       
+		if (Framerate.isLoaded && !newFPS) {
 			Framerate.fpsCounter.alpha = 0.4;
 			Framerate.memoryCounter.alpha = 0.4;
 			Framerate.codenameBuildField.alpha = 0.4;
@@ -623,7 +620,7 @@ class Charter extends UIState {
 	override function destroy() {
 		__updatePlaytestInfo();
 
-		if(Framerate.isLoaded) {
+		if(Framerate.isLoaded && !Options.newFPS) {
 			Framerate.fpsCounter.alpha = 1;
 			Framerate.memoryCounter.alpha = 1;
 			Framerate.codenameBuildField.alpha = 1;
