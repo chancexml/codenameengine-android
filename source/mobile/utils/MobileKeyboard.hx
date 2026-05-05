@@ -1,56 +1,52 @@
 package mobile.utils;
 
 import flixel.FlxG;
-import flixel.FlxBasic;
-import flixel.group.FlxGroup;
-import flixel.addons.ui.FlxInputText;
+import openfl.Lib;
+import openfl.text.TextField;
 
 class MobileKeyboard {
     public static var isKeyboardShown:Bool = false;
 
     public static function init():Void {
         #if mobile
-        if (!FlxG.signals.postUpdate.has(checkInputFocus)) {
-            FlxG.signals.postUpdate.add(checkInputFocus);
+        if (!FlxG.signals.postUpdate.has(updateKeyboardStatus)) {
+            FlxG.signals.postUpdate.add(updateKeyboardStatus);
         }
         #end
     }
 
     #if mobile
-    private static function checkInputFocus():Void {
-        var inputFocused:Bool = false;
-        
-        function checkMember(member:FlxBasic) {
-            if (inputFocused || member == null) return; 
+    private static function updateKeyboardStatus():Void {
+        var isFocused:Bool = Std.isOfType(Lib.current.stage.focus, TextField);
 
-            if (Std.isOfType(member, FlxGroup)) {
-                var group:FlxGroup = cast member;
-                group.forEachAlive(checkMember);
-            } 
-            else if (Std.isOfType(member, FlxInputText)) {
-                var inputText:FlxInputText = cast member;
-                
-                if (inputText.hasFocus) {
-                    inputFocused = true;
-                }
-            }
+        if (!isFocused && FlxG.state != null) {
+            isFocused = checkGenericFocus(FlxG.state);
         }
 
-        if (FlxG.state != null) {
-            FlxG.state.forEachAlive(checkMember);
-          
-            if (FlxG.state.subState != null) {
-                FlxG.state.subState.forEachAlive(checkMember);
-            }
-        }
-
-        if (inputFocused && !isKeyboardShown) {
-            openfl.Lib.application.window.textInputEnabled = true;
+        if (isFocused && !isKeyboardShown) {
+            Lib.application.window.textInputEnabled = true;
             isKeyboardShown = true;
-        } else if (!inputFocused && isKeyboardShown) {
-            openfl.Lib.application.window.textInputEnabled = false;
+        } else if (!isFocused && isKeyboardShown) {
+            Lib.application.window.textInputEnabled = false;
             isKeyboardShown = false;
         }
+    }
+
+    private static function checkGenericFocus(object:Dynamic):Bool {
+        if (object == null) return false;
+
+        if (Reflect.hasField(object, "hasFocus") && Reflect.field(object, "hasFocus") == true) {
+            return true;
+        }
+
+        if (Std.isOfType(object, flixel.group.FlxTypedGroup)) {
+            var group:flixel.group.FlxTypedGroup<Dynamic> = cast object;
+            for (member in group.members) {
+                if (member != null && checkGenericFocus(member)) return true;
+            }
+        }
+        
+        return false;
     }
     #end
 }
