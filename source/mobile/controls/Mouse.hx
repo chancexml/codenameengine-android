@@ -2,31 +2,23 @@ package mobile.controls;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.math.FlxPoint;
 import flixel.ui.FlxButton;
-import flixel.group.FlxGroup;
-import flixel.FlxObject;
+import flixel.math.FlxPoint;
+
 #if mobile
 import funkin.backend.system.Controls;
-import funkin.options.keybinds.KeybindsOptions;
-import mobile.controls.VirtualPad;
-import mobile.controls.FlxButton;
-import mobile.utils.ButtonHelper;
 #end
 
 class Call {
     public static var virtualMouse:VirtualMouse;
 
     public static function Mouse():Void {
-        if (virtualMouse != null && !virtualMouse.exists) {
-            virtualMouse = null; 
-        }
-
         if (virtualMouse == null) {
-            virtualMouse = new VirtualMouse(FlxG.width / 2, FlxG.height / 2);
-            FlxG.state.add(virtualMouse);
-        } else {
-            FlxG.state.remove(virtualMouse, true);
+            virtualMouse = new VirtualMouse(
+                FlxG.width / 2,
+                FlxG.height / 2
+            );
+
             FlxG.state.add(virtualMouse);
         }
     }
@@ -34,135 +26,149 @@ class Call {
 
 class VirtualMouse extends FlxSprite {
     var lastTouch:FlxPoint;
+
+    public var sensitivity:Float = 1.6;
+
     var isHovering:Bool = false;
-    public var sensitivity:Float = 1.6; 
 
     public function new(x:Float, y:Float) {
         super(x, y);
-        loadGraphic("assets/images/menus/cursor/mouse.png", false, 32, 32);
-        scrollFactor.set(0, 0); 
+
+        loadGraphic(
+            "assets/images/menus/cursor/mouse.png",
+            false,
+            32,
+            32
+        );
+
+        scrollFactor.set();
+
         lastTouch = new FlxPoint();
-        
+
         #if mobile
-        FlxG.mouse.visible = false; 
+        FlxG.mouse.visible = false;
         #end
-
-        FlxG.signals.preUpdate.add(onPreUpdate);
     }
 
-    override public function destroy():Void {
-        if (FlxG.signals.preUpdate.has(onPreUpdate)) {
-            FlxG.signals.preUpdate.remove(onPreUpdate);
-        }
-        super.destroy();
-    }
-
-    private function onPreUpdate():Void {
-        updateMovement();
-    }
-
-    override public function update(elapsed:Float):Void {
-        autoDetectHover();
+    override function update(elapsed:Float):Void {
         super.update(elapsed);
+
+        updateMovement();
+        checkButtons();
     }
 
-    private function updateMovement():Void {
-        var clickedJustNow:Bool = false;
-        var releasedJustNow:Bool = false;
-
+    function updateMovement():Void {
         for (touch in FlxG.touches.list) {
+
             var touchingPad:Bool = false;
-            
+
+            #if mobile
             if (Controls.virtualPad != null) {
+
                 Controls.virtualPad.forEachAlive(function(btn:FlxSprite) {
-                    if (touch.overlaps(btn)) touchingPad = true;
+
+                    if (touch.overlaps(btn))
+                        touchingPad = true;
                 });
             }
+            #end
 
-            if (touchingPad) continue;
+            if (touchingPad)
+                continue;
 
             if (touch.justPressed) {
-                lastTouch.set(touch.screenX, touch.screenY);
-                clickedJustNow = true;
-            } 
-            else if (touch.pressed) {
+
+                lastTouch.set(
+                    touch.screenX,
+                    touch.screenY
+                );
+            }
+
+            if (touch.pressed) {
+
                 var deltaX = touch.screenX - lastTouch.x;
                 var deltaY = touch.screenY - lastTouch.y;
 
-                this.x += deltaX * sensitivity;
-                this.y += deltaY * sensitivity;
+                x += deltaX * sensitivity;
+                y += deltaY * sensitivity;
 
-                if (this.x < 0) this.x = 0;
-                if (this.x > FlxG.width - width) this.x = FlxG.width - width;
-                if (this.y < 0) this.y = 0;
-                if (this.y > FlxG.height - height) this.y = FlxG.height - height;
+                if (x < 0)
+                    x = 0;
 
-                lastTouch.set(touch.screenX, touch.screenY);
-            }
-            
-            if (touch.justReleased) {
-                releasedJustNow = true;
-            }
+                if (y < 0)
+                    y = 0;
 
-            @:privateAccess {
-                touch.screenX = -1000;
-                touch.screenY = -1000;
-                touch.x = -1000;
-                touch.y = -1000;
+                if (x > FlxG.width - width)
+                    x = FlxG.width - width;
+
+                if (y > FlxG.height - height)
+                    y = FlxG.height - height;
+
+                lastTouch.set(
+                    touch.screenX,
+                    touch.screenY
+                );
             }
         }
-
-        #if mobile
-        @:privateAccess {
-            FlxG.mouse.x = Std.int(this.x);
-            FlxG.mouse.y = Std.int(this.y);
-            FlxG.mouse.screenX = Std.int(this.x);
-            FlxG.mouse.screenY = Std.int(this.y);
-
-            if (clickedJustNow) FlxG.mouse._leftButton.press();
-            if (releasedJustNow) FlxG.mouse._leftButton.release();
-        }
-        #end
     }
 
-    private function autoDetectHover():Void {
-        var foundClickable:Bool = false;
+    function checkButtons():Void {
 
-        function checkMember(member:flixel.FlxBasic) {
-            if (foundClickable || member == this) return; 
+        var hovering:Bool = false;
 
-            if (Std.isOfType(member, FlxGroup)) {
-                var group:FlxGroup = cast member;
-                group.forEachAlive(checkMember);
-            } 
-            else if (Std.isOfType(member, FlxObject)) {
-                var obj:FlxObject = cast member;
-                var isPadButton:Bool = false;
-                
-                if (Controls.virtualPad != null) {
-                    Controls.virtualPad.forEachAlive(function(btn:FlxSprite) {
-                        if (obj == btn) isPadButton = true;
-                    });
-                }
+        FlxG.state.forEachAlive(function(obj) {
 
-                if (!isPadButton) {
-                    var isActuallyClickable = Std.isOfType(obj, FlxButton) || (Reflect.hasField(obj, "inputEnabled") && Reflect.field(obj, "inputEnabled") == true);
-                    
-                    if (isActuallyClickable && FlxG.mouse.overlaps(obj)) {
-                        foundClickable = true;
+            if (obj == null)
+                return;
+
+            if (Std.isOfType(obj, FlxButton)) {
+
+                var btn:FlxButton = cast obj;
+
+                if (overlaps(btn)) {
+
+                    hovering = true;
+
+                    for (touch in FlxG.touches.list) {
+
+                        if (touch.justPressed) {
+
+                            if (btn.onUp != null)
+                                btn.onUp.callback();
+                        }
                     }
                 }
             }
-        }
+        });
 
-        FlxG.state.forEachAlive(checkMember);
+        if (hovering && !isHovering) {
 
-        if (foundClickable && !isHovering) {
-            loadGraphic("assets/images/menus/cursor/hover.png", false, 32, 32);
+            loadGraphic(
+                "assets/images/menus/cursor/hover.png",
+                false,
+                32,
+                32
+            );
+
             isHovering = true;
-        } else if (!foundClickable && isHovering) {
-            loadGraphic("assets/images/menus/cursor/mouse.png", false, 32, 32);
+        }
+        else if (!hovering && isHovering) {
+
+            loadGraphic(
+                "assets/images/menus/cursor/mouse.png",
+                false,
+                32,
+                32
+            );
+
             isHovering = false;
         }
+    }
+
+    override function destroy():Void {
+
+        lastTouch.put();
+
+        super.destroy();
     }
 }
