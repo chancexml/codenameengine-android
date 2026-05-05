@@ -141,7 +141,7 @@
 	<haxelib name="markdown" />
 	<haxelib name="hxcpp-debug-server" if="TEST_BUILD debug" />
 	<haxelib name="extension-androidtools" if="android" />
-	<haxelib name="virtual-cursor" if="android || ios" /> 
+	<haxelib name="virtual-cursor" if="android" /> 
 	
 	
 	<!-- _____________________________ Path Settings ____________________________ -->
