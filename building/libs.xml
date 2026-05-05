@@ -10,7 +10,7 @@
 		<!-- Flixel -->
 		<git name="flixel" url="https://github.com/ChanceXML/cne-flixel-old" />
 		<git name="flixel-addons" url="https://github.com/CodenameCrew/cne-flixel-addons" ref="old" />
-		<git name="flixel-ui" url="https://github.com/HaxeFlixel/flixel-ui" />
+		<lib name="flixel-ui" version="2.5.0" />
 
 		<!-- Other Libraries -->
 		<git name="hscript-improved" url="https://github.com/CodenameCrew/hscript-improved" ref="codename-dev" />
