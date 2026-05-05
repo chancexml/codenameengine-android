@@ -25,6 +25,7 @@ import sys.FileSystem;
 #end
 import flixel.util.FlxColor;
 #if mobile
+import mobile.controls.VirtualMouse;
 import funkin.backend.system.Controls;
 import funkin.options.Options;
 import funkin.options.keybinds.KeybindsOptions;
