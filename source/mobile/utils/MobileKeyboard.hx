@@ -40,13 +40,12 @@ class MobileKeyboard {
             return true;
         }
 
-        if (Std.isOfType(object, flixel.group.FlxTypedGroup)) {
-            var group:flixel.group.FlxTypedGroup<Dynamic> = cast object;
+        if (Std.isOfType(object, FlxTypedGroup)) {
+            var group:FlxTypedGroup<Dynamic> = cast object;
             for (member in group.members) {
                 if (member != null && checkGenericFocus(member)) return true;
             }
         }
-        
         return false;
     }
     #end
