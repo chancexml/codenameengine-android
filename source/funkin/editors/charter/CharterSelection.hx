@@ -8,6 +8,13 @@ import funkin.editors.EditorTreeMenu;
 import funkin.menus.FreeplayState.FreeplaySonglist;
 import funkin.options.type.*;
 import haxe.Json;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 using StringTools;
 
@@ -24,6 +31,9 @@ class CharterSelectionScreen extends EditorTreeMenuScreen {
 	public var freeplayList:FreeplaySonglist;
 	public var songList:Array<String> = [];
 	public var curSong:ChartMetaData;
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
 
 	inline public function makeChartOption(d:String, v:String, name:String):TextOption {
 		return new TextOption(d, getID('acceptDifficulty'), () -> FlxG.switchState(new Charter(name, d, v)));
@@ -78,6 +88,14 @@ class CharterSelectionScreen extends EditorTreeMenuScreen {
 		freeplayList = FreeplaySonglist.get(false);
 
 		for (i => s in freeplayList.songs) add(makeSongOption(s));
+
+        #if mobile
+        virtualPad = ButtonHelper.create(this, UP_DOWN, A_B);
+
+        ButtonHelper.bind(virtualPad, ['up', 'down'], ['accept','back']);
+
+        Controls.virtualPad = virtualPad;
+        #end
 	}
 
 	#if sys
