@@ -31,7 +31,8 @@ import funkin.options.keybinds.KeybindsOptions;
 import mobile.controls.VirtualPad;
 import mobile.controls.FlxButton;
 import mobile.utils.ButtonHelper;
-import mobile.controls.Mouse;
+import virt.Call;
+import virt.VirtualCursor;
 #end
 
 class Charter extends UIState {
