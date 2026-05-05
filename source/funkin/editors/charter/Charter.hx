@@ -1430,7 +1430,7 @@ class Charter extends UIState {
 					if (FlxG.keys.pressed.CONTROL) {
 						zoom += 0.25 * FlxG.mouse.wheel;
 						__camZoom = Math.pow(2, zoom);
-					} else if (controls.getJustPressed("dev-access")) {
+					} else if (FlxG.keys.pressed.SHIFT) {
 						sideScroll -= 40 * FlxG.mouse.wheel;
 					} else {
 						if (!FlxG.sound.music.playing) {
