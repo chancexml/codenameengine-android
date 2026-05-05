@@ -16,7 +16,8 @@ import extension.androidtools.content.Context;
 import mobile.utils.ButtonHelper;
 import mobile.controls.VirtualPad;
 import funkin.backend.utils.NativeAPI;
-import mobile.controls.Mouse;
+import virt.Call;
+import virt.VirtualCursor;
 #end
 
 class HScript extends Script {
