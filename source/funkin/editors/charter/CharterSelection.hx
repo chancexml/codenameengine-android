@@ -31,10 +31,11 @@ class CharterSelectionScreen extends EditorTreeMenuScreen {
 	public var freeplayList:FreeplaySonglist;
 	public var songList:Array<String> = [];
 	public var curSong:ChartMetaData;
+	/**
 	#if mobile
     public var virtualPad:VirtualPad;
     #end
-
+    **/
 	inline public function makeChartOption(d:String, v:String, name:String):TextOption {
 		return new TextOption(d, getID('acceptDifficulty'), () -> FlxG.switchState(new Charter(name, d, v)));
 	}
