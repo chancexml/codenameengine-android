@@ -42,10 +42,10 @@ class UIUtil {
 
 	public static function keyToActionString(key:FlxKey):String {
 		return switch(key) {
-			case UP: "up";
-			case DOWN: "down";
-			case LEFT: "left";
-			case RIGHT: "right";
+			case W: "up";
+			case S: "down";
+			case A: "left";
+			case D: "right";
 			case ENTER: "accept";
 			case ESCAPE, BACKSPACE: "back";
 			case P: "pause";
