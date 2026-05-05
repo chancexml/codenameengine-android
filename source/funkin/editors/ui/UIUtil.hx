@@ -55,31 +55,37 @@ class UIUtil {
 	}
 
 	public static function getKeyState(key:FlxKey, Status:FlxInputState):Bool {
-        var control = funkin.backend.system.Controls;
+		if (FlxG.keys.checkStatus(fixKey(key), Status)) {
+			return true;
+		}
 
-        if (control == NONE) {
-            return FlxG.keys.checkStatus(fixKey(key), Status);
-        } 
+		var actionString = keyToActionString(key);
+		if (actionString == "") {
+			return false;
+		}
 
-        var controls:Controls = null;
-        if (Std.isOfType(FlxG.state, funkin.backend.MusicBeatState)) {
-            controls = (cast FlxG.state).controls;
-        } 
-        else if (FlxG.state.subState != null && Std.isOfType(FlxG.state.subState, funkin.backend.MusicBeatState)) {
-            controls = (cast FlxG.state.subState).controls;
-        }
+		var controls:Controls = null;
+		if (Std.isOfType(FlxG.state, funkin.backend.MusicBeatState)) {
+			controls = (cast FlxG.state).controls;
+		} 
+		else if (FlxG.state.subState != null && Std.isOfType(FlxG.state.subState, funkin.backend.MusicBeatState)) {
+			controls = (cast FlxG.state.subState).controls;
+		}
 
-        if (controls != null) {
-            return switch (Status) {
-                case JUST_PRESSED: controls.justPressed(control);
-                case PRESSED:      controls.pressed(control);
-                case JUST_RELEASED: controls.justReleased(control);
-                case RELEASED:     !controls.pressed(control);
-                default:           false;
-            };
-        }
+		if (controls != null) {
+			var propName = actionString.toUpperCase().split("-").join("_");
+			var isPressed:Bool = Reflect.getProperty(controls, propName) == true;
 
-        return false;
+			return switch (Status) {
+				case JUST_PRESSED:  Reflect.getProperty(controls, propName + "_P") == true;
+				case PRESSED:       isPressed;
+				case JUST_RELEASED: Reflect.getProperty(controls, propName + "_R") == true;
+				case RELEASED:      !isPressed;
+				default:            false;
+			};
+		}
+
+		return false;
 	}
 	
 	/**
