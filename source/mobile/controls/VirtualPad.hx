@@ -299,32 +299,38 @@ public function justReleased(action:String):Bool
 	
 override public function destroy():Void
 {
-	#if mobile
-	if (Controls.virtualPad == this)
-		Controls.virtualPad = null;
-	#end
+    #if mobile
+    if (Controls.virtualPad == this)
+        Controls.virtualPad = null;
+    #end
 
-	if (boundActions != null)
-	{
-		boundActions.clear();
-		boundActions = null;
-	}
+    if (boundActions != null)
+    {
+        boundActions.clear();
+        boundActions = null;
+    }
 
-	if (virtualpadCamera != null)
-	{
-		if (FlxG.cameras.list.contains(virtualpadCamera))
-			FlxG.cameras.remove(virtualpadCamera);
+    if (virtualpadCamera != null)
+    {
+        FlxG.cameras.remove(virtualpadCamera, false);
+        virtualpadCamera = null;
+    }
 
-		virtualpadCamera = null;
-	}
+    buttonA = FlxDestroyUtil.destroy(buttonA);
+    buttonB = FlxDestroyUtil.destroy(buttonB);
+    buttonC = FlxDestroyUtil.destroy(buttonC);
+    buttonX = FlxDestroyUtil.destroy(buttonX);
+    buttonY = FlxDestroyUtil.destroy(buttonY);
+    
+    buttonLeft = FlxDestroyUtil.destroy(buttonLeft);
+    buttonDown = FlxDestroyUtil.destroy(buttonDown);
+    buttonUp = FlxDestroyUtil.destroy(buttonUp);
+    buttonRight = FlxDestroyUtil.destroy(buttonRight);
 
-	this.cameras = null;
-	atlasFrames = null;
+    this.cameras = null;
+    atlasFrames = null;
 
-	buttonA = buttonB = buttonC = buttonX = buttonY = null;
-	buttonLeft = buttonDown = buttonUp = buttonRight = null;
-
-	super.destroy();
+    super.destroy();
 }
 	
 	private function createButton(x:Float, y:Float, width:Int, height:Int, graphic:String):FlxButton
