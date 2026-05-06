@@ -151,6 +151,14 @@ class VirtualPad extends FlxSpriteGroup
 		this.alpha = 0.55;
 		#end
 	}
+	override public function draw():Void {
+        if (virtualpadCamera != null && !FlxG.cameras.list.contains(virtualpadCamera))
+        {
+            return; 
+        }
+
+        super.draw();
+	}
 
 	private function addAction(btn:FlxButton, action:String):Void
 	{
