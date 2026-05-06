@@ -67,7 +67,7 @@ class HScript extends Script {
 		interp.variables.set("Controls", Controls);
 
 		#if mobile
-		interp.variables.set("Call", Call);
+		interp.variables.set("Call", virt.Call);
 		interp.variables.set("ButtonHelper", ButtonHelper);
 		interp.variables.set("VirtualPad", VirtualPad);
 		#end
