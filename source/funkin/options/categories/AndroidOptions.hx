@@ -55,4 +55,5 @@ class AndroidOptions extends TreeMenuScreen {
             0.05,
 			'hitboxOpacity',
 		));
+	}
 }
