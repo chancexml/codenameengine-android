@@ -584,15 +584,6 @@ class Charter extends UIState {
 		// add the ui group
 		add(uiGroup);
 		
-        #if mobile
-		Call.Mouse();
-        
-        virtualPad = ButtonHelper.create(this, FULL, A_B_C_X_Y);
-
-        ButtonHelper.bind(virtualPad,['up','down','left','right'],['accept','back','switchmod','pause','reset']);
-        Controls.virtualPad = virtualPad;
-        #end
-
 		loadSong();
        
 		if (Framerate.isLoaded && !Options.newFPS) {
@@ -615,6 +606,15 @@ class Charter extends UIState {
 		dataDisplay.cameras = [charterCamera]; dataDisplay.x = -dataDisplay.width; add(dataDisplay);*/
 
 		DiscordUtil.call("onEditorLoaded", ["Chart Editor", __song + " (" + __diff + ")" + (__variant != null && __variant != "" ? " (" + __variant + ")" : "")]);
+
+		#if mobile
+		Call.Mouse();
+        
+        virtualPad = ButtonHelper.create(this, FULL, A_B_C_X_Y);
+
+        ButtonHelper.bind(virtualPad,['up','down','left','right'],['accept','back','switchmod','pause','reset']);
+        Controls.virtualPad = virtualPad;
+        #end
 	}
 
 	override function destroy() {
