@@ -628,6 +628,16 @@ class Charter extends UIState {
 		super.destroy();
 	}
 
+	override public function draw():Void
+    {
+        if (virtualpadCamera != null && !FlxG.cameras.list.contains(virtualpadCamera))
+        {
+            return; 
+        }
+
+        super.draw();
+    }
+	
 	public function loadSong() {
 		if (__reload) {
 			EventsData.reloadEvents();
