@@ -14,7 +14,7 @@ public static var hintStyle:String = "Simple";
 class AndroidOptions extends TreeMenuScreen {
 
     public function new() {
-        super('optionsTree.android-name', 'optionsTree.android-desc', '');
+        super('optionsTree.android-name', 'optionsTree.android-desc', 'AndroidOptions');
 
         add(new Checkbox(
             getNameID('pauseButton'),
