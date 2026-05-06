@@ -46,7 +46,7 @@ class AndroidKeyboard extends FlxBasic
                     var targetCam = input.camera; 
                     if (input.getScreenBounds(null, targetCam).containsXY(mousePos.x, mousePos.y)) {
                         
-                        input.hasFocus = true;
+                        @:privateAccess input.hasFocus = true;
                         
                         Lib.application.window.textInputEnabled = true;
                         
