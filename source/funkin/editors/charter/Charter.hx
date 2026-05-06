@@ -589,7 +589,7 @@ class Charter extends UIState {
         
         virtualPad = ButtonHelper.create(this, FULL, A_B_C_X_Y);
 
-        ButtonHelper.bind(virtualPad,['up','down','left','right']['accept','back','switchmod','pause','reset']);
+        ButtonHelper.bind(virtualPad,['up','down','left','right'],['accept','back','switchmod','pause','reset']);
         Controls.virtualPad = virtualPad;
         #end
 
