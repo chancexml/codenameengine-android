@@ -4,8 +4,7 @@ import flixel.FlxG;
 import flixel.FlxBasic;
 import flixel.math.FlxPoint;
 import openfl.Lib;
-
-import flixel.addons.text.FlxInputText; 
+import flixel.text.FlxInputText; 
 
 class AndroidKeyboard extends FlxBasic
 {
