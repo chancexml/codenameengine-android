@@ -1,52 +1,66 @@
 package mobile.utils;
 
 import flixel.FlxG;
+import flixel.FlxBasic;
+import flixel.math.FlxPoint;
 import openfl.Lib;
-import openfl.text.TextField;
-import flixel.group.FlxGroup;
 
-class MobileKeyboard {
-    public static var isKeyboardShown:Bool = false;
+import flixel.addons.text.FlxInputText; 
 
-    public static function init():Void {
-        #if mobile
-        if (!FlxG.signals.postUpdate.has(updateKeyboardStatus)) {
-            FlxG.signals.postUpdate.add(updateKeyboardStatus);
-        }
-        #end
-    }
+class AndroidKeyboard extends FlxBasic
+{
+    private static var _instance:AndroidKeyboard;
 
-    #if mobile
-    private static function updateKeyboardStatus():Void {
-        var isFocused:Bool = Std.isOfType(Lib.current.stage.focus, TextField);
-
-        if (!isFocused && FlxG.state != null) {
-            isFocused = checkGenericFocus(FlxG.state);
-        }
-
-        if (isFocused && !isKeyboardShown) {
-            Lib.application.window.textInputEnabled = true;
-            isKeyboardShown = true;
-        } else if (!isFocused && isKeyboardShown) {
-            Lib.application.window.textInputEnabled = false;
-            isKeyboardShown = false;
+    public static function init():Void
+    {
+        if (_instance == null) {
+            _instance = new AndroidKeyboard();
+            FlxG.plugins.add(_instance);
         }
     }
 
-    private static function checkGenericFocus(object:Dynamic):Bool {
-        if (object == null) return false;
+    public function new()
+    {
+        super();
+        visible = false;
+    }
 
-        if (Reflect.hasField(object, "hasFocus") && Reflect.field(object, "hasFocus") == true) {
-            return true;
+    override public function update(elapsed:Float):Void
+    {
+        super.update(elapsed);
+
+        if (FlxG.mouse.justReleased || (FlxG.touches.getFirst() != null && FlxG.touches.getFirst().justReleased)) {
+            checkInputFocus();
         }
+    }
 
-        if (Std.isOfType(object, FlxTypedGroup)) {
-            var group:FlxTypedGroup<Dynamic> = cast object;
-            for (member in group.members) {
-                if (member != null && checkGenericFocus(member)) return true;
+    private function checkInputFocus():Void
+    {
+        var foundInput:Bool = false;
+        var mousePos:FlxPoint = FlxG.mouse.getScreenPosition();
+
+        var checkObject = function(obj:Dynamic) {
+            if (obj != null && obj.visible && obj.exists) {
+                if (Std.isOfType(obj, FlxInputText)) {
+                    var input:FlxInputText = cast obj;
+                    
+                    var targetCam = input.camera; 
+                    if (input.getScreenBounds(null, targetCam).containsXY(mousePos.x, mousePos.y)) {
+                        
+                        input.hasFocus = true;
+                        
+                        Lib.application.window.textInputEnabled = true;
+                        
+                        foundInput = true;
+                    }
+                }
             }
+        };
+
+        FlxG.state.forEach(checkObject, true);
+
+        if (FlxG.state.subState != null) {
+            FlxG.state.subState.forEach(checkObject, true);
         }
-        return false;
     }
-    #end
 }
