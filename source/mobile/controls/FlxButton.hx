@@ -150,21 +150,22 @@ class FlxTypedButton<T:FlxSprite> extends FlxSprite implements IFlxInput
 
 	override public function destroy():Void
 	{
-		label = FlxDestroyUtil.destroy(label);
-		_spriteLabel = null;
+        label = FlxDestroyUtil.destroy(label);
+        _spriteLabel = null;
 
-		onUp = FlxDestroyUtil.destroy(onUp);
-		onDown = FlxDestroyUtil.destroy(onDown);
-		onOver = FlxDestroyUtil.destroy(onOver);
-		onOut = FlxDestroyUtil.destroy(onOut);
+        onUp = FlxDestroyUtil.destroy(onUp);
+        onDown = FlxDestroyUtil.destroy(onDown);
+        onOver = FlxDestroyUtil.destroy(onOver);
+        onOut = FlxDestroyUtil.destroy(onOut);
 
-		labelOffsets = FlxDestroyUtil.putArray(labelOffsets);
-		labelAlphas = null;
-		currentInput = null;
-		input = null;
+        labelOffsets = FlxDestroyUtil.putArray(labelOffsets);
+    
+        labelAlphas = null;
+        currentInput = null;
+        input = null;
 
-		super.destroy();
-	}
+        super.destroy();
+    }
 
 	override public function update(elapsed:Float):Void
 	{
