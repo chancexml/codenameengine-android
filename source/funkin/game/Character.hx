@@ -179,20 +179,8 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 
 		switch (lastAnimContext) {
 			case SING | MISS:
-				if (lastHit + (Conductor.stepCrochet * holdTime) < Conductor.songPosition) {
-					if (!repeatHold) {
-						var curAnim = getAnimName();
-						if (curAnim != null) {
-							if (curAnim.endsWith("-hold"))
-								curAnim = curAnim.substring(0, curAnim.length - 5);
-
-							var endAnim = curAnim + "-end";
-							if (hasAnimation(endAnim)) {
-								playAnim(endAnim, true, NONE); 
-								return; 
-							}
-						}
-					}
+				var timeLimit:Float = repeatHold ? (Conductor.stepCrochet * holdTime) : 500;
+				if (Conductor.songPosition > lastHit + timeLimit) {
 					dance();
 				}
 			case DANCE:
@@ -317,6 +305,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		super.playAnim(event.animName, event.force, event.context, event.reverse, event.startingFrame);
 
 		offset.set((isPlayer != playerOffsets) ? globalOffset.x : -globalOffset.x, -globalOffset.y);
+		
 		if (event.context == SING || event.context == MISS)
 			lastHit = Conductor.songPosition;
 	}
