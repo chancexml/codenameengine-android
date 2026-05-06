@@ -80,12 +80,16 @@ class Main extends Sprite
         openfl.Lib.current.stage.addEventListener(openfl.events.Event.ACTIVATE, onResult);
         #if android
         checkPermissions();
-		mobile.utils.MobileKeyboard.init();
         #end
         #end
+
 
         addChild(game = new FunkinGame(gameWidth, gameHeight, MainState, Options.framerate, Options.framerate, skipSplash, startFullscreen));
 
+		#if android
+		mobile.utils.AndroidKeyboard.init();
+		#end
+			
         if (Options.newFPS)
     {
     	var statsCounter = new FPSMemCounter(10, 10);
