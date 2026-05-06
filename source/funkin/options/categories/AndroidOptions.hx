@@ -38,24 +38,21 @@ class AndroidOptions extends TreeMenuScreen {
             'hitboxStyle'
         ));
 
-        add(new SliderOption(
-            getNameID('hintOpacity'),
+        add(new NumOption(
+            getNameID('hintOpacity'), 
             getDescID('hintOpacity'),
-            0,
+			0.25,
             1,
             0.05,
-            2,
-            'hintOpacity'
-        ));
+			'hintOpacity',
+		));
 
-        add(new SliderOption(
-            getNameID('hitboxOpacity'),
+        add(new NumOption(
+            getNameID('hitboxOpacity'), 
             getDescID('hitboxOpacity'),
-            0,
+			0.2,
             1,
             0.05,
-            2,
-            'hitboxOpacity'
-        ));
-    }
+			'hitboxOpacity',
+		));
 }
