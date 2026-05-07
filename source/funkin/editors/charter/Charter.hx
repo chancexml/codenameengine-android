@@ -618,7 +618,7 @@ class Charter extends UIState {
 	function postCreate()
     {
         #if mobile
-        Call.Mouse();
+        //Call.Mouse();
         #end
     }
 
