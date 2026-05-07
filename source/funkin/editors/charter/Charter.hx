@@ -1357,7 +1357,44 @@ class Charter extends UIState {
 			for (shader in waveformHandler.waveShaders)
 				shader.data.time.value = [__timer];
 		}
+        // yes. this is how im doing it
+		#if mobile
+		if (controls.getJustPressed("accept")) {
+			FlxG.keys.handleAction(FlxKey.ENTER, true);
+		}
 
+		if (controls.getJustPressed("back")) {
+			FlxG.keys.handleAction(FlxKey.BACKSPACE, true);
+		}
+
+		if (controls.getJustPressed("switchmod")) {
+			FlxG.keys.handleAction(FlxKey.SPACE, true);
+		}
+
+		if (controls.getJustPressed("pause")) {
+			FlxG.keys.handleAction(FlxKey.Q, true);
+		}
+
+		if (controls.getJustPressed("reset")) {
+			FlxG.keys.handleAction(FlxKey.E, true);
+		}
+		
+		if (controls.anyJustPressed(["up", "ui_up"])) {
+            FlxG.keys.handleAction(FlxKey.W, true);
+		}
+
+		if (controls.anyJustPressed(["down", "ui_down"])) {
+            FlxG.keys.handleAction(FlxKey.S, true);
+		}
+
+		if (controls.anyJustPressed(["left", "ui_left"])) {
+            FlxG.keys.handleAction(FlxKey.A, true);
+		}
+
+		if (controls.anyJustPressed(["right", "ui_right"])) {
+            FlxG.keys.handleAction(FlxKey.D, true);
+		}
+		#end
 		updateNoteLogic(elapsed);
 		updateAutoSaving(elapsed);
 
