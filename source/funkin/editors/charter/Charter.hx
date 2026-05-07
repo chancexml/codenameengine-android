@@ -615,8 +615,6 @@ class Charter extends UIState {
         Controls.virtualPad = virtualPad;
 
 		Call.Mouse();
-
-		if (Call.mouse != null) Call.mouse.disableGhostTouch = true;
         #end
 	}
 
