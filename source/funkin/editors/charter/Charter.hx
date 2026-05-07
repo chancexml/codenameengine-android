@@ -614,9 +614,17 @@ class Charter extends UIState {
         ButtonHelper.bind(virtualPad,['up','down','left','right'],['accept','back','switchmod','pause','reset']);
         Controls.virtualPad = virtualPad;
 
-		Call.Mouse();
         #end
 	}
+
+	override function postCreate()
+    {
+        super.postCreate();
+
+        #if mobile
+        Call.Mouse();
+        #end
+    }
 
 	override function destroy() {
 		__updatePlaytestInfo();
