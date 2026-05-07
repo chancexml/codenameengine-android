@@ -617,9 +617,9 @@ class Charter extends UIState {
         #end
 	}
 
-	override function postCreate()
+	function postCreate()
     {
-        super.postCreate();
+        super.postCreated();
 
         #if mobile
         Call.Mouse();
