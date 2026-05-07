@@ -608,12 +608,10 @@ class Charter extends UIState {
 		DiscordUtil.call("onEditorLoaded", ["Chart Editor", __song + " (" + __diff + ")" + (__variant != null && __variant != "" ? " (" + __variant + ")" : "")]);
 
 		#if mobile
-        /**
         virtualPad = ButtonHelper.create(this, FULL, A_B_C_X_Y);
 
         ButtonHelper.bind(virtualPad,['up','down','left','right'],['accept','back','switchmod','pause','reset']);
         Controls.virtualPad = virtualPad;
-        **/
         #end
 	}
 
