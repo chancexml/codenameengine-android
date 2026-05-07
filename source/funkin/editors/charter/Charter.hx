@@ -1378,20 +1378,20 @@ class Charter extends UIState {
 		if (controls.getJustPressed("reset")) {
 			FlxG.keys.handleAction(FlxKey.E, true);
 		}
-		
-		if (controls.anyJustPressed(["up", "ui_up"])) {
+	
+		if (controls.getJustPressed("up")) {
             FlxG.keys.handleAction(FlxKey.W, true);
 		}
 
-		if (controls.anyJustPressed(["down", "ui_down"])) {
+		if (controls.getJustPressed("down")) {
             FlxG.keys.handleAction(FlxKey.S, true);
 		}
 
-		if (controls.anyJustPressed(["left", "ui_left"])) {
+		if (controls.getJustPressed("left")) {
             FlxG.keys.handleAction(FlxKey.A, true);
 		}
 
-		if (controls.anyJustPressed(["right", "ui_right"])) {
+		if (controls.getJustPressed("right")) {
             FlxG.keys.handleAction(FlxKey.D, true);
 		}
 		#end
