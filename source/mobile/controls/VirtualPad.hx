@@ -166,6 +166,13 @@ class VirtualPad extends FlxSpriteGroup
 		    || buttonC.pressed
 			|| buttonX.pressed
 			|| buttonY.pressed;
+
+		if (touchingPad)
+        {
+            FlxG.mouse.justPressed = false;
+            FlxG.mouse.pressed = false;
+            FlxG.mouse.justReleased = false;
+        }
     }
 	
 	override public function draw():Void {
