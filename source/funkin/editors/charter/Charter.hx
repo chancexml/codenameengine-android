@@ -1363,36 +1363,72 @@ class Charter extends UIState {
 			FlxG.keys.handleAction(FlxKey.ENTER, true);
 		}
 
+		if (controls.getJustReleased("accept")) {
+			FlxG.keys.handleAction(FlxKey.ENTER, false);
+		}
+
 		if (controls.getJustPressed("back")) {
 			FlxG.keys.handleAction(FlxKey.BACKSPACE, true);
+		}
+
+		if (controls.getJustReleased("back")) {
+			FlxG.keys.handleAction(FlxKey.BACKSPACE, false);
 		}
 
 		if (controls.getJustPressed("switchmod")) {
 			FlxG.keys.handleAction(FlxKey.SPACE, true);
 		}
 
+		if (controls.getJustReleased("switchmod")) {
+			FlxG.keys.handleAction(FlxKey.SPACE, false);
+		}
+
 		if (controls.getJustPressed("pause")) {
 			FlxG.keys.handleAction(FlxKey.Q, true);
 		}
 
+		if (controls.getJustReleased("pause")) {
+			FlxG.keys.handleAction(FlxKey.Q, false);
+		}
+		
 		if (controls.getJustPressed("reset")) {
 			FlxG.keys.handleAction(FlxKey.E, true);
+		}
+
+		if (controls.getJustReleased("reset")) {
+			FlxG.keys.handleAction(FlxKey.E, false);
 		}
 	
 		if (controls.getJustPressed("up")) {
             FlxG.keys.handleAction(FlxKey.W, true);
 		}
 
+		if (controls.getJustReleased("up")) {
+            FlxG.keys.handleAction(FlxKey.W, false);
+		}
+
 		if (controls.getJustPressed("down")) {
             FlxG.keys.handleAction(FlxKey.S, true);
+		}
+
+		if (controls.getJustReleased("down")) {
+            FlxG.keys.handleAction(FlxKey.S, false);
 		}
 
 		if (controls.getJustPressed("left")) {
             FlxG.keys.handleAction(FlxKey.A, true);
 		}
 
+		if (controls.getJustReleased("left")) {
+            FlxG.keys.handleAction(FlxKey.A, false);
+		}
+
 		if (controls.getJustPressed("right")) {
             FlxG.keys.handleAction(FlxKey.D, true);
+		}
+
+		if (controls.getJustReleasedd("right")) {
+            FlxG.keys.handleAction(FlxKey.D, false);
 		}
 		#end
 		updateNoteLogic(elapsed);
