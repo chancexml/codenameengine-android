@@ -152,7 +152,7 @@ class VirtualPad extends FlxSpriteGroup
 		#end
 	}
 
-	public function update(elapsed:Float)
+	override function update(elapsed:Float)
     {
         super.update(elapsed);
 
@@ -162,16 +162,11 @@ class VirtualPad extends FlxSpriteGroup
             || buttonUp.pressed
             || buttonDown.pressed
             || buttonA.pressed
-            || buttonB.pressed
-		    || buttonC.pressed
-			|| buttonX.pressed
-			|| buttonY.pressed;
+            || buttonB.pressed;
 
-		if (touchingPad)
+        if (touchingPad)
         {
-            FlxG.mouse.justPressed = false;
-            FlxG.mouse.pressed = false;
-            FlxG.mouse.justReleased = false;
+            FlxG.mouse._leftButton.current = 0;
         }
     }
 	
