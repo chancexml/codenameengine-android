@@ -8,9 +8,7 @@ import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxPoint;
 import flixel.util.FlxDestroyUtil;
 import mobile.controls.FlxButton;
-#if mobile
 import funkin.backend.system.Controls;
-#end
 
 class VirtualPad extends FlxSpriteGroup
 {
@@ -25,6 +23,8 @@ class VirtualPad extends FlxSpriteGroup
 	public var buttonDown:FlxButton;
 
 	public var virtualpadCamera:FlxCamera;
+
+	public static var touchingPad:Bool = false;
 
 	private inline static var B_W:Int = 132;
 	private inline static var B_H:Int = 135;
@@ -151,6 +151,23 @@ class VirtualPad extends FlxSpriteGroup
 		this.alpha = 0.55;
 		#end
 	}
+
+	public function update(elapsed:Float)
+    {
+        super.update(elapsed);
+
+        touchingPad =
+            buttonLeft.pressed
+            || buttonRight.pressed
+            || buttonUp.pressed
+            || buttonDown.pressed
+            || buttonA.pressed
+            || buttonB.pressed
+		    || buttonC.pressed
+			|| buttonX.pressed
+			|| buttonY.pressed;
+    }
+	
 	override public function draw():Void {
         if (virtualpadCamera != null && !FlxG.cameras.list.contains(virtualpadCamera))
         {
