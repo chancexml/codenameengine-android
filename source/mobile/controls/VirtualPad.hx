@@ -156,16 +156,15 @@ class VirtualPad extends FlxSpriteGroup
     {
         super.update(elapsed);
 
-        touchingPad =
-            buttonLeft.pressed
-            || buttonRight.pressed
-            || buttonUp.pressed
-            || buttonDown.pressed
-            || buttonA.pressed
-            || buttonB.pressed
-	        || buttonC.pressed
-			|| buttonX.pressed
-			|| buttonY.pressed;
+        touchingPad = (buttonLeft != null && buttonLeft.pressed)
+            || (buttonRight != null && buttonRight.pressed)
+            || (buttonUp != null && buttonUp.pressed)
+            || (buttonDown != null && buttonDown.pressed)
+            || (buttonA != null && buttonA.pressed)
+            || (buttonB != null && buttonB.pressed)
+            || (buttonC != null && buttonC.pressed)
+            || (buttonX != null && buttonX.pressed)
+            || (buttonY != null && buttonY.pressed);
 
         if (touchingPad)
         {
