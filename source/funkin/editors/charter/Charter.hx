@@ -1427,7 +1427,7 @@ class Charter extends UIState {
             FlxG.keys.handleAction(FlxKey.D, true);
 		}
 
-		if (controls.getJustReleasedd("right")) {
+		if (controls.getJustReleased("right")) {
             FlxG.keys.handleAction(FlxKey.D, false);
 		}
 		#end
