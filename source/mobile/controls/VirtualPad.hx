@@ -166,6 +166,7 @@ class VirtualPad extends FlxSpriteGroup
 
         if (touchingPad)
         {
+			@:privateAccess
             FlxG.mouse._leftButton.current = 0;
         }
     }
