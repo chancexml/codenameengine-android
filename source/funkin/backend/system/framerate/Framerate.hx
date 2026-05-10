@@ -312,8 +312,15 @@ class MemoryCounter extends Sprite {
 		}
 		memoryPeakText.alpha = 0.5;
 
-		updateScale();
+		reload();
 		addEventListener(Event.ADDED_TO_STAGE, function(_) stage.addEventListener(Event.RESIZE, onResize));
+	}
+
+	public function reload() {
+		for(label in [memoryText, memoryPeakText]) {
+			label.defaultTextFormat = new TextFormat(Framerate.fontName, 12, -1);
+		}
+		updateScale();
 	}
 
 	function onResize(_) updateScale();
@@ -359,12 +366,18 @@ class FramerateCounter extends Sprite {
 		fpsLabel = new TextField();
 		for(label in [fpsNum, fpsLabel]) {
 			label.autoSize = LEFT;
-			label.defaultTextFormat = new TextFormat(Framerate.fontName, label == fpsNum ? 18 : 12, -1);
 			label.selectable = false;
 			addChild(label);
 		}
-		updateScale();
+		reload();
 		addEventListener(Event.ADDED_TO_STAGE, function(_) stage.addEventListener(Event.RESIZE, onResize));
+	}
+
+	public function reload() {
+		fpsNum.defaultTextFormat = new TextFormat(Framerate.fontName, 18, -1);
+		fpsLabel.defaultTextFormat = new TextFormat(Framerate.fontName, 12, -1);
+		fpsLabel.text = "FPS";
+		updateScale();
 	}
 
 	function onResize(_) updateScale();
