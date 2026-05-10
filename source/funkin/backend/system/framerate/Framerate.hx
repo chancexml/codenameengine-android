@@ -10,9 +10,15 @@ import funkin.backend.assets.ScriptedAssetLibrary;
 import funkin.backend.scripting.ModState;
 import funkin.options.Options;
 
+import flixel.math.FlxPoint;
+import openfl.display.DisplayObject;
+import openfl.display.Sprite;
+import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
 import openfl.Lib;
 import openfl.events.Event;
 import openfl.display.Bitmap;
+import openfl.display.BitmapData;
 import openfl.display.Sprite;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
