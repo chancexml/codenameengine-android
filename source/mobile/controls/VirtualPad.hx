@@ -174,6 +174,7 @@ class VirtualPad extends FlxSpriteGroup
         {
            FlxG.mouse.enabled = true;
     }
+}
 	
 	override public function draw():Void {
         if (virtualpadCamera != null && !FlxG.cameras.list.contains(virtualpadCamera))
