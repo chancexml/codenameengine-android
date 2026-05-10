@@ -168,9 +168,11 @@ class VirtualPad extends FlxSpriteGroup
 
         if (touchingPad)
         {
-			@:privateAccess
-            FlxG.mouse._leftButton.current = 0;
+           FlxG.mouse.enabled = false;
         }
+        else
+        {
+           FlxG.mouse.enabled = true;
     }
 	
 	override public function draw():Void {
