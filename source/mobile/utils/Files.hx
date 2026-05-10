@@ -62,7 +62,7 @@ class Files
 		trace("Mods target path: " + modsBase);
 
 		copyFolderOnce("assets", assetsBase + "assets/");
-		copyFolderOnce("mods", modsBase + "mods/");
+		//copyFolderOnce("mods", modsBase + "mods/");
 	}
 
 	static function copyFolderOnce(folder:String, target:String):Void
