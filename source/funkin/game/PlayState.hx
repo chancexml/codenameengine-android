@@ -959,7 +959,7 @@ class PlayState extends MusicBeatState
 		hitbox.buttonRight.onDown.callback = function() {
 		if (!isRightPressed) { 
 		    isRightPressed = true;
-            triggerKey(Right, true); 
+            triggerKey(RIGHT, true); 
             }
         };
 
@@ -985,7 +985,7 @@ class PlayState extends MusicBeatState
         };
 
 		hitbox.buttonRight.onUp.callback = function() { 
-        if (isRighfPressed) {
+        if (isRightPressed) {
             isRightPressed = false;
             triggerKey(RIGHT, false); 
             }
