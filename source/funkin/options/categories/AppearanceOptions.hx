@@ -1,8 +1,8 @@
 package funkin.options.categories;
 
 import funkin.backend.system.framerate.Framerate; 
-import funkin.backend.system.framerate.MemoryCounter; 
-import funkin.backend.system.framerate.CodenameBuildField;
+//import funkin.backend.system.framerate.MemoryCounter; 
+//import funkin.backend.system.framerate.CodenameBuildField;
 // import nothing
 
 class AppearanceOptions extends TreeMenuScreen {
