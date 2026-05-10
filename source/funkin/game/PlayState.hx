@@ -922,6 +922,11 @@ class PlayState extends MusicBeatState
 				FlxG.sound.load(Paths.sound(s));
 
 	    #if mobile
+		var isLeftPressed = false;
+		var isDownPressed = false;
+		var isUpPressed = false;
+		var isRightPressed = false;
+			
 		var androidPause = new mobile.controls.Pause();
         add(androidPause);
         androidPause.setPauseButton('true');
@@ -930,16 +935,62 @@ class PlayState extends MusicBeatState
         add(hitbox);
 		hitbox.setupCamera();
 		
-        hitbox.buttonLeft.onDown.callback = function() { triggerKey(LEFT, true); };
-        hitbox.buttonDown.onDown.callback = function() { triggerKey(DOWN, true); };
-        hitbox.buttonUp.onDown.callback = function() { triggerKey(UP, true); };
-        hitbox.buttonRight.onDown.callback = function() { triggerKey(RIGHT, true); };
+        hitbox.buttonLeft.onDown.callback = function() {
+		if (!isLeftPressed) { 
+		    isLeftPressed = true;
+            triggerKey(LEFT, true); 
+            }
+        };
 
-        hitbox.buttonLeft.onUp.callback = function() { triggerKey(LEFT, false); };
-        hitbox.buttonDown.onUp.callback = function() { triggerKey(DOWN, false); };
-        hitbox.buttonUp.onUp.callback = function() { triggerKey(UP, false); };
-        hitbox.buttonRight.onUp.callback = function() { triggerKey(RIGHT, false); };
+		hitbox.buttonDown.onDown.callback = function() {
+		if (!isDownPressed) { 
+		    isDownPressed = true;
+            triggerKey(DOWN, true); 
+            }
+        };
 
+		hitbox.buttonUp.onDown.callback = function() {
+		if (!isUpPressed) { 
+		    isUpPressed = true;
+            triggerKey(UP, true); 
+            }
+        };
+
+		hitbox.buttonRight.onDown.callback = function() {
+		if (!isRightPressed) { 
+		    isRightPressed = true;
+            triggerKey(Right, true); 
+            }
+        };
+
+        hitbox.buttonLeft.onUp.callback = function() { 
+        if (isLeftPressed) {
+            isLeftPressed = false;
+            triggerKey(LEFT, false); 
+            }
+        };
+
+		hitbox.buttonDown.onUp.callback = function() { 
+        if (isDownPressed) {
+            isDownPressed = false;
+            triggerKey(DOWN, false); 
+            }
+        };
+
+		hitbox.buttonUp.onUp.callback = function() { 
+        if (isUpPressed) {
+            isUpPressed = false;
+            triggerKey(UP, false); 
+            }
+        };
+
+		hitbox.buttonRight.onUp.callback = function() { 
+        if (isRighfPressed) {
+            isRightPressed = false;
+            triggerKey(RIGHT, false); 
+            }
+        };
+			
         hitbox.buttonLeft.onOut.callback = hitbox.buttonLeft.onUp.callback;
         hitbox.buttonDown.onOut.callback = hitbox.buttonDown.onUp.callback;
         hitbox.buttonUp.onOut.callback = hitbox.buttonUp.onUp.callback;
