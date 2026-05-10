@@ -14,6 +14,7 @@ import sys.FileSystem;
 #end
 #if android
 import extension.androidtools.content.Context;
+import extension.androidtools.os.Build;
 #end
 
 using StringTools;
@@ -246,17 +247,35 @@ class Paths
         #if android
 
         if (ModsFolder.currentModFolder != null) {
-            var mediaDirs = extension.androidtools.content.Context.getExternalMediaDirs();
-            var mediaPath:String = "/storage/emulated/0/Android/media/com.yoshman29.codenameengine";
-
+            var basePath:String = null;
+            
+            var mediaDirs = Context.getExternalMediaDirs();
             if (mediaDirs != null && mediaDirs.length > 0) {
                 var dir:Dynamic = mediaDirs[0];
-                mediaPath = Std.isOfType(dir, String)
-                    ? cast dir
+                var tempPath:String = Std.isOfType(dir, String) 
+                    ? cast dir 
                     : dir.getAbsolutePath();
+                
+                if (tempPath != null && tempPath.trim() != "") {
+                    basePath = tempPath;
+                }
             }
 
-            return Path.normalize(mediaPath + "/mods/" + ModsFolder.currentModFolder);
+            if (basePath == null) {
+                if (Build.VERSION.SDK_INT >= 30) {
+                    var obbDir = Context.getObbDir();
+                    basePath = Std.isOfType(obbDir, String) 
+                        ? cast obbDir 
+                        : obbDir.getAbsolutePath();
+                } else {
+                    var dataDir = Context.getExternalFilesDir(null);
+                    basePath = Std.isOfType(dataDir, String) 
+                        ? cast dataDir 
+                        : dataDir.getAbsolutePath();
+                }
+            }
+
+            return Path.normalize(basePath + "/mods/" + ModsFolder.currentModFolder);
         }
 
         var dataPath:String = Path.normalize(lime.system.System.applicationStorageDirectory);
