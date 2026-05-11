@@ -374,7 +374,7 @@ class Charter extends UIState {
 				childs: [
 					{
 						label: translate("playback.play"),
-						keybind: [ESCAPE],
+						keybind: [BACKSPACE],
 						onSelect: _playback_play
 					},
 					null,
