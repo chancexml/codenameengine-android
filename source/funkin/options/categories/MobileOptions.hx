@@ -22,6 +22,15 @@ class MobileOptions extends TreeMenuScreen {
             'pauseButton'
         ));
 
+		add(new NumOption(
+            getNameID('virtualPadOpacity'), 
+            getDescID('virtualPadOpacity'),
+			0.55,
+            1,
+            0.05,
+			'virtualPadOpacity',
+		));
+
         add(new ArrayOption(
             getNameID('hintStyle'),
             getDescID('hintStyle'),
