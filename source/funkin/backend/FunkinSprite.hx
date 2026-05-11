@@ -9,7 +9,6 @@ import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.util.typeLimit.OneOfTwo;
-import funkin.options.Options;
 import funkin.backend.scripting.events.sprite.PlayAnimContext;
 import funkin.backend.system.interfaces.IBeatReceiver;
 import funkin.backend.system.interfaces.IOffsetCompatible;
@@ -125,24 +124,17 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 	}
 
 	public override function update(elapsed:Float)
-{
-    super.update(elapsed);
+	{
+		super.update(elapsed);
 
-    var curName = getAnimName();
-    if (curName == null || debugMode) return;
+		// hate how it looks like but hey at least its optimized and fast  - Nex
+		if (!debugMode && isAnimFinished()) {
+			var name = getAnimName() + '-loop';
+			if (hasAnim(name))
+				playAnim(name, null, lastAnimContext);
+		}
+	}
 
-    if (isAnimFinished() || isAnimAtEnd()) {
-        if (Options.repeatHold) { 
-            var loopName = curName + '-loop';
-            if (hasAnim(loopName))
-                playAnim(loopName, null, lastAnimContext);
-        } else {
-            if (animation.curAnim != null)
-                animation.pause(); 
-        }
-    }
-}
-	
 	override function initVars() {
 		super.initVars();
 		_rect2 = FlxRect.get();
@@ -162,29 +154,17 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 
 	private var countedBeat = 0;
 	public function beatHit(curBeat:Int)
-{
-    if(!animEnabled) return;
+	{
+		if(!animEnabled) return;
+		if (lastAnimContext != LOCK && beatAnims.length > 0 && (curBeat + beatOffset) % beatInterval == 0)
+		{
+			// TODO: find a solution without countedBeat
+			var anim = beatAnims[FlxMath.wrap(countedBeat++, 0, beatAnims.length - 1)];
+			if (anim.name != null && anim.name != "null" && anim.name != "none")
+				playAnim(anim.name, anim.forced);
+		}
+	}
 
-    var curName = getAnimName();
-
-    if (!Options.repeatHold && lastAnimContext == SING && curName != null) {
-        if (!curName.endsWith("-end")) {
-            var endAnim = curName + "-end";
-            if (hasAnim(endAnim)) {
-                playAnim(endAnim, true, NONE);
-                return;
-            }
-        }
-    }
-
-    if (lastAnimContext != LOCK && beatAnims.length > 0 && (curBeat + beatOffset) % beatInterval == 0)
-    {
-        var anim = beatAnims[FlxMath.wrap(countedBeat++, 0, beatAnims.length - 1)];
-        if (anim.name != null && anim.name != "null" && anim.name != "none")
-            playAnim(anim.name, anim.forced);
-    }
-}
-			
 	public function stepHit(curBeat:Int)
 	{
 	}
@@ -281,23 +261,23 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 	public var lastAnimContext:PlayAnimContext = DANCE;
 
 	public function playAnim(AnimName:String, ?Force:Null<Bool>, Context:PlayAnimContext = NONE, Reversed:Bool = false, Frame:Int = 0):Void
-{
-    if (AnimName == null || (!hasAnim(AnimName) && !debugMode))
-        return;
+	{
+		if (AnimName == null || (!hasAnim(AnimName) && !debugMode))
+			return;
 
-    if (Force == null) {
-        var anim = animDatas.get(AnimName);
-        Force = anim != null && anim.forced;
-    }
+		if (Force == null) {
+			var anim = animDatas.get(AnimName);
+			Force = anim != null && anim.forced;
+		}
 
-    animation.play(AnimName, Force, Reversed, Frame);
+		animation.play(AnimName, Force, Reversed, Frame);
 
-    var daOffset = getAnimOffset(AnimName);
-    frameOffset.set(daOffset.x, daOffset.y);
-    daOffset.putWeak();
+		var daOffset = getAnimOffset(AnimName);
+		frameOffset.set(daOffset.x, daOffset.y);
+		daOffset.putWeak();
 
-    lastAnimContext = Context;
-}
+		lastAnimContext = Context;
+	}
 
 	public inline function addAnim(name:String, prefix:String, frameRate:Float = 24, ?looped:Bool, ?forced:Bool, ?indices:Array<Int>, x:Float = 0, y:Float = 0, animType:XMLAnimType = NONE, animateAtlasLabel:Bool = false)
 	{
