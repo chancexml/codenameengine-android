@@ -240,7 +240,7 @@ class AssetTreeInfo extends FramerateCategory {
 				text += '[${l.tag.toString().toUpperCase()}] ';
 				var className = Type.getClassName(Type.getClass(l)).split(".").pop();
 				#if TRANSLATIONS_SUPPORT
-				if (l is TranslatedAssetLibrary) text += '${className} - ${cast(l, TranslatedAssetLibrary).langFolder} for (${cast(l, TranslatedAssetLibrary).forLibrary.modName})\n';
+				if (l is TranslatedAssetLibrary) text += '${className} - ${cast(l, TranslatedAssetLibrary).langFolder} for (${cast(l, TranslatedAssetLibrary).modName})\n';
 				else #end if (l is ScriptedAssetLibrary) text += '${className} - ${cast(l, ScriptedAssetLibrary).scriptName} (${cast(l, ScriptedAssetLibrary).modName})\n';
 				else if (l is IModsAssetLibrary) text += '${className} - ${cast(l, IModsAssetLibrary).modName} - ${cast(l, IModsAssetLibrary).libName}\n';
 				else text += Std.string(l) + '\n';
@@ -298,7 +298,7 @@ class MemoryCounter extends Sprite {
 	public var memoryPeak:Float = 0;
 
 	public var offsetX:Float = 10;
-	public var offsetY:Float = 30;
+	public var offsetY:Float = 36;
 
 	public function new() {
 		super();
@@ -408,14 +408,14 @@ class FramerateCounter extends Sprite {
 
 	private inline function updatePosition() {
 		fpsLabel.x = fpsNum.x + fpsNum.width;
-		fpsLabel.y = (fpsNum.y + fpsNum.height) - fpsLabel.height;
+		fpsLabel.y = (fpsNum.y + fpsNum.height) - fpsLabel.height - 2;
 	}
 }
 
 class CodenameBuildField extends TextField {
 	public var offsetX:Float = 10;
-	public var offsetY:Float = 50;
-
+	public var offsetY:Float = 54;
+	
 	public function new() {
 		super();
 		defaultTextFormat = Framerate.textFormat;
@@ -530,7 +530,6 @@ class Framerate extends Sprite {
 	private function __addToList(spr:DisplayObject) {
 		spr.x = 0;
 		spr.y = __lastAddedSprite != null ? (__lastAddedSprite.y + __lastAddedSprite.height) : 4;
-		//spr.y += offset.y;
 		__lastAddedSprite = spr;
 		addChild(spr);
 	}
@@ -538,8 +537,11 @@ class Framerate extends Sprite {
 
 	var debugAlpha:Float = 0;
 	public override function __enterFrame(t:Int) {
-		alpha = CoolUtil.fpsLerp(alpha, debugMode > 0 ? 1 : 0, 0.5);
-		debugAlpha = CoolUtil.fpsLerp(debugAlpha, debugMode > 1 ? 1 : 0, 0.5);
+		var shouldBeVisible = (debugMode > 0 && Options.fpsSize > 0);
+		var shouldDebugBeVisible = (debugMode > 1 && Options.fpsSize > 0);
+
+		alpha = CoolUtil.fpsLerp(alpha, shouldBeVisible ? 1 : 0, 0.5);
+		debugAlpha = CoolUtil.fpsLerp(debugAlpha, shouldDebugBeVisible ? 1 : 0, 0.5);
 
 		if (alpha < 0.05) return;
 		super.__enterFrame(t);
@@ -556,7 +558,7 @@ class Framerate extends Sprite {
 		bgSprite.scaleY = height;
 
 		var selectable = debugMode == 2;
-		{  // idk i tried to make it more readable:sob:  - Nex
+		{
 			memoryCounter.memoryText.selectable = memoryCounter.memoryPeakText.selectable =
 			fpsCounter.fpsNum.selectable = fpsCounter.fpsLabel.selectable =
 			#if SHOW_BUILD_ON_FPS codenameBuildField.selectable = #end selectable;
