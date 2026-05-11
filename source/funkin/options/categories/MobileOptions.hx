@@ -11,10 +11,10 @@ public static var pauseButton:Bool = true;
 public static var hitboxStyle:String = "Simple";
 public static var hintStyle:String = "Simple";
 **/
-class AndroidOptions extends TreeMenuScreen {
+class MobileOptions extends TreeMenuScreen {
 
     public function new() {
-        super('optionsTree.android-name', 'optionsTree.android-desc', 'AndroidOptions');
+        super('optionsTree.mobile-name', 'optionsTree.mobile-desc', 'MobileOptions');
 
         add(new Checkbox(
             getNameID('pauseButton'),
