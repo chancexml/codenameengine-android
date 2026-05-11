@@ -1,30 +1,5 @@
 package mobile.controls;
 
-import flixel.FlxCamera;
-import flixel.FlxG;
-import flixel.FlxSprite;
-import flixel.graphics.atlas.FlxAtlas;
-import flixel.graphics.atlas.FlxNode;
-import flixel.graphics.frames.FlxTileFrames;
-import flixel.input.FlxInput;
-import flixel.input.FlxPointer;
-import flixel.input.IFlxInput;
-import flixel.math.FlxPoint;
-import flixel.text.FlxText;
-import flixel.util.FlxDestroyUtil;
-
-import flixel.util.FlxDestroyUtil.IFlxDestroyable;
-
-#if (flixel >= "5.3.0")
-import flixel.sound.FlxSound;
-#else
-import flixel.system.FlxSound;
-#end
-
-#if FLX_TOUCH
-import flixel.input.touch.FlxTouch;
-#end
-
 class FlxButton extends FlxTypedButton<FlxText>
 {
 	public static inline var NORMAL:Int = 0;
