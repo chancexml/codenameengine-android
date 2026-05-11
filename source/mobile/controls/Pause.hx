@@ -1,14 +1,5 @@
 package mobile.controls;
 
-import flixel.FlxG;
-import flixel.FlxSprite;
-import flixel.FlxCamera;
-import flixel.group.FlxGroup;
-import funkin.game.PlayState;
-import funkin.backend.assets.Paths;
-import funkin.options.Options;
-import funkin.menus.PauseSubState;
-
 class Pause extends FlxGroup
 {
     public var pauseButton:FlxSprite;
