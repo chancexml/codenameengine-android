@@ -10,6 +10,7 @@ import flixel.util.FlxDestroyUtil;
 import flixel.input.touch.FlxTouchManager;
 import mobile.controls.FlxButton;
 import funkin.backend.system.Controls;
+import funkin.options.Options;
 
 class VirtualPad extends FlxSpriteGroup
 {
