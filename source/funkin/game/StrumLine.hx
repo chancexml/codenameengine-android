@@ -8,6 +8,7 @@ import funkin.backend.chart.ChartData;
 import funkin.backend.scripting.events.note.*;
 import funkin.backend.system.Conductor;
 import funkin.backend.system.Controls;
+import funkin.options.Options;
 
 /**
  * Group of strums, that contains the strums and notes.
