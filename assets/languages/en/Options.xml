@@ -27,8 +27,8 @@
 		<str id="optionsTree.debug-name">Debug Options</str>
 		<str id="optionsTree.debug-desc">Debug Options for Developer Mode.</str>
 
-		<str id="optionsTree.android-name">Android Options</str>
-        <str id="optionsTree.android-desc">Configure mobile-specific stuff.</str>
+		<str id="optionsTree.mobile-name">Mobile Options</str>
+        <str id="optionsTree.mobile-desc">Configure stuff related to mobile.</str>
 	</group>
 
 	<group name="KeybindOptions" prefix="KeybindsOptions.">
@@ -67,7 +67,7 @@
 		</group>
 	</group>
 	
-    <group name="AndroidOptions" prefix="AndroidOptions.">
+    <group name="MobileOptions" prefix="MobileOptions.">
    	    <str id="pauseButton-name">Pause Button</str>
 	    <str id="pauseButton-desc">If unchecked. the pause button will become invisible</str>
 	
