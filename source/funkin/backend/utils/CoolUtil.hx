@@ -130,25 +130,39 @@ final class CoolUtil
 		#end
 	}
 
-	/**
-	 * Safe saves a file (even adding eventual missing folders) and shows a warning box instead of making the program crash
-	 * @param path Path to save the file at.
-	 * @param content Content of the file to save (as String or Bytes).
-	 */
 	@:noUsing public static function safeSaveFile(path:String, content:OneOfTwo<String, Bytes>, showErrorBox:Bool = true) {
-		#if sys
-		try {
-			addMissingFolders(Path.directory(path));
-			if(content is Bytes) sys.io.File.saveBytes(path, content);
-			else sys.io.File.saveContent(path, content);
-		} catch(e) {
-			var errMsg:String = 'Error while trying to save the file: ${Std.string(e).replace('\n', ' ')}';
-			Logs.error(errMsg);
-			if(showErrorBox) funkin.backend.utils.NativeAPI.showMessageBox("Codename Engine Warning", errMsg, MSG_WARNING);
+	#if sys
+	try {
+
+		#if android
+		var dataPath:String = haxe.io.Path.normalize(lime.system.System.applicationStorageDirectory);
+
+		if (!dataPath.endsWith("files"))
+			dataPath += "/files";
+
+		if (path.startsWith("mods/"))
+		{
+			path = dataPath + "/" + path;
 		}
 		#end
-	}
 
+		addMissingFolders(Path.directory(path));
+
+		if(content is Bytes)
+			sys.io.File.saveBytes(path, content);
+		else
+			sys.io.File.saveContent(path, content);
+
+	} catch(e) {
+		var errMsg:String = 'Error while trying to save the file: ${Std.string(e).replace('\n', ' ')}';
+		Logs.error(errMsg);
+
+		if(showErrorBox)
+			funkin.backend.utils.NativeAPI.showMessageBox("Codename Engine Warning", errMsg, MSG_WARNING);
+	}
+	#end
+	}
+	
 	/**
 	 * Gets file attributes from a file or a folder adding eventual missing folders in the path
 	 * (WARNING: Only works on `windows` for now. On other platforms the attributes' value it's always going to be `0` -thanks to the wrapper you can also use `isNothing` for checking- but still creates eventual missing folders if the platforms allows it to).
