@@ -254,37 +254,44 @@ class StrumLine extends FlxTypedGroup<Strum> {
 	var __notePerStrum:Array<Note> = [];
 
 	function __inputProcessPressed(note:Note) {
-		if (__pressed[note.strumID] && note.isSustainNote && note.strumTime < __updateNote_songPos && !note.wasGoodHit && note.sustainParent.wasGoodHit) {
-			
-	    if (Options.repeatHold) {
-		    PlayState.instance.goodNoteHit(this, note);
-	    }
-	    else
-        {
-	    note.wasGoodHit = true;
+	    if (__pressed[note.strumID] && note.isSustainNote && note.strumTime < __updateNote_songPos && !note.wasGoodHit && note.sustainParent != null && note.sustainParent.wasGoodHit)
+	{
+		if (Options.repeatHold)
+		{
+			PlayState.instance.goodNoteHit(this, note);
+			return;
+		}
 
-	    for (char in characters)
-	    {
-		    if (char == null) continue;
+		note.wasGoodHit = true;
 
-		    var anim:String = char.animation.curAnim != null
-		  	    ? char.animation.curAnim.name
-			    : "";
+		var singAnim = switch (note.noteData) {
+			case 0: "singLEFT";
+			case 1: "singDOWN";
+			case 2: "singUP";
+			case 3: "singRIGHT";
+			default: "singLEFT";
+		};
 
-		    if (anim.startsWith("sing"))
-		    {
-			    char.holdTime = 0;
+		for (char in characters) {
+			if (char == null)
+				continue;
 
-			    if (char.animation.curAnim != null)
-			    {
-				    char.animation.curAnim.curFrame =
-					    char.animation.curAnim.frames.length - 1;
-			    }
-		     } 
-	      }
-       }
-    }
- }
+			var anim = char.animation.curAnim;
+
+			if (anim == null)
+				continue;
+
+			if (anim.name.startsWith(singAnim)) {
+				char.holdTime = 0;
+
+				if (anim.finished)
+				{
+					anim.curFrame = anim.frames.length - 1;
+				}
+			}
+		}
+	}
+}
 		
 	function __inputProcessJustPressed(note:Note) {
 		var strumID = note.strumID;
