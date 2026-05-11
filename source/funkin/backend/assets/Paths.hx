@@ -262,19 +262,19 @@ class Paths
             }
 
             if (basePath == null) {
-                if (Build.VERSION.SDK_INT >= 30) {
-                    var obbDir = Context.getObbDir();
+                if (extension.androidtools.os.VERSION.SDK_INT >= 30) {
+                    var obbDir:Dynamic = Context.getObbDir();
                     basePath = Std.isOfType(obbDir, String) 
                         ? cast obbDir 
                         : obbDir.getAbsolutePath();
                 } else {
-                    var dataDir = Context.getExternalFilesDir(null);
+                    var dataDir:Dynamic = Context.getExternalFilesDir(null);
                     basePath = Std.isOfType(dataDir, String) 
                         ? cast dataDir 
                         : dataDir.getAbsolutePath();
                 }
-            }
-
+			}
+			
             return Path.normalize(basePath + "/mods/" + ModsFolder.currentModFolder);
         }
 
