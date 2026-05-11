@@ -32,7 +32,7 @@ import extension.androidtools.Permissions;
 import extension.androidtools.os.Environment;
 import extension.androidtools.Settings;
 import mobile.utils.Files;
-import mobile.utils.MobileKeyboard;
+import mobile.backend.MobileKeyboard;
 #end
 
 class Main extends Sprite
@@ -87,7 +87,7 @@ class Main extends Sprite
         addChild(game = new FunkinGame(gameWidth, gameHeight, MainState, Options.framerate, Options.framerate, skipSplash, startFullscreen));
 
 		#if android
-		mobile.utils.AndroidKeyboard.init();
+		AndroidKeyboard.init();
 		#end
 			
         if (Options.newFPS)
