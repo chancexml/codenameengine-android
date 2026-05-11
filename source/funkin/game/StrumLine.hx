@@ -279,10 +279,11 @@ class StrumLine extends FlxTypedGroup<Strum> {
 				    char.animation.curAnim.curFrame =
 					    char.animation.curAnim.frames.length - 1;
 			    }
-		    } 
-	    }
+		     } 
+	      }
+       }
     }
-}
+ }
 		
 	function __inputProcessJustPressed(note:Note) {
 		var strumID = note.strumID;
