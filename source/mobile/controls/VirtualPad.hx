@@ -152,35 +152,31 @@ class VirtualPad extends FlxSpriteGroup
 		#end
 	}
 
-	override function update(elapsed:Float)
-    {
-        super.update(elapsed);
- 
-        touchingPad =
-            (buttonLeft != null && buttonLeft.pressed)
-            || (buttonRight != null && buttonRight.pressed)
-            || (buttonUp != null && buttonUp.pressed)
-            || (buttonDown != null && buttonDown.pressed)
-            || (buttonA != null && buttonA.pressed)
-            || (buttonB != null && buttonB.pressed)
-            || (buttonC != null && buttonC.pressed)
-            || (buttonX != null && buttonX.pressed)
-            || (buttonY != null && buttonY.pressed);
-        FlxG.mouse.visible = !touchingPad;
-        FlxG.mouse.enabled = !touchingPad;
-  
-        #if mobile
-        if (touchingPad)
-        {
-            FlxG.touches.enabled = false;
+	override function update(elapsed:Float) {
+	    super.update(elapsed);
+
+        var isPressingAnything:Bool = false;
+        var padButtons = [buttonLeft, buttonRight, buttonUp, buttonDown, buttonA, buttonB, buttonC, buttonX, buttonY];
+
+        for (btn in padButtons) {
+            if (btn != null && btn.pressed) {
+                isPressingAnything = true;
+                break;
+            }
         }
-        else
+
+        if (isPressingAnything)
         {
-        FlxG.touches.enabled = true;
+            FlxG.mouse.enabled = true;
+        
+            @:privateAccess
+            {
+                FlxG.mouse._leftButton.current = 0; 
+                FlxG.mouse._leftButton.last = 0;
+            }
         }
-        #end
     }
- 	
+
 	override public function draw():Void {
         if (virtualpadCamera != null && !FlxG.cameras.list.contains(virtualpadCamera))
         {
