@@ -25,7 +25,7 @@ class MobileOptions extends TreeMenuScreen {
 		add(new NumOption(
             getNameID('virtualPadOpacity'), 
             getDescID('virtualPadOpacity'),
-			0.55,
+			0,
             1,
             0.05,
 			'virtualPadOpacity',
@@ -50,7 +50,7 @@ class MobileOptions extends TreeMenuScreen {
         add(new NumOption(
             getNameID('hintOpacity'), 
             getDescID('hintOpacity'),
-			0.25,
+			0,
             1,
             0.05,
 			'hintOpacity',
@@ -59,7 +59,7 @@ class MobileOptions extends TreeMenuScreen {
         add(new NumOption(
             getNameID('hitboxOpacity'), 
             getDescID('hitboxOpacity'),
-			0.2,
+			0,
             1,
             0.05,
 			'hitboxOpacity',
