@@ -7,6 +7,7 @@ import flixel.graphics.frames.FlxTileFrames;
 import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxPoint;
 import flixel.util.FlxDestroyUtil;
+import flixel.input.touch.FlxTouchManager;
 import mobile.controls.FlxButton;
 import funkin.backend.system.Controls;
 
@@ -153,8 +154,9 @@ class VirtualPad extends FlxSpriteGroup
 	override function update(elapsed:Float)
     {
         super.update(elapsed);
-
-        touchingPad = (buttonLeft != null && buttonLeft.pressed)
+ 
+        touchingPad =
+            (buttonLeft != null && buttonLeft.pressed)
             || (buttonRight != null && buttonRight.pressed)
             || (buttonUp != null && buttonUp.pressed)
             || (buttonDown != null && buttonDown.pressed)
@@ -163,17 +165,21 @@ class VirtualPad extends FlxSpriteGroup
             || (buttonC != null && buttonC.pressed)
             || (buttonX != null && buttonX.pressed)
             || (buttonY != null && buttonY.pressed);
-
+        FlxG.mouse.visible = !touchingPad;
+        FlxG.mouse.enabled = !touchingPad;
+  
+        #if mobile
         if (touchingPad)
         {
-           FlxG.mouse.enabled = false;
+            FlxG.touches.enabled = false;
         }
         else
         {
-           FlxG.mouse.enabled = true;
+        FlxG.touches.enabled = true;
+        }
+        #end
     }
-}
-	
+ 	
 	override public function draw():Void {
         if (virtualpadCamera != null && !FlxG.cameras.list.contains(virtualpadCamera))
         {
