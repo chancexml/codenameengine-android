@@ -258,11 +258,30 @@ class StrumLine extends FlxTypedGroup<Strum> {
 	    if (Options.repeatHold) {
 		    PlayState.instance.goodNoteHit(this, note);
 	    }
-	    else 
-		{
-		    note.wasGoodHit = true;
-		}
-	}
+	    else
+        {
+	    note.wasGoodHit = true;
+
+	    for (char in characters)
+	    {
+		    if (char == null) continue;
+
+		    var anim:String = char.animation.curAnim != null
+		  	    ? char.animation.curAnim.name
+			    : "";
+
+		    if (anim.startsWith("sing"))
+		    {
+			    char.holdTimer = 0;
+
+			    if (char.animation.curAnim != null)
+			    {
+				    char.animation.curAnim.curFrame =
+					    char.animation.curAnim.frames.length - 1;
+			    }
+		    } 
+	    }
+    }
 		
 	function __inputProcessJustPressed(note:Note) {
 		var strumID = note.strumID;
