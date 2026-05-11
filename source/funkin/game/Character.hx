@@ -40,7 +40,6 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 
 	public var lastHit:Float = Math.NEGATIVE_INFINITY;
 	public var holdTime:Float = 4;
-	public var repeatHold:Bool = false;
 
 	public var playerOffsets:Bool = false;
 
@@ -141,13 +140,6 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 				stunned = false;
 		}
 
-		if (!repeatHold && getAnimName() != null) {
-			var animName = getAnimName();
-			if (isAnimFinished() && !animName.endsWith("-hold") && hasAnimation(animName + "-hold")) {
-				playAnim(animName + "-hold", true, lastAnimContext);
-			}
-		}
-
 		if (!__lockAnimThisFrame && lastAnimContext != DANCE)
 			tryDance();
 
@@ -179,10 +171,8 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 
 		switch (lastAnimContext) {
 			case SING | MISS:
-				var timeLimit:Float = repeatHold ? (Conductor.stepCrochet * holdTime) : 500;
-				if (Conductor.songPosition > lastHit + timeLimit) {
+				if (lastHit + (Conductor.stepCrochet * holdTime) < Conductor.songPosition)
 					dance();
-				}
 			case DANCE:
 				dance();
 			case LOCK:
@@ -305,7 +295,6 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		super.playAnim(event.animName, event.force, event.context, event.reverse, event.startingFrame);
 
 		offset.set((isPlayer != playerOffsets) ? globalOffset.x : -globalOffset.x, -globalOffset.y);
-		
 		if (event.context == SING || event.context == MISS)
 			lastHit = Conductor.songPosition;
 	}
@@ -357,7 +346,6 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		playerOffsets = false;
 		flipX = false;
 		holdTime = 4;
-		repeatHold = false;
 		iconColor = null;
 
 		animation.destroyAnimations();
@@ -388,7 +376,6 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		if (xml.x.exists("camx")) cameraOffset.x = Std.parseFloat(xml.x.get("camx"));
 		if (xml.x.exists("camy")) cameraOffset.y = Std.parseFloat(xml.x.get("camy"));
 		if (xml.x.exists("holdTime")) holdTime = Std.parseFloat(xml.x.get("holdTime")).getDefaultFloat(4);
-		if (xml.x.exists("repeatHold")) repeatHold = (xml.x.get("repeatHold") == "true");
 		if (xml.x.exists("flipX")) flipX = (xml.x.get("flipX") == "true");
 		if (xml.x.exists("icon")) icon = xml.x.get("icon");
 		if (xml.x.exists("color")) iconColor = FlxColor.fromString(xml.x.get("color"));
@@ -452,7 +439,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 	public static var characterProperties:Array<String> = [
 		"x", "y", "sprite", "scale", "antialiasing",
 		"flipX", "camx", "camy", "isPlayer", "icon",
-		"color", "gameOverChar", "holdTime", "repeatHold", "applyStageMatrix"
+		"color", "gameOverChar", "holdTime", "applyStageMatrix"
 	];
 	public static var characterAnimProperties:Array<String> = [
 		"name", "anim", "label", "x", "y", "fps", "loop", "indices"
@@ -469,7 +456,6 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		if (cameraOffset.y != 0) xml.set("camy", Std.string(FlxMath.roundDecimal(cameraOffset.y, 2)));
 
 		if (holdTime != 4) xml.set("holdTime", Std.string(FlxMath.roundDecimal(holdTime, 4)));
-		if (repeatHold) xml.set("repeatHold", "true");
 
 		var realFlipped:Bool = isPlayer ? !__baseFlipped : __baseFlipped;
 		if (realFlipped) xml.set("flipX", "true");
@@ -537,6 +523,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 		return stunned = b;
 	}
 
+	// ---- Backwards compat ----
 	// Interval at which the character will dance (higher number = slower dance)
 	@:noCompletion public var danceInterval(get, set):Int;
 	@:noCompletion private function set_danceInterval(v:Int)
@@ -561,6 +548,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 
 		return this.script = script;
 	}
+	// ---- end of Backwards compat ----
 
 
 	public static function getXMLFromCharName(character:OneOfTwo<String, Character>):Access {
