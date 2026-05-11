@@ -67,7 +67,7 @@
 		</group>
 	</group>
 	
-    <group name="MobileOptions" prefix="MobileOptions.">
+    <group name="MobileOptions" prefix="MobileOptions">
    	    <str id="pauseButton-name">Pause Button</str>
 	    <str id="pauseButton-desc">If unchecked. the pause button will become invisible</str>
 
