@@ -26,6 +26,7 @@ class Options
 	/**
 	 * SETTINGS
 	 */
+	public static var virtualPadOpacity:Float = 0.55;
 	public static var hitboxOpacity:Float = 0.15;
 	public static var hintOpacity:Float = 0.25;
 	public static var pauseButton:Bool = true;
