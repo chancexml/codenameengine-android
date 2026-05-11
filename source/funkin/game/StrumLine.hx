@@ -272,7 +272,7 @@ class StrumLine extends FlxTypedGroup<Strum> {
 
 		    if (anim.startsWith("sing"))
 		    {
-			    char.holdTimer = 0;
+			    char.holdTime = 0;
 
 			    if (char.animation.curAnim != null)
 			    {
