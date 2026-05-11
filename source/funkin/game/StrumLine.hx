@@ -56,26 +56,11 @@ class StrumLine extends FlxTypedGroup<Strum> {
 	}
 
 	public inline function handleHit(event:NoteHitEvent) {
-        if (event.note == null || event.characters == null) return;
-  
-        if (event.note.isSustainNote) {
-            if (Options.repeatHold) return;
+		if (event.note == null || event.characters == null) return;
 
-            var chars = event.characters.copy();
-            event.characters = [];
-  
-            for (char in chars) {
-                if (char == null || char.animation == null || char.animation.curAnim == null) continue;
-            
-                char.holdTime = 0; 
-                var anim = char.animation.curAnim;
-
-                if (anim.curFrame >= anim.frames.length - 1) {
-                    anim.curFrame = anim.frames.length - 1;
-                    anim.pause(); 
-                }
-            }
-        }
+		if (event.note.isSustainNote && !Options.repeatHold) {
+			event.characters = [];
+		}
 	}
 	
 	public function generate(strumLine:ChartStrumLine, ?startTime:Float) {
@@ -116,8 +101,37 @@ class StrumLine extends FlxTypedGroup<Strum> {
 	public override function update(elapsed:Float) {
 		super.update(elapsed);
 		notes.update(elapsed);
-	}
 
+		if (!Options.repeatHold) {
+			var isHolding = false;
+			
+			notes.forEachAlive(function(note:Note) {
+				if (note.isSustainNote && note.wasGoodHit) {
+					if (Conductor.songPosition <= note.strumTime + note.sustainLength) {
+						if (cpu || (__pressed.length > note.strumID && __pressed[note.strumID])) {
+							isHolding = true;
+						}
+					}
+				}
+			});
+
+			if (isHolding) {
+				for (c in characters) {
+					if (c == null || c.animation == null || c.animation.curAnim == null) continue;
+					
+					c.__lockAnimThisFrame = true;
+					c.holdTime = 0;
+
+					var anim = c.animation.curAnim;
+					if (anim.curFrame >= anim.frames.length - 1) {
+						anim.curFrame = anim.frames.length - 1;
+						anim.pause();
+					}
+				}
+			}
+		}
+	}
+	
 	public override function draw() {
 		super.draw();
 		notes.cameras = cameras;
