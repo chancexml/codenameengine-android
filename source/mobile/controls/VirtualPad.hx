@@ -152,30 +152,27 @@ class VirtualPad extends FlxSpriteGroup
 		#end
 	}
 
-	override function update(elapsed:Float) {
-	    super.update(elapsed);
-
-        var isPressingAnything:Bool = false;
+	override function update(elapsed:Float) 
+	{
         var padButtons = [buttonLeft, buttonRight, buttonUp, buttonDown, buttonA, buttonB, buttonC, buttonX, buttonY];
+        var overlappingPad:Bool = false;
 
         for (btn in padButtons) {
-            if (btn != null && btn.pressed) {
-                isPressingAnything = true;
+            if (btn != null && btn.visible && FlxG.mouse.overlaps(btn)) {
+                overlappingPad = true;
                 break;
             }
         }
-
-        if (isPressingAnything)
-        {
-            FlxG.mouse.enabled = true;
-        
-            @:privateAccess
-            {
+		
+        if (overlappingPad) {
+            @:privateAccess {
                 FlxG.mouse._leftButton.current = 0; 
                 FlxG.mouse._leftButton.last = 0;
-            }
+           }
         }
-    }
+
+	    super.update(elapsed);
+	}
 
 	override public function draw():Void {
         if (virtualpadCamera != null && !FlxG.cameras.list.contains(virtualpadCamera))
