@@ -31,9 +31,9 @@ class OptionsMenu extends TreeMenu {
 			substate: funkin.options.keybinds.KeybindsOptions
 		},
 		{
-			name: 'optionsTree.android-name',
-			desc: 'optionsTree.android-desc',
-			state: AndroidOptions
+			name: 'optionsTree.mobile-name',
+			desc: 'optionsTree.mobile-desc',
+			state: MobileOptions
 		},
 		{
 			name: 'optionsTree.gameplay-name',
