@@ -56,28 +56,26 @@ class StrumLine extends FlxTypedGroup<Strum> {
 	}
 
 	public inline function handleHit(event:NoteHitEvent) {
-		if (event.note == null || event.characters == null) return;
+        if (event.note == null || event.characters == null) return;
+  
+        if (event.note.isSustainNote) {
+            if (Options.repeatHold) return;
 
-		if (event.note.isSustainNote) {
-			if (Options.repeatHold) return;
+            var chars = event.characters.copy();
+            event.characters = [];
+  
+            for (char in chars) {
+                if (char == null || char.animation == null || char.animation.curAnim == null) continue;
+            
+                char.holdTime = 0; 
+                var anim = char.animation.curAnim;
 
-			var chars = event.characters.copy();
-			event.characters = [];
-
-			for (char in chars) {
-				if (char == null || char.animation == null || char.animation.curAnim == null) continue;
-				
-				char.holdTimer = 0;
-				var anim = char.animation.curAnim;
-
-				if (anim.finished || anim.curFrame >= anim.frames.length - 1) {
-					anim.looped = false;
-					anim.finished = true;
-					anim.paused = true;
-					anim.curFrame = anim.frames.length - 1;
-				}
-			}
-		}
+                if (anim.curFrame >= anim.frames.length - 1) {
+                    anim.curFrame = anim.frames.length - 1;
+                    anim.pause(); 
+                }
+            }
+        }
 	}
 	
 	public function generate(strumLine:ChartStrumLine, ?startTime:Float) {
