@@ -307,6 +307,7 @@ class StrumLine extends FlxTypedGroup<Strum> {
 		if (noteShouldAvoid == curShouldAvoid && noteDist < curDist)
 			__notePerStrum[strumID] = note;
 	}
+}
 
 	/**
 	 * Updates the input for the strumline, and handles the input.
