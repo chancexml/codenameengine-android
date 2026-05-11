@@ -1,17 +1,5 @@
 package mobile.controls;
 
-import flixel.FlxCamera;
-import flixel.FlxG;
-import flixel.graphics.frames.FlxAtlasFrames;
-import flixel.graphics.frames.FlxTileFrames;
-import flixel.group.FlxSpriteGroup;
-import flixel.math.FlxPoint;
-import flixel.util.FlxDestroyUtil;
-import flixel.input.touch.FlxTouchManager;
-import mobile.controls.FlxButton;
-import funkin.backend.system.Controls;
-import funkin.options.Options;
-
 class VirtualPad extends FlxSpriteGroup
 {
 	public var buttonA:FlxButton;
