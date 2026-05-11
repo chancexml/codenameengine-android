@@ -1,4 +1,4 @@
-package mobile;
+package mobile.backend;
 
 class AndroidKeyboard extends FlxBasic
 {
