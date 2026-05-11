@@ -24,6 +24,7 @@ import flixel.input.touch.FlxTouchManager;
 import mobile.*;
 import mobile.controls.*;
 import mobile.utils.*;
+import mobile.backend.*;
 
 import funkin.backend.system.Controls;
 import funkin.game.PlayState;
