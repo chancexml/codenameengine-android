@@ -148,7 +148,7 @@ class VirtualPad extends FlxSpriteGroup
 
 		#if mobile
 		Controls.virtualPad = this;
-		this.alpha = 0.55;
+		this.alpha = Options.virtualPadOpacity;
 		#end
 	}
 
