@@ -51,7 +51,7 @@ class UIUtil {
 			case P: "pause";
 			case R: "reset";
 			case TAB: "change-mode";
-			case Q: "change-mode":
+			case Q: "change-mode";
 			case E: "pause";
 			default: ""; 
 		}
