@@ -22,6 +22,7 @@ import funkin.backend.system.interfaces.IBeatReceiver;
 import funkin.backend.system.interfaces.IOffsetCompatible;
 import funkin.backend.utils.MatrixUtil;
 import funkin.backend.utils.XMLUtil;
+import funkin.backend.utils.CoolUtil;
 import haxe.Exception;
 import haxe.io.Path;
 import haxe.xml.Access;
@@ -560,7 +561,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 
 		var xml:Access = null;
 		while (true) {
-			var xmlPath:String = Paths.xml('characters/$character');
+			var xmlPath = CoolUtil.getFileCaseInsensitive(Paths.xml('characters/' + curCharacter));
 			if (!Assets.exists(xmlPath)) {
 				character = FALLBACK_CHARACTER;
 				if (char != null)
