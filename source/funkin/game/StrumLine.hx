@@ -108,7 +108,8 @@ class StrumLine extends FlxTypedGroup<Strum> {
             notes.forEachAlive(function(note:Note) {
                 if (note.isSustainNote && note.wasGoodHit) {
                     if (Conductor.songPosition <= note.strumTime + note.sustainLength) {
-                        if (cpu || (controls.pressed(note.noteData % 4))) {
+                        var controlNames:Array<String> = ["NOTE_LEFT", "NOTE_DOWN", "NOTE_UP", "NOTE_RIGHT"];
+                        if (controls.getPressed(controlNames[note.noteData % 4])) {
                             isHolding = true;
                         }
                     }
