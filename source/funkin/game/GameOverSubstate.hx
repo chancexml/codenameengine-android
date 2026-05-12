@@ -10,11 +10,22 @@ import funkin.backend.system.Conductor;
 import funkin.editors.charter.Charter;
 import funkin.menus.FreeplayState;
 import funkin.menus.StoryMenuState;
+#if mobile
+import funkin.backend.system.Controls;
+import funkin.options.keybinds.KeybindsOptions;
+import mobile.controls.VirtualPad;
+import mobile.controls.FlxButton;
+import mobile.utils.ButtonHelper;
+#end
 
 class GameOverSubstate extends MusicBeatSubstate
 {
 	var character:Character;
 
+	#if mobile
+    public var virtualPad:VirtualPad;
+    #end
+		
 	public var characterName:String;
 	public var gameOverSong:String;
 	public var gameOverSongBPM:Float;
@@ -91,6 +102,14 @@ class GameOverSubstate extends MusicBeatSubstate
 
 		DiscordUtil.call("onGameOver", []);
 		gameoverScript.call("postCreate");
+
+		#if mobile
+        virtualPad = ButtonHelper.create(this, NONE, A_B);
+
+        ButtonHelper.bind(virtualPad, null, ['accept','back']);
+
+        Controls.virtualPad = virtualPad;
+        #end
 	}
 
 	override function update(elapsed:Float)
@@ -102,8 +121,8 @@ class GameOverSubstate extends MusicBeatSubstate
 		if (__cancelDefault)
 			return;
 
-		if (controls.ACCEPT) endBullshit();
-		if (controls.BACK) exit();
+		if (controls.ACCEPT || controls.getJustPressed("accept")) endBullshit();
+		if (controls.BACK || controls.getJustPressed("back")) exit();
 
 		if (!isEnding && ((!lossSFX.playing) || (character.getAnimName() == "firstDeath" && character.isAnimFinished())) && (FlxG.sound.music == null || !FlxG.sound.music.playing))
 		{
