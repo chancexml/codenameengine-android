@@ -33,6 +33,7 @@ import mobile.controls.FlxButton;
 import mobile.utils.ButtonHelper;
 import virt.Call;
 import virt.VirtualCursor;
+import mobile.backend.MobileKeyboard;
 #end
 
 class Charter extends UIState {
@@ -613,6 +614,10 @@ class Charter extends UIState {
         ButtonHelper.bind(virtualPad,['up','down','left','right'],['accept','back','switchmod','pause','reset']);
         Controls.virtualPad = virtualPad;
         #end
+
+		#if android
+		AndroidKeyboard.init();
+		#end
 	}
 
 	function postCreate()
