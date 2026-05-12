@@ -56,12 +56,12 @@ class StrumLine extends FlxTypedGroup<Strum> {
 	}
 
 	public inline function handleHit(event:NoteHitEvent) {
-		if (event.note == null || event.characters == null) return;
-
-		if (event.note.isSustainNote && !Options.repeatHold) {
-			event.characters = [];
-		}
-	}
+        if (event.note == null || event.characters == null) return;
+		
+        if (event.note.isSustainNote && !Options.repeatHold) {
+            event.characters = []; 
+        }
+    }
 	
 	public function generate(strumLine:ChartStrumLine, ?startTime:Float) {
 		var total = 0;
@@ -99,37 +99,39 @@ class StrumLine extends FlxTypedGroup<Strum> {
 	}
 
 	public override function update(elapsed:Float) {
-		super.update(elapsed);
-		notes.update(elapsed);
+        super.update(elapsed);
+        notes.update(elapsed);
 
-		if (!Options.repeatHold) {
-			var isHolding = false;
-			
-			notes.forEachAlive(function(note:Note) {
-				if (note.isSustainNote && note.wasGoodHit) {
-					if (Conductor.songPosition <= note.strumTime + note.sustainLength) {
-						if (cpu || (__pressed.length > note.strumID && __pressed[note.strumID])) {
-							isHolding = true;
-						}
-					}
-				}
-			});
+        if (!Options.repeatHold) {
+            var isHolding = false;
 
-			if (isHolding) {
-				for (c in characters) {
-					if (c == null || c.animation == null || c.animation.curAnim == null) continue;
-					
-					c.__lockAnimThisFrame = true;
-					c.holdTime = 0;
+            notes.forEachAlive(function(note:Note) {
+                if (note.isSustainNote && note.wasGoodHit) {
+                    if (Conductor.songPosition <= note.strumTime + note.sustainLength) {
+                        if (cpu || (controls.pressed(note.noteData % 4))) {
+                            isHolding = true;
+                        }
+                    }
+                }
+            });
 
-					var anim = c.animation.curAnim;
-					if (anim.curFrame >= anim.frames.length - 1) {
-						anim.curFrame = anim.frames.length - 1;
-						anim.pause();
-					}
-				}
-			}
-		}
+            if (isHolding) {
+                for (c in characters) {
+                    if (c == null || c.animation.curAnim == null) continue;
+
+                    c.lastHit = Conductor.songPosition; 
+
+                    if (c.animation.curAnim.name.startsWith("sing")) {
+                        var anim = c.animation.curAnim;
+
+                        if (anim.finished || anim.curFrame >= anim.frames.length - 1) {
+                            anim.curFrame = anim.frames.length - 1;
+                            anim.pause();
+                        }
+                    }
+                }
+            }
+        }
 	}
 	
 	public override function draw() {
