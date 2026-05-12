@@ -475,6 +475,26 @@ final class CoolUtil
 		Paths.getFrames('characters/$spriteName');
 	}
 
+    /**
+     * helps with android being case sensitive.
+    **/
+    public static function getFileCaseInsensitive(path:String):String {
+        if (sys.FileSystem.exists(path)) return path;
+		
+        var directory = haxe.io.Path.directory(path);
+        var filename = haxe.io.Path.withoutDirectory(path);
+
+        if (!sys.FileSystem.exists(directory)) return path;
+
+        for (file in sys.FileSystem.readDirectory(directory)) {
+            if (file.toLowerCase() == filename.toLowerCase()) {
+                return haxe.io.Path.join([directory, file]);
+            }
+        }
+		
+        return path;
+	}
+
 	/**
 	 * Plays music, while resetting the Conductor, and taking info from INI in count.
 	 * @param path Path to the music
