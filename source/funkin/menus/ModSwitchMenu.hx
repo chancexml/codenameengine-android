@@ -102,6 +102,10 @@ class ModSwitchMenu extends MusicBeatSubstate {
 
 		if (FlxG.cameras.list.contains(subCam))
 			FlxG.cameras.remove(subCam);
+
+		#if mobile
+        ButtonHelper.bind(virtualPad, ['up', 'down'], ['accept','back','switchmod','dev-access']);
+        #end
 	}
 }
 #end
