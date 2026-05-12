@@ -44,7 +44,7 @@ class FramerateCategory extends Sprite {
 	public var text:TextField;
 	public var bgSprite:Bitmap;
 
-	public var offsetX:Float = 8;
+	public var offsetX:Float = 4;
 	public var offsetY:Float = 10;
 
 	private var _text:String = "";
@@ -297,7 +297,7 @@ class MemoryCounter extends Sprite {
 	public var memory:Float = 0;
 	public var memoryPeak:Float = 0;
 
-	public var offsetX:Float = 8;
+	public var offsetX:Float = 4;
 	public var offsetY:Float = 36;
 
 	public function new() {
@@ -357,7 +357,7 @@ class FramerateCounter extends Sprite {
 	private var accumulatedTime:Float = Lib.getTimer();
 	private var lastUpdateTime:Float = 0;
 
-	public var offsetX:Float = 8;
+	public var offsetX:Float = 4;
 	public var offsetY:Float = 10;
 
 	public function new() {
@@ -413,7 +413,7 @@ class FramerateCounter extends Sprite {
 }
 
 class CodenameBuildField extends TextField {
-	public var offsetX:Float = 8;
+	public var offsetX:Float = 4;
 	public var offsetY:Float = 54;
 	
 	public function new() {
@@ -487,7 +487,7 @@ class Framerate extends Sprite {
 
 		isLoaded = true;
 
-		x = 10;
+		x = 4;
 		y = 2;
 
 		if (__bitmap == null)
