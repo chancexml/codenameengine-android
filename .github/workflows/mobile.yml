@@ -2,8 +2,8 @@ name: Mobile Build
 run-name: ${{ github.event.inputs.build_name }}
 
 on:
-  #push:
-    #branches: [main]
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       build_name:
@@ -45,7 +45,7 @@ jobs:
          java-version: '17'
 
       - name: Restore cache
-        if: ${{ github.event.inputs.rebuild_cache != 'Yes' }}
+        if: ${{ github.event.inputs.rebuild_cache != 'Yes' || github.event_name == 'push'}}
         uses: actions/cache/restore@v4
         with:
          path: |
@@ -129,7 +129,7 @@ jobs:
          haxelib run lime build android -clean ${{ github.event.inputs.android_flags }}
 
       - name: Save cache
-        if: ${{ always() && github.event.inputs.rebuild_cache != 'Yes' }}
+        if: ${{ always() && github.event.inputs.rebuild_cache != 'Yes' || github.event_name == 'push'}}
         uses: actions/cache/save@v4
         with:
          path: |
