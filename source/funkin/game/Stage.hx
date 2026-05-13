@@ -43,29 +43,47 @@ class Stage extends FlxBasic implements IBeatReceiver {
 
 	public static function parseFloatSafe(str:String):Null<Float> {
 		if (str == null) return null;
+		
+		str = StringTools.replace(str, " ", "");
 		str = StringTools.replace(str, ",", ".");
-		var val = Std.parseFloat(str);
-		if (Math.isNaN(val)) return null;
+		if (str.length == 0) return null;
+
+		var isNegative = false;
+		if (str.charAt(0) == "-") {
+			isNegative = true;
+			str = str.substring(1);
+		}
 
 		var dotIndex = str.indexOf(".");
-		if (dotIndex != -1) {
-			var expectedInt = Std.parseInt(str.substring(0, dotIndex));
-			if (expectedInt == null) expectedInt = 0;
-			
-			if (val == expectedInt && str.substring(dotIndex + 1).length > 0) {
-				var decStr = str.substring(dotIndex + 1);
-				var decVal = 0.0;
-				for (i in 0...decStr.length) {
-					var charCode = decStr.charCodeAt(i);
-					if (charCode >= 48 && charCode <= 57) {
-						decVal += (charCode - 48) / Math.pow(10, i + 1);
-					} else break;
-				}
-				val = (str.charAt(0) == '-') ? expectedInt - decVal : expectedInt + decVal;
+		var intPartStr = dotIndex == -1 ? str : str.substring(0, dotIndex);
+		var decPartStr = dotIndex == -1 ? "" : str.substring(dotIndex + 1);
+
+		var expectedInt:Float = 0;
+		if (intPartStr.length > 0) {
+			var cleanInt = "";
+			for (i in 0...intPartStr.length) {
+				var charCode = intPartStr.charCodeAt(i);
+				if (charCode >= 48 && charCode <= 57) cleanInt += intPartStr.charAt(i);
+				else break;
+			}
+			var parsed = Std.parseInt(cleanInt);
+			if (parsed != null) expectedInt = parsed;
+		}
+
+		var decVal = 0.0;
+		if (decPartStr.length > 0) {
+			for (i in 0...decPartStr.length) {
+				var charCode = decPartStr.charCodeAt(i);
+				if (charCode >= 48 && charCode <= 57) {
+					decVal += (charCode - 48) / Math.pow(10, i + 1);
+				} else break;
 			}
 		}
-		return val;
+
+		var finalVal = expectedInt + decVal;
+		return isNegative ? -finalVal : finalVal;
 	}
+	
 
 	public inline function getSprite(name:String)
 		return stageSprites[name];
@@ -484,8 +502,12 @@ class StageCharPos extends FlxObject {
 
 	private var oldInfo:OldCharInfo = null;
 
-	public function prepareCharacter(char:Character, id:Float = 0) {
+		
+    public function prepareCharacter(char:Character, id:Float = 0) {
 		_id = id;
+		
+		if (oldInfo != null) revertCharacter(char);
+		
 		oldInfo = getOldInfo(char);
 		char.setPosition(x + (id * charSpacingX), y + (id * charSpacingY));
 		char.scrollFactor.set(scrollFactor.x, scrollFactor.y);
@@ -498,7 +520,7 @@ class StageCharPos extends FlxObject {
 		char.angle += angle;
 		char.zoomFactor *= zoomFactor;
 	}
-
+	
 	public function getOldInfo(char:Character) {
 		return {
 			x: char.x, y: char.y,
