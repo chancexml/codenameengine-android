@@ -72,6 +72,8 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 	{
 		super(x, y);
 
+        var xmlPath = CoolUtil.getFileCaseInsensitive(Paths.xml('characters/' + character));
+
 		animOffsets = new Map<String, FlxPoint>();
 		curCharacter = character != null ? character : Flags.DEFAULT_CHARACTER;
 		this.isPlayer = isPlayer;
@@ -561,7 +563,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 
 		var xml:Access = null;
 		while (true) {
-			var xmlPath = CoolUtil.getFileCaseInsensitive(Paths.xml('characters/' + curCharacter));
+			var xmlPath = CoolUtil.getFileCaseInsensitive(Paths.xml('characters/' + name));
 			if (!Assets.exists(xmlPath)) {
 				character = FALLBACK_CHARACTER;
 				if (char != null)
