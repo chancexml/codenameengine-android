@@ -132,7 +132,7 @@ class StrumLine extends FlxTypedGroup<Strum> {
                     }
    
                     if (!isHolding && Conductor.songPosition > c.lastHit + 500) {
-                        c.holdTimer = c.singDuration; 
+                        c.holdTime = 4; 
                     }
                 }
             }
