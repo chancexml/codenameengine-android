@@ -132,7 +132,7 @@ class VirtualPad extends FlxSpriteGroup
 			default:
 		}
 
-		scrollFactor.set()
+		scrollFactor.set();
 	}
 
 	override function update(elapsed:Float) 
