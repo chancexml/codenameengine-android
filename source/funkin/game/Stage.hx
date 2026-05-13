@@ -275,19 +275,19 @@ class Stage extends FlxBasic implements IBeatReceiver {
 		}
 
 		if (node != null) {
-			charPos.x = Std.parseFloat(node.getAtt("x")).getDefault(charPos.x);
-			charPos.y = Std.parseFloat(node.getAtt("y")).getDefault(charPos.y);
-			charPos.charSpacingX = Std.parseFloat(node.getAtt("spacingx")).getDefault(charPos.charSpacingX);
-			charPos.charSpacingY = Std.parseFloat(node.getAtt("spacingy")).getDefault(charPos.charSpacingY);
-			charPos.camxoffset = Std.parseFloat(node.getAtt("camxoffset")).getDefault(charPos.camxoffset);
-			charPos.camyoffset = Std.parseFloat(node.getAtt("camyoffset")).getDefault(charPos.camyoffset);
-			charPos.skewX = Std.parseFloat(node.getAtt("skewx")).getDefault(charPos.skewX);
-			charPos.skewY = Std.parseFloat(node.getAtt("skewy")).getDefault(charPos.skewY);
-			charPos.alpha = Std.parseFloat(node.getAtt("alpha")).getDefault(charPos.alpha);
-			charPos.angle = Std.parseFloat(node.getAtt("angle")).getDefault(charPos.angle);
+			charPos.x = Std.parseFloat(node.getAtt("x")).getDefaultFloat(charPos.x);
+			charPos.y = Std.parseFloat(node.getAtt("y")).getDefaultFloat(charPos.y);
+			charPos.charSpacingX = Std.parseFloat(node.getAtt("spacingx")).getDefaultFloat(charPos.charSpacingX);
+			charPos.charSpacingY = Std.parseFloat(node.getAtt("spacingy")).getDefaultFloat(charPos.charSpacingY);
+			charPos.camxoffset = Std.parseFloat(node.getAtt("camxoffset")).getDefaultFloat(charPos.camxoffset);
+			charPos.camyoffset = Std.parseFloat(node.getAtt("camyoffset")).getDefaultFloat(charPos.camyoffset);
+			charPos.skewX = Std.parseFloat(node.getAtt("skewx")).getDefaultFloat(charPos.skewX);
+			charPos.skewY = Std.parseFloat(node.getAtt("skewy")).getDefaultFloat(charPos.skewY);
+			charPos.alpha = Std.parseFloat(node.getAtt("alpha")).getDefaultFloat(charPos.alpha);
+			charPos.angle = Std.parseFloat(node.getAtt("angle")).getDefaultFloat(charPos.angle);
 			charPos.flipX = (node.has.flip || node.has.flipX) ? (node.getAtt("flip") == "true" || node.getAtt("flipX") == "true") : charPos.flipX;
-			charPos.zoomFactor = Std.parseFloat(node.getAtt("zoomfactor")).getDefault(charPos.zoomFactor);
-
+			charPos.zoomFactor = Std.parseFloat(node.getAtt("zoomfactor")).getDefaultFloat(charPos.zoomFactor);
+			
 			if (node.has.scale) {
 				var scale:Null<Float> = Std.parseFloat(node.att.scale);
 				if (scale.isNotNull()) charPos.scale.set(scale, scale);
