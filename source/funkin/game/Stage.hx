@@ -82,12 +82,11 @@ class Stage extends FlxBasic implements IBeatReceiver {
 		var event = null;
 		var elems:Array<Access> = [];
 		if (xml != null) {
-			var parsed:Null<Float>;
-			if((parsed = Std.parseFloat(xml.getAtt("startCamPosX"))).isNotNull()) startCam.x = parsed;
-			if((parsed = Std.parseFloat(xml.getAtt("startCamPosY"))).isNotNull()) startCam.y = parsed;
-			if((parsed = Std.parseFloat(xml.getAtt("zoom"))).isNotNull()) defaultZoom = parsed;
+			if (xml.has.startCamPosX) startCam.x = Std.parseFloat(xml.att.startCamPosX);
+			if (xml.has.startCamPosY) startCam.y = Std.parseFloat(xml.att.startCamPosY);
+			if (xml.has.zoom) defaultZoom = Std.parseFloat(xml.att.zoom);
 
-			stageName = xml.getAtt("name").getDefault(stageFile);
+			stageName = xml.has.name ? xml.att.name : stageFile;
 
 			if (PlayState.instance == state) {
 				if(xml.has.startCamPosX) PlayState.instance.camFollow.x = startCam.x;
@@ -99,12 +98,10 @@ class Stage extends FlxBasic implements IBeatReceiver {
 				if (!spritesParentFolder.endsWith("/")) spritesParentFolder += "/";
 			}
 
-			// Load custom attributes
 			for(att in xml.x.attributes())
 				if(!DEFAULT_ATTRIBUTES.contains(att))
 					extra.set(att, xml.x.get(att));
 
-			// some way to tag that the sprites are from the group
 			for(node in xml.elements) {
 				if (node.name == "high-memory" && (!Options.lowMemoryMode || forceLoadAll)) for(e in node.elements) __pushNcheckNode(elems, e);
 				else if (node.name == "low-memory" && (Options.lowMemoryMode || forceLoadAll)) for(e in node.elements) __pushNcheckNode(elems, e);
@@ -157,10 +154,12 @@ class Stage extends FlxBasic implements IBeatReceiver {
 						addCharPos(node.att.name, node);
 					case "ratings" | "combo":
 						if (PlayState.instance != state) continue;
-						PlayState.instance.comboGroup.setPosition(
-							Std.parseFloat(node.getAtt("x")).getDefaultFloat(PlayState.instance.comboGroup.x),
-							Std.parseFloat(node.getAtt("y")).getDefaultFloat(PlayState.instance.comboGroup.y)
-						);
+						var cX = PlayState.instance.comboGroup.x;
+						var cY = PlayState.instance.comboGroup.y;
+						if (node.has.x) cX = Std.parseFloat(node.att.x);
+						if (node.has.y) cY = Std.parseFloat(node.att.y);
+						
+						PlayState.instance.comboGroup.setPosition(cX, cY);
 						PlayState.instance.add(PlayState.instance.comboGroup);
 						PlayState.instance.comboGroup;
 					case "use-extension" | "extension" | "ext":
@@ -177,6 +176,32 @@ class Stage extends FlxBasic implements IBeatReceiver {
 				}
 
 				if (sprite != null) {
+					if (Std.isOfType(sprite, flixel.FlxSprite)) {
+						var flxSpr:flixel.FlxSprite = cast sprite;
+						if (node.has.x) flxSpr.x = Std.parseFloat(node.att.x);
+						if (node.has.y) flxSpr.y = Std.parseFloat(node.att.y);
+						if (node.has.alpha) flxSpr.alpha = Std.parseFloat(node.att.alpha);
+						
+						if (node.has.scale) {
+							var s = Std.parseFloat(node.att.scale);
+							flxSpr.scale.set(s, s);
+							flxSpr.updateHitbox();
+						}
+						if (node.has.scalex) { flxSpr.scale.x = Std.parseFloat(node.att.scalex); flxSpr.updateHitbox(); }
+						if (node.has.scaley) { flxSpr.scale.y = Std.parseFloat(node.att.scaley); flxSpr.updateHitbox(); }
+						
+						if (node.has.scroll) {
+							var sc = Std.parseFloat(node.att.scroll);
+							flxSpr.scrollFactor.set(sc, sc);
+						}
+						if (node.has.scrollx) flxSpr.scrollFactor.x = Std.parseFloat(node.att.scrollx);
+						if (node.has.scrolly) flxSpr.scrollFactor.y = Std.parseFloat(node.att.scrolly);
+						
+						if (node.has.zoomfactor && Reflect.hasField(sprite, "zoomFactor")) {
+							Reflect.setProperty(sprite, "zoomFactor", Std.parseFloat(node.att.zoomfactor));
+						}
+					}
+
 					for(e in node.nodes.property)
 						XMLUtil.applyXMLProperty(sprite, e);
 				}
@@ -199,16 +224,13 @@ class Stage extends FlxBasic implements IBeatReceiver {
 		if (PlayState.instance == state) {
 			setStagesSprites(stageScript);
 
-			// i know this for gets run twice under, but its better like this in case a script modifies the short lived ones, i dont wanna save them in an array; more dynamic like this  - Nex
 			for (info in xmlImportedScripts) if (info.importStageSprites) {
 				var script = info.getScript();
 				if (script != null) setStagesSprites(script);
 			}
 
-			// idk lemme check anyways just in case scripts did smth  - Nex
 			if (event != null) PlayState.instance.gameAndCharsEvent("onPostStageCreation", event);
 
-			// shortlived scripts destroy when the stage finishes setting up  - Nex
 			for (info in xmlImportedScripts) if (info.shortLived) {
 				var script = info.getScript();
 				if (script == null) continue;
@@ -275,18 +297,23 @@ class Stage extends FlxBasic implements IBeatReceiver {
 		}
 
 		if (node != null) {
-			charPos.x = Std.parseFloat(node.getAtt("x")).getDefaultFloat(charPos.x);
-			charPos.y = Std.parseFloat(node.getAtt("y")).getDefaultFloat(charPos.y);
-			charPos.charSpacingX = Std.parseFloat(node.getAtt("spacingx")).getDefaultFloat(charPos.charSpacingX);
-			charPos.charSpacingY = Std.parseFloat(node.getAtt("spacingy")).getDefaultFloat(charPos.charSpacingY);
-			charPos.camxoffset = Std.parseFloat(node.getAtt("camxoffset")).getDefaultFloat(charPos.camxoffset);
-			charPos.camyoffset = Std.parseFloat(node.getAtt("camyoffset")).getDefaultFloat(charPos.camyoffset);
-			charPos.skewX = Std.parseFloat(node.getAtt("skewx")).getDefaultFloat(charPos.skewX);
-			charPos.skewY = Std.parseFloat(node.getAtt("skewy")).getDefaultFloat(charPos.skewY);
-			charPos.alpha = Std.parseFloat(node.getAtt("alpha")).getDefaultFloat(charPos.alpha);
-			charPos.angle = Std.parseFloat(node.getAtt("angle")).getDefaultFloat(charPos.angle);
-			charPos.flipX = (node.has.flip || node.has.flipX) ? (node.getAtt("flip") == "true" || node.getAtt("flipX") == "true") : charPos.flipX;
-			charPos.zoomFactor = Std.parseFloat(node.getAtt("zoomfactor")).getDefaultFloat(charPos.zoomFactor);
+			if (node.has.x) charPos.x = Std.parseFloat(node.att.x);
+			if (node.has.y) charPos.y = Std.parseFloat(node.att.y);
+			if (node.has.spacingx) charPos.charSpacingX = Std.parseFloat(node.att.spacingx);
+			if (node.has.spacingy) charPos.charSpacingY = Std.parseFloat(node.att.spacingy);
+			if (node.has.camxoffset) charPos.camxoffset = Std.parseFloat(node.att.camxoffset);
+			if (node.has.camyoffset) charPos.camyoffset = Std.parseFloat(node.att.camyoffset);
+			if (node.has.skewx) charPos.skewX = Std.parseFloat(node.att.skewx);
+			if (node.has.skewy) charPos.skewY = Std.parseFloat(node.att.skewy);
+			if (node.has.alpha) charPos.alpha = Std.parseFloat(node.att.alpha);
+			if (node.has.angle) charPos.angle = Std.parseFloat(node.att.angle);
+			if (node.has.zoomfactor) charPos.zoomFactor = Std.parseFloat(node.att.zoomfactor);
+			
+			if (node.has.flip || node.has.flipX || node.has.flipx) {
+				charPos.flipX = (node.has.flip && node.att.flip == "true") || 
+								(node.has.flipX && node.att.flipX == "true") || 
+								(node.has.flipx && node.att.flipx == "true");
+			}
 			
 			if (node.has.scale) {
 				var scale:Null<Float> = Std.parseFloat(node.att.scale);
