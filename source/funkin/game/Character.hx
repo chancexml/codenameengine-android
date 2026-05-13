@@ -563,7 +563,7 @@ class Character extends FunkinSprite implements IBeatReceiver implements IOffset
 
 		var xml:Access = null;
 		while (true) {
-			var xmlPath = CoolUtil.getFileCaseInsensitive(Paths.xml('characters/' + name));
+			var xmlPath = CoolUtil.getFileCaseInsensitive(Paths.xml('characters/' + character));
 			if (!Assets.exists(xmlPath)) {
 				character = FALLBACK_CHARACTER;
 				if (char != null)
