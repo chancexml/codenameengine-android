@@ -116,19 +116,23 @@ class StrumLine extends FlxTypedGroup<Strum> {
                 }
             });
 
-            if (isHolding) {
-                for (c in characters) {
-                    if (c == null || c.animation.curAnim == null) continue;
-
+            for (c in characters) {
+                if (c == null || c.animation.curAnim == null) continue;
+  
+                if (isHolding) {
                     c.lastHit = Conductor.songPosition; 
+                }
+ 
+                if (c.animation.curAnim.name.startsWith("sing")) {
+                    var anim = c.animation.curAnim;
 
-                    if (c.animation.curAnim.name.startsWith("sing")) {
-                        var anim = c.animation.curAnim;
-
-                        if (anim.finished || anim.curFrame >= anim.frames.length - 1) {
-                            anim.curFrame = anim.frames.length - 1;
-                            anim.pause();
-                        }
+                    if (anim.finished || anim.curFrame >= anim.frames.length - 1) {
+                        anim.curFrame = anim.frames.length - 1;
+                        anim.pause();
+                    }
+   
+                    if (!isHolding && Conductor.songPosition > c.lastHit + 500) {
+                        c.holdTimer = c.singDuration; 
                     }
                 }
             }
