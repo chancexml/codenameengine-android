@@ -132,12 +132,7 @@ class VirtualPad extends FlxSpriteGroup
 			default:
 		}
 
-		scrollFactor.set();
-
-		#if mobile
-		Controls.virtualPad = this;
-		this.alpha = Options.virtualPadOpacity;
-		#end
+		scrollFactor.set()
 	}
 
 	override function update(elapsed:Float) 
@@ -158,6 +153,11 @@ class VirtualPad extends FlxSpriteGroup
                 FlxG.mouse._leftButton.last = 0;
            }
         }
+
+		#if mobile
+		Controls.virtualPad = this;
+		this.alpha = Options.virtualPadOpacity;
+		#end
 
 	    super.update(elapsed);
 	}
