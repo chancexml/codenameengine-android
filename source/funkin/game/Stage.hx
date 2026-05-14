@@ -10,7 +10,9 @@ import funkin.backend.system.interfaces.IBeatReceiver;
 import funkin.backend.scripting.DummyScript;
 import funkin.backend.scripting.Script;
 import funkin.backend.scripting.events.stage.*;
+import funkin.backend.system.interfaces.IBeatReceiver;
 import haxe.io.Path;
+import haxe.xml.Access;
 
 using StringTools;
 
@@ -41,50 +43,6 @@ class Stage extends FlxBasic implements IBeatReceiver {
 
 	public var spritesParentFolder = "";
 
-	public static function parseFloatSafe(str:String):Null<Float> {
-		if (str == null) return null;
-		
-		str = StringTools.replace(str, " ", "");
-		str = StringTools.replace(str, ",", ".");
-		if (str.length == 0) return null;
-
-		var isNegative = false;
-		if (str.charAt(0) == "-") {
-			isNegative = true;
-			str = str.substring(1);
-		}
-
-		var dotIndex = str.indexOf(".");
-		var intPartStr = dotIndex == -1 ? str : str.substring(0, dotIndex);
-		var decPartStr = dotIndex == -1 ? "" : str.substring(dotIndex + 1);
-
-		var expectedInt:Float = 0;
-		if (intPartStr.length > 0) {
-			var cleanInt = "";
-			for (i in 0...intPartStr.length) {
-				var charCode = intPartStr.charCodeAt(i);
-				if (charCode >= 48 && charCode <= 57) cleanInt += intPartStr.charAt(i);
-				else break;
-			}
-			var parsed = Std.parseInt(cleanInt);
-			if (parsed != null) expectedInt = parsed;
-		}
-
-		var decVal = 0.0;
-		if (decPartStr.length > 0) {
-			for (i in 0...decPartStr.length) {
-				var charCode = decPartStr.charCodeAt(i);
-				if (charCode >= 48 && charCode <= 57) {
-					decVal += (charCode - 48) / Math.pow(10, i + 1);
-				} else break;
-			}
-		}
-
-		var finalVal = expectedInt + decVal;
-		return isNegative ? -finalVal : finalVal;
-	}
-	
-
 	public inline function getSprite(name:String)
 		return stageSprites[name];
 
@@ -95,7 +53,7 @@ class Stage extends FlxBasic implements IBeatReceiver {
 		for (k=>e in stageSprites) script.set(k, e);
 
 	public function prepareInfos(node:Access)
-		return PlayState.instance == null ? null : XMLImportedScriptInfo.prepareInfos(node, PlayState.instance.scripts, (infos) -> xmlImportedScripts.push(infos));
+		return  PlayState.instance == null ? null : XMLImportedScriptInfo.prepareInfos(node, PlayState.instance.scripts, (infos) -> xmlImportedScripts.push(infos));
 
 	public function new(stage:String, ?state:FlxState, autoLoad:Bool = true) {
 		super();
@@ -124,11 +82,12 @@ class Stage extends FlxBasic implements IBeatReceiver {
 		var event = null;
 		var elems:Array<Access> = [];
 		if (xml != null) {
-			if (xml.has.startCamPosX) { var v = parseFloatSafe(xml.att.startCamPosX); if(v!=null) startCam.x = v; }
-			if (xml.has.startCamPosY) { var v = parseFloatSafe(xml.att.startCamPosY); if(v!=null) startCam.y = v; }
-			if (xml.has.zoom) { var v = parseFloatSafe(xml.att.zoom); if(v!=null) defaultZoom = v; }
+			var parsed:Null<Float>;
+			if((parsed = Std.parseFloat(xml.getAtt("startCamPosX"))).isNotNull()) startCam.x = parsed;
+			if((parsed = Std.parseFloat(xml.getAtt("startCamPosY"))).isNotNull()) startCam.y = parsed;
+			if((parsed = Std.parseFloat(xml.getAtt("zoom"))).isNotNull()) defaultZoom = parsed;
 
-			stageName = xml.has.name ? xml.att.name : stageFile;
+			stageName = xml.getAtt("name").getDefault(stageFile);
 
 			if (PlayState.instance == state) {
 				if(xml.has.startCamPosX) PlayState.instance.camFollow.x = startCam.x;
@@ -140,10 +99,12 @@ class Stage extends FlxBasic implements IBeatReceiver {
 				if (!spritesParentFolder.endsWith("/")) spritesParentFolder += "/";
 			}
 
+			// Load custom attributes
 			for(att in xml.x.attributes())
 				if(!DEFAULT_ATTRIBUTES.contains(att))
 					extra.set(att, xml.x.get(att));
 
+			// some way to tag that the sprites are from the group
 			for(node in xml.elements) {
 				if (node.name == "high-memory" && (!Options.lowMemoryMode || forceLoadAll)) for(e in node.elements) __pushNcheckNode(elems, e);
 				else if (node.name == "low-memory" && (Options.lowMemoryMode || forceLoadAll)) for(e in node.elements) __pushNcheckNode(elems, e);
@@ -196,12 +157,10 @@ class Stage extends FlxBasic implements IBeatReceiver {
 						addCharPos(node.att.name, node);
 					case "ratings" | "combo":
 						if (PlayState.instance != state) continue;
-						var cX = PlayState.instance.comboGroup.x;
-						var cY = PlayState.instance.comboGroup.y;
-						if (node.has.x) { var v = parseFloatSafe(node.att.x); if(v!=null) cX = v; }
-						if (node.has.y) { var v = parseFloatSafe(node.att.y); if(v!=null) cY = v; }
-						
-						PlayState.instance.comboGroup.setPosition(cX, cY);
+						PlayState.instance.comboGroup.setPosition(
+							Std.parseFloat(node.getAtt("x")).getDefaultFloat(PlayState.instance.comboGroup.x),
+							Std.parseFloat(node.getAtt("y")).getDefaultFloat(PlayState.instance.comboGroup.y)
+						);
 						PlayState.instance.add(PlayState.instance.comboGroup);
 						PlayState.instance.comboGroup;
 					case "use-extension" | "extension" | "ext":
@@ -218,32 +177,6 @@ class Stage extends FlxBasic implements IBeatReceiver {
 				}
 
 				if (sprite != null) {
-					if (Std.isOfType(sprite, flixel.FlxSprite)) {
-						var flxSpr:flixel.FlxSprite = cast sprite;
-						if (node.has.x) { var v = parseFloatSafe(node.att.x); if(v!=null) flxSpr.x = v; }
-						if (node.has.y) { var v = parseFloatSafe(node.att.y); if(v!=null) flxSpr.y = v; }
-						if (node.has.alpha) { var v = parseFloatSafe(node.att.alpha); if(v!=null) flxSpr.alpha = v; }
-						
-						if (node.has.scale) {
-							var s = parseFloatSafe(node.att.scale);
-							if(s != null) { flxSpr.scale.set(s, s); flxSpr.updateHitbox(); }
-						}
-						if (node.has.scalex) { var v = parseFloatSafe(node.att.scalex); if(v!=null) { flxSpr.scale.x = v; flxSpr.updateHitbox(); } }
-						if (node.has.scaley) { var v = parseFloatSafe(node.att.scaley); if(v!=null) { flxSpr.scale.y = v; flxSpr.updateHitbox(); } }
-						
-						if (node.has.scroll) {
-							var sc = parseFloatSafe(node.att.scroll);
-							if(sc!=null) flxSpr.scrollFactor.set(sc, sc);
-						}
-						if (node.has.scrollx) { var v = parseFloatSafe(node.att.scrollx); if(v!=null) flxSpr.scrollFactor.x = v; }
-						if (node.has.scrolly) { var v = parseFloatSafe(node.att.scrolly); if(v!=null) flxSpr.scrollFactor.y = v; }
-						
-						if (node.has.zoomfactor && Reflect.hasField(sprite, "zoomFactor")) {
-							var v = parseFloatSafe(node.att.zoomfactor);
-							if(v!=null) Reflect.setProperty(sprite, "zoomFactor", v);
-						}
-					}
-
 					for(e in node.nodes.property)
 						XMLUtil.applyXMLProperty(sprite, e);
 				}
@@ -266,13 +199,16 @@ class Stage extends FlxBasic implements IBeatReceiver {
 		if (PlayState.instance == state) {
 			setStagesSprites(stageScript);
 
+			// i know this for gets run twice under, but its better like this in case a script modifies the short lived ones, i dont wanna save them in an array; more dynamic like this  - Nex
 			for (info in xmlImportedScripts) if (info.importStageSprites) {
 				var script = info.getScript();
 				if (script != null) setStagesSprites(script);
 			}
 
+			// idk lemme check anyways just in case scripts did smth  - Nex
 			if (event != null) PlayState.instance.gameAndCharsEvent("onPostStageCreation", event);
 
+			// shortlived scripts destroy when the stage finishes setting up  - Nex
 			for (info in xmlImportedScripts) if (info.shortLived) {
 				var script = info.getScript();
 				if (script == null) continue;
@@ -339,47 +275,42 @@ class Stage extends FlxBasic implements IBeatReceiver {
 		}
 
 		if (node != null) {
-			if (node.has.x) { var v = parseFloatSafe(node.att.x); if(v!=null) charPos.x = v; }
-			if (node.has.y) { var v = parseFloatSafe(node.att.y); if(v!=null) charPos.y = v; }
-			if (node.has.spacingx) { var v = parseFloatSafe(node.att.spacingx); if(v!=null) charPos.charSpacingX = v; }
-			if (node.has.spacingy) { var v = parseFloatSafe(node.att.spacingy); if(v!=null) charPos.charSpacingY = v; }
-			if (node.has.camxoffset) { var v = parseFloatSafe(node.att.camxoffset); if(v!=null) charPos.camxoffset = v; }
-			if (node.has.camyoffset) { var v = parseFloatSafe(node.att.camyoffset); if(v!=null) charPos.camyoffset = v; }
-			if (node.has.skewx) { var v = parseFloatSafe(node.att.skewx); if(v!=null) charPos.skewX = v; }
-			if (node.has.skewy) { var v = parseFloatSafe(node.att.skewy); if(v!=null) charPos.skewY = v; }
-			if (node.has.alpha) { var v = parseFloatSafe(node.att.alpha); if(v!=null) charPos.alpha = v; }
-			if (node.has.angle) { var v = parseFloatSafe(node.att.angle); if(v!=null) charPos.angle = v; }
-			if (node.has.zoomfactor) { var v = parseFloatSafe(node.att.zoomfactor); if(v!=null) charPos.zoomFactor = v; }
-			
-			if (node.has.flip || node.has.flipX || node.has.flipx) {
-				charPos.flipX = (node.has.flip && node.att.flip == "true") || 
-								(node.has.flipX && node.att.flipX == "true") || 
-								(node.has.flipx && node.att.flipx == "true");
-			}
-			
+			charPos.x = Std.parseFloat(node.getAtt("x")).getDefault(charPos.x);
+			charPos.y = Std.parseFloat(node.getAtt("y")).getDefault(charPos.y);
+			charPos.charSpacingX = Std.parseFloat(node.getAtt("spacingx")).getDefault(charPos.charSpacingX);
+			charPos.charSpacingY = Std.parseFloat(node.getAtt("spacingy")).getDefault(charPos.charSpacingY);
+			charPos.camxoffset = Std.parseFloat(node.getAtt("camxoffset")).getDefault(charPos.camxoffset);
+			charPos.camyoffset = Std.parseFloat(node.getAtt("camyoffset")).getDefault(charPos.camyoffset);
+			charPos.skewX = Std.parseFloat(node.getAtt("skewx")).getDefault(charPos.skewX);
+			charPos.skewY = Std.parseFloat(node.getAtt("skewy")).getDefault(charPos.skewY);
+			charPos.alpha = Std.parseFloat(node.getAtt("alpha")).getDefault(charPos.alpha);
+			charPos.angle = Std.parseFloat(node.getAtt("angle")).getDefault(charPos.angle);
+			charPos.flipX = (node.has.flip || node.has.flipX) ? (node.getAtt("flip") == "true" || node.getAtt("flipX") == "true") : charPos.flipX;
+			charPos.zoomFactor = Std.parseFloat(node.getAtt("zoomfactor")).getDefault(charPos.zoomFactor);
+
 			if (node.has.scale) {
-				var scale = parseFloatSafe(node.att.scale);
-				if (scale != null) charPos.scale.set(scale, scale);
+				var scale:Null<Float> = Std.parseFloat(node.att.scale);
+				if (scale.isNotNull()) charPos.scale.set(scale, scale);
 			}
 			if (node.has.scalex) {
-				var scale = parseFloatSafe(node.att.scalex);
-				if (scale != null) charPos.scale.x = scale;
+				var scale:Null<Float> = Std.parseFloat(node.att.scalex);
+				if (scale.isNotNull()) charPos.scale.x = scale;
 			}
 			if (node.has.scaley) {
-				var scale = parseFloatSafe(node.att.scaley);
-				if (scale != null) charPos.scale.y = scale;
+				var scale:Null<Float> = Std.parseFloat(node.att.scaley);
+				if (scale.isNotNull()) charPos.scale.y = scale;
 			}
 
 			if (node.has.scroll) {
-				var scroll = parseFloatSafe(node.att.scroll);
+				var scroll:Null<Float> = Std.parseFloat(node.att.scroll);
 				if (scroll != null) charPos.scrollFactor.set(scroll, scroll);
 			}
 			if (node.has.scrollx) {
-				var scroll = parseFloatSafe(node.att.scrollx);
+				var scroll:Null<Float> = Std.parseFloat(node.att.scrollx);
 				if (scroll != null) charPos.scrollFactor.x = scroll;
 			}
 			if (node.has.scrolly) {
-				var scroll = parseFloatSafe(node.att.scrolly);
+				var scroll:Null<Float> = Std.parseFloat(node.att.scrolly);
 				if (scroll != null) charPos.scrollFactor.y = scroll;
 			}
 		}
@@ -482,9 +413,7 @@ class StageCharPos extends FlxObject {
 	public var skewY:Float = 0;
 	public var alpha:Float = 1;
 	public var flipX:Bool = false;
-    
-	public var scale:FlxPoint = new FlxPoint(1, 1);
-	
+	public var scale:FlxPoint = FlxPoint.get(1, 1);
 	public var zoomFactor:Float = 1;
 
 	public function new() {
@@ -502,25 +431,21 @@ class StageCharPos extends FlxObject {
 
 	private var oldInfo:OldCharInfo = null;
 
-		
-    public function prepareCharacter(char:Character, id:Float = 0) {
+	public function prepareCharacter(char:Character, id:Float = 0) {
 		_id = id;
-		
-		if (oldInfo != null) revertCharacter(char);
-		
 		oldInfo = getOldInfo(char);
 		char.setPosition(x + (id * charSpacingX), y + (id * charSpacingY));
 		char.scrollFactor.set(scrollFactor.x, scrollFactor.y);
 		if (!Std.isOfType(FlxG.state, CharacterEditor)) {
 			char.scale.x *= scale.x; char.scale.y *= scale.y;
 		}
-		char.cameraOffset.add(camxoffset, camyoffset);
+		char.cameraOffset += FlxPoint.weak(camxoffset, camyoffset);
 		char.skew.x += skewX; char.skew.y += skewY;
 		char.alpha *= alpha;
 		char.angle += angle;
 		char.zoomFactor *= zoomFactor;
 	}
-	
+
 	public function getOldInfo(char:Character) {
 		return {
 			x: char.x, y: char.y,
