@@ -273,7 +273,7 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 		animation.play(AnimName, Force, Reversed, Frame);
 
 		var daOffset = getAnimOffset(AnimName);
-		frameOffset.set(daOffset.x, daOffset.y);
+		offset.set(daOffset.x, daOffset.y);
 		daOffset.putWeak();
 
 		lastAnimContext = Context;
